@@ -4,10 +4,11 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle,
+  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
 
 // QR Code display component
 function QRDisplay({ value }: { value: string }) {
@@ -103,6 +104,7 @@ export default function CreateQuizPage() {
 
   const [roomCode, setRoomCode] = useState("");
   const [isPublished, setIsPublished] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [playerCount, setPlayerCount] = useState(0);
 
@@ -118,10 +120,61 @@ export default function CreateQuizPage() {
     return () => clearInterval(interval);
   }, [isPublished]);
 
-  const handlePublish = () => {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    setRoomCode(code);
-    setIsPublished(true);
+  const handlePublish = async () => {
+    if (!publicKey) return;
+    setIsPublishing(true);
+    
+    try {
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const walletStr = publicKey.toString();
+
+      // 1. Ensure Profile Exists
+      await supabase.from("profiles").upsert(
+        { wallet_address: walletStr },
+        { onConflict: 'wallet_address' }
+      );
+
+      // 2. Insert Quiz
+      const { data: quizData, error: quizError } = await supabase
+        .from("quizzes")
+        .insert({
+          host_wallet: walletStr,
+          title,
+          description,
+          room_code: code,
+          reward_pool_amount: Number(rewardPool),
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (quizError || !quizData) throw quizError;
+
+      // 3. Insert Questions
+      const questionsToInsert = questions.map((q, idx) => ({
+        quiz_id: quizData.id,
+        question_text: q.text,
+        options: q.options,
+        correct_answer_index: q.correctIndex,
+        time_limit_seconds: q.timeLimit,
+        order_number: idx,
+      }));
+
+      const { error: questionsError } = await supabase
+        .from("questions")
+        .insert(questionsToInsert);
+
+      if (questionsError) throw questionsError;
+
+      // Success
+      setRoomCode(code);
+      setIsPublished(true);
+    } catch (err) {
+      console.error("Error publishing quiz:", err);
+      alert(lang === "ENG" ? "Failed to publish quiz. Check console." : "Gagal mempublikasikan kuis.");
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   const walletShort = publicKey
@@ -454,11 +507,14 @@ export default function CreateQuizPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={handlePublish}
-              disabled={!title || questions.some((q) => !q.text || q.options.some((o) => !o))}
+              disabled={!title || questions.some((q) => !q.text || q.options.some((o) => !o)) || isPublishing}
               className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
-              <Send className="w-6 h-6" />
-              {lang === "ENG" ? "Publish Quiz" : "Publikasikan Kuis"}
+              {isPublishing ? (
+                <><Loader2 className="w-6 h-6 animate-spin" /> {lang === "ENG" ? "Publishing..." : "Memproses..."}</>
+              ) : (
+                <><Send className="w-6 h-6" /> {lang === "ENG" ? "Publish Quiz" : "Publikasikan Kuis"}</>
+              )}
             </motion.button>
           </div>
         )}

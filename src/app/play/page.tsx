@@ -9,6 +9,7 @@ import {
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function PlayPage() {
   const { lang } = useLanguage();
@@ -33,12 +34,9 @@ export default function PlayPage() {
   const [isClaiming, setIsClaiming] = useState(false);
   const [hasClaimed, setHasClaimed] = useState(false);
 
-  // Mocked questions for demo
-  const fakeQuestions = [
-    { text: "What does 'SOL' stand for?", options: ["Solana", "Solar", "Solid", "Solution"], correctIndex: 0, timeLimit: 15 },
-    { text: "Which consensus mechanism does Solana use?", options: ["PoW", "PoS", "PoH", "PoA"], correctIndex: 2, timeLimit: 15 },
-    { text: "What is the native token of Solana?", options: ["SOL", "ETH", "BTC", "USDT"], correctIndex: 0, timeLimit: 15 },
-  ];
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [quizInfo, setQuizInfo] = useState<any>(null);
+  const [isJoining, setIsJoining] = useState(false);
 
   // Timer logic
   useEffect(() => {
@@ -53,7 +51,8 @@ export default function PlayPage() {
 
   const handleAnswerSelection = (index: number) => {
     setSelectedAnswer(index);
-    const correct = index === fakeQuestions[currentQuestionIndex].correctIndex;
+    if (!questions[currentQuestionIndex]) return;
+    const correct = index === questions[currentQuestionIndex].correct_answer_index;
     setIsCorrect(correct);
     if (correct) {
       // Base score + time bonus
@@ -67,11 +66,11 @@ export default function PlayPage() {
   };
 
   const nextQuestion = () => {
-    if (currentQuestionIndex < fakeQuestions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(i => i + 1);
       setSelectedAnswer(null);
       setIsCorrect(null);
-      setTimeLeft(fakeQuestions[currentQuestionIndex + 1].timeLimit);
+      setTimeLeft(questions[currentQuestionIndex + 1].time_limit_seconds || 15);
       setQuizState("playing");
     } else {
       setQuizState("finished");
@@ -103,9 +102,48 @@ export default function PlayPage() {
     ? `${publicKey.toString().slice(0, 6)}...${publicKey.toString().slice(-4)}`
     : "";
 
-  const handleJoinWithCode = () => {
+  const handleJoinWithCode = async () => {
     if (roomCode.length >= 4) {
-      setIsJoined(true);
+      setIsJoining(true);
+      try {
+        // Fetch Quiz
+        const { data: quizData, error: quizError } = await supabase
+          .from("quizzes")
+          .select("*")
+          .eq("room_code", roomCode)
+          .single();
+
+        if (quizError || !quizData) throw new Error("Quiz not found");
+        
+        // Fetch Questions
+        const { data: qsData, error: qsError } = await supabase
+          .from("questions")
+          .select("*")
+          .eq("quiz_id", quizData.id)
+          .order("order_number", { ascending: true });
+
+        if (qsError || !qsData) throw new Error("Failed fetching questions");
+        if (qsData.length === 0) throw new Error("Quiz has no questions");
+
+        setQuizInfo(quizData);
+        setQuestions(qsData);
+        setTimeLeft(qsData[0].time_limit_seconds || 15);
+
+        // check profile
+        if (publicKey) {
+          await supabase.from("profiles").upsert(
+            { wallet_address: publicKey.toString() },
+            { onConflict: 'wallet_address' }
+          );
+        }
+
+        setIsJoined(true);
+      } catch (err: any) {
+        console.error("Error joining:", err);
+        alert(err.message || "Failed to join room");
+      } finally {
+        setIsJoining(false);
+      }
     }
   };
 
@@ -198,11 +236,11 @@ export default function PlayPage() {
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Players" : "Pemain"}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-[#9945FF]">{fakeQuestions.length}</div>
+                  <div className="text-2xl font-extrabold text-[#9945FF]">{questions.length}</div>
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Questions" : "Soal"}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-[#FDE047]">2 SOL</div>
+                  <div className="text-2xl font-extrabold text-[#FDE047]">{quizInfo?.reward_pool_amount || 0} SOL</div>
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Prize Pool" : "Total Hadiah"}</div>
                 </div>
               </div>
@@ -238,7 +276,7 @@ export default function PlayPage() {
               {/* Progress & Timer */}
               <div className="flex items-center justify-between glass px-6 py-4 rounded-full border border-black/10 dark:border-white/10">
                 <span className="font-bold text-gray-500">
-                  {lang === "ENG" ? "Question" : "Soal"} {currentQuestionIndex + 1} / {fakeQuestions.length}
+                  {lang === "ENG" ? "Question" : "Soal"} {currentQuestionIndex + 1} / {questions.length}
                 </span>
                 <div className="flex items-center gap-2 text-[#9945FF] font-extrabold text-xl">
                   <Clock className="w-5 h-5" />
@@ -249,13 +287,13 @@ export default function PlayPage() {
               {/* Question */}
               <div className="glass p-10 rounded-[2.5rem] border border-[#9945FF]/30 text-center shadow-[0_0_30px_rgba(153,69,255,0.15)]">
                 <h2 className="text-2xl md:text-3xl font-extrabold leading-tight">
-                  {fakeQuestions[currentQuestionIndex].text}
+                  {questions[currentQuestionIndex]?.question_text}
                 </h2>
               </div>
 
               {/* Options */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {fakeQuestions[currentQuestionIndex].options.map((opt, idx) => (
+                {(questions[currentQuestionIndex]?.options || []).map((opt: string, idx: number) => (
                   <button
                     key={idx}
                     disabled={selectedAnswer !== null}
@@ -306,7 +344,7 @@ export default function PlayPage() {
               <div className="glass p-6 rounded-[2rem] border border-black/10 dark:border-white/10 inline-block">
                 <p className="text-sm text-gray-500 mb-2">{lang === "ENG" ? "Correct Answer:" : "Jawaban Benar:"}</p>
                 <p className="text-xl font-bold text-[#14F195]">
-                  {fakeQuestions[currentQuestionIndex].options[fakeQuestions[currentQuestionIndex].correctIndex]}
+                  {questions[currentQuestionIndex]?.options?.[questions[currentQuestionIndex]?.correct_answer_index]}
                 </p>
               </div>
               

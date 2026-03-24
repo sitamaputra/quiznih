@@ -1,6 +1,6 @@
 -- 1. Tabel Profil User (Berbasis Wallet Solana)
 CREATE TABLE profiles (
-  id UUID PRIMARY KEY DEFAULT auth.uid(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   wallet_address TEXT UNIQUE NOT NULL,
   username TEXT,
   avatar_url TEXT,
@@ -11,9 +11,10 @@ CREATE TABLE profiles (
 -- 2. Tabel Kuis (Metadata Utama)
 CREATE TABLE quizzes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  host_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  host_wallet TEXT REFERENCES profiles(wallet_address) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
+  room_code TEXT UNIQUE NOT NULL,
   reward_pool_amount NUMERIC DEFAULT 0, -- Dalam SOL
   is_active BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
