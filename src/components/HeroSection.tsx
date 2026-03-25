@@ -64,8 +64,8 @@ export default function HeroSection() {
           className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
         >
           {lang === "ENG"
-            ? "The Web3 alternative to Kahoot. Host quizzes for your community and automatically distribute crypto rewards to winners with zero friction."
-            : "Alternatif Web3 untuk Kahoot. Host kuis untuk komunitasmu dan secara otomatis bagikan hadiah kripto ke pemenang tanpa ribet."}
+            ? "The ultimate decentralized trivia experience. Host quizzes for your community and automatically distribute crypto rewards with zero friction."
+            : "Pengalaman trivia terdesentralisasi terbaik. Host kuis untuk komunitasmu dan bagikan hadiah kripto secara otomatis tanpa hambatan."}
         </motion.p>
         
         <motion.div 
@@ -74,17 +74,9 @@ export default function HeroSection() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
         >
-          <Link href="/create" className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/25 group">
-            <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-            {lang === "ENG" ? "Host a Quiz" : "Mulai Kuis"}
-          </Link>
-          
-          <Link 
-            href="/play"
-            className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors duration-300 group"
-          >
+          <Link href="/dashboard" className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-500 text-white px-12 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/25 group">
             <PlayCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            {lang === "ENG" ? "Enter Game PIN" : "Masukkan PIN"}
+            {lang === "ENG" ? "Play Now" : "Main Sekarang"}
           </Link>
         </motion.div>
       </motion.div>
