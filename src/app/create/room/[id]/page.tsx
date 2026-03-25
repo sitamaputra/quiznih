@@ -132,7 +132,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
         .eq("id", quizId);
       
       if (error) throw error;
-      setQuizData(prev => ({ ...prev, status: 'playing' }));
+      setQuizData((prev: any) => ({ ...prev, status: 'playing' }));
     } catch (err) {
       console.error("Error starting quiz:", err);
       alert("Failed to start quiz.");
