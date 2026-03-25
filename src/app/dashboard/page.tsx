@@ -34,7 +34,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Header */}
-      <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
+      <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
         <Link href="/" className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>

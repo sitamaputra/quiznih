@@ -488,10 +488,10 @@ export default function PlayPage() {
       </div>
 
       {/* Header */}
-      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
+      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
+        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Dashboard" : "Dasbor"}</span>
+          <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
         </Link>
         {publicKey && (
           <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#14F195]/30">
