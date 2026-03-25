@@ -42,17 +42,17 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight text-black dark:text-white"
+          className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight text-white"
         >
           {lang === "ENG" ? (
             <>
-              Test Your Knowledge, <br className="hidden md:block"/>
-              <span className="text-gradient">Earn Crypto Rewards.</span>
+              Decentralized Trivia. <br className="hidden md:block"/>
+              <span className="text-gradient">Play, Win, Earn Instantly.</span>
             </>
           ) : (
             <>
-              Uji Pengetahuanmu, <br className="hidden md:block"/>
-              <span className="text-gradient">Dapatkan Hadiah Kripto.</span>
+              Trivia Terdesentralisasi. <br className="hidden md:block"/>
+              <span className="text-gradient">Main, Menang, Hasilkan Instan.</span>
             </>
           )}
         </motion.h1>
@@ -61,11 +61,11 @@ export default function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.6 }}
-          className="text-lg md:text-2xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
         >
           {lang === "ENG"
-            ? "The ultimate Web3 trivia experience. Join live games, answer fast, outsmart the competition, and win real Solana tokens."
-            : "Pengalaman trivia Web3 terbaik. Ikuti permainan langsung, jawab dengan cepat, kalahkan lawan, dan menangkan token Solana asli."}
+            ? "The Web3 alternative to Kahoot. Host quizzes for your community and automatically distribute crypto rewards to winners with zero friction."
+            : "Alternatif Web3 untuk Kahoot. Host kuis untuk komunitasmu dan secara otomatis bagikan hadiah kripto ke pemenang tanpa ribet."}
         </motion.p>
         
         <motion.div 
@@ -74,20 +74,18 @@ export default function HeroSection() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
         >
-          <Link href="/dashboard" className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-[#0A0A0A] px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-300 shadow-[0_0_30px_rgba(20,241,149,0.3)] group">
-            <PlayCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            {lang === "ENG" ? "Enter Quiz Room" : "Masuk Ruang Kuis"}
+          <Link href="/create" className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/25 group">
+            <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+            {lang === "ENG" ? "Host a Quiz" : "Mulai Kuis"}
           </Link>
           
-          <button 
-            onClick={handleWalletClick}
-            className="w-full sm:w-auto flex items-center justify-center gap-3 glass hover:bg-black/5 dark:hover:bg-white/10 border border-black/10 dark:border-white/20 text-black dark:text-white px-8 py-4 rounded-full font-bold text-lg transition-colors duration-300 group"
+          <Link 
+            href="/play"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors duration-300 group"
           >
-            <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-            {publicKey 
-              ? `${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-4)}`
-              : lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
-          </button>
+            <PlayCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            {lang === "ENG" ? "Enter Game PIN" : "Masukkan PIN"}
+          </Link>
         </motion.div>
       </motion.div>
     </section>

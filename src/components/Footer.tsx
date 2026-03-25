@@ -18,9 +18,9 @@ export default function Footer() {
         </div>
 
         <p className="text-sm text-gray-600 dark:text-gray-500 text-center">
-          {lang === "ENG" 
-            ? "Built securely on Solana. Decentralized Trivia for everyone."
-            : "Dibangun aman di atas Solana. Trivia terdesentralisasi untuk semua."}
+          &copy; 2026 Quiznih. {lang === "ENG" 
+            ? "Built for Superteam Indonesia on Solana."
+            : "Dibangun untuk Superteam Indonesia di atas Solana."}
         </p>
 
         <div className="flex gap-4">

@@ -8,31 +8,31 @@ export default function HowItWorks() {
 
   const steps = [
     {
-      icon: <LinkIcon className="w-8 h-8 text-[#14F195]" />,
-      title: lang === "ENG" ? "1. Connect Wallet" : "1. Hubungkan Dompet",
+      icon: <span className="text-3xl">⚡️</span>,
+      title: lang === "ENG" ? "Instant Payouts" : "Pembayaran Instan",
       description: lang === "ENG" 
-        ? "Link your Phantom or Solflare wallet. Don't have one? Create it in seconds to start."
-        : "Tautkan dompet Phantom atau Solflare Anda. Belum punya? Buat dalam hitungan detik untuk mulai.",
-      color: "from-[#14F195]/20 to-transparent",
-      border: "border-[#14F195]/30",
+        ? "Reward top players instantly via smart contracts using USDC or SOL."
+        : "Hadiah untuk pemain top dikirim langsung via smart contract menggunakan USDC atau SOL.",
+      color: "from-purple-500/20 to-transparent",
+      border: "border-purple-500/30",
     },
     {
-      icon: <Users className="w-8 h-8 text-[#9945FF]" />,
-      title: lang === "ENG" ? "2. Join a Room" : "2. Gabung Ruangan",
+      icon: <span className="text-3xl">🛡️</span>,
+      title: lang === "ENG" ? "On-Chain Verified" : "Terverifikasi On-Chain",
       description: lang === "ENG"
-        ? "Enter a live quiz room via invite link or create your own with custom Web3 trivia."
-        : "Masuk ruangan kuis live lewat tautan undangan atau buat sendiri kuis trivia Web3-mu.",
-      color: "from-[#9945FF]/20 to-transparent",
-      border: "border-[#9945FF]/30",
+        ? "Immutable leaderboards. No more cheating, total transparency."
+        : "Leaderboard tidak bisa diubah. Tidak ada kecurangan, transparansi total.",
+      color: "from-cyan-500/20 to-transparent",
+      border: "border-cyan-500/30",
     },
     {
-      icon: <Trophy className="w-8 h-8 text-[#FDE047]" />,
-      title: lang === "ENG" ? "3. Win Crypto" : "3. Menangkan Kripto",
+      icon: <span className="text-3xl">🔗</span>,
+      title: lang === "ENG" ? "Solana Blinks" : "Solana Blinks",
       description: lang === "ENG"
-        ? "Answer quickly and correctly to earn points. Top players win real $SOL or NFT prizes."
-        : "Jawab dengan cepat dan benar untuk skor tertinggi. Pemain top memenangkan $SOL atau NFT.",
-      color: "from-[#FDE047]/20 to-transparent",
-      border: "border-[#FDE047]/30",
+        ? "Play quizzes directly on X (Twitter) without leaving the app."
+        : "Mainkan kuis langsung di X (Twitter) tanpa harus keluar dari aplikasi.",
+      color: "from-purple-500/20 to-transparent",
+      border: "border-purple-500/30",
     }
   ];
 
