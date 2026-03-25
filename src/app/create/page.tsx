@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 // QR Code display component
 function QRDisplay({ value }: { value: string }) {
@@ -55,6 +56,7 @@ export default function CreateQuizPage() {
   const { lang } = useLanguage();
   const { publicKey } = useWallet();
   const { setVisible } = useWalletModal();
+  const router = useRouter();
 
   useEffect(() => {
     if (!publicKey) setVisible(true);
@@ -396,23 +398,16 @@ export default function CreateQuizPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={handleStartQuiz}
-                disabled={isStarting || participants.length === 0 || quizState === 'playing'}
-                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                onClick={() => router.push(`/create/room/${quizId}`)}
+                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg flex items-center justify-center gap-3 transition-all"
               >
-                {isStarting ? (
-                  <><Loader2 className="w-6 h-6 animate-spin" /> {lang === "ENG" ? "Starting..." : "Memulai..."}</>
-                ) : quizState === 'playing' ? (
-                  <>🚀 {lang === "ENG" ? "Quiz Live!" : "Kuis Sedang Berlangsung!"}</>
-                ) : (
-                  <>🚀 {lang === "ENG" ? "Start Quiz Now" : "Mulai Kuis Sekarang"}</>
-                )}
+                🎮 {lang === "ENG" ? "Go to Control Room" : "Ke Ruang Kontrol"}
               </button>
               <Link
-                href="/dashboard"
-                className="py-5 px-8 rounded-2xl glass border border-black/10 dark:border-white/20 font-bold text-center hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                href="/manage"
+                className="py-5 px-8 rounded-2xl glass border border-white/20 font-bold text-center hover:bg-white/10 transition-colors"
               >
-                {lang === "ENG" ? "Back to Dashboard" : "Kembali ke Dasbor"}
+                {lang === "ENG" ? "Manage All" : "Kelola Semua"}
               </Link>
             </div>
           </motion.div>

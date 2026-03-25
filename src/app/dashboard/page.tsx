@@ -3,7 +3,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
-import { PlusCircle, Gamepad2, Wallet2, ArrowLeft, Crown, Users } from "lucide-react";
+import { PlusCircle, Gamepad2, Wallet2, ArrowLeft, Crown, Users, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -94,9 +94,19 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-[#9945FF] font-bold group-hover:gap-3 transition-all">
-                <PlusCircle className="w-5 h-5" />
-                <span>{lang === "ENG" ? "Create Quiz" : "Buat Kuis"}</span>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2 text-[#9945FF] font-bold group-hover:gap-3 transition-all">
+                  <PlusCircle className="w-5 h-5" />
+                  <span>{lang === "ENG" ? "Create New Quiz" : "Buat Kuis Baru"}</span>
+                </div>
+                <Link 
+                  href="/manage"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-2 text-gray-500 hover:text-[#9945FF] text-sm font-semibold transition-all"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>{lang === "ENG" ? "Manage My Quizzes" : "Kelola Kuis Saya"}</span>
+                </Link>
               </div>
             </div>
           </motion.div>
