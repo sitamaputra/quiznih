@@ -16,7 +16,7 @@ CREATE TABLE quizzes (
   description TEXT,
   room_code TEXT UNIQUE NOT NULL,
   reward_pool_amount NUMERIC DEFAULT 0, -- Dalam SOL
-  is_active BOOLEAN DEFAULT false,
+  status TEXT DEFAULT 'waiting', -- 'waiting', 'playing', 'finished'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
@@ -36,6 +36,7 @@ CREATE TABLE leaderboard (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   quiz_id UUID REFERENCES quizzes(id) ON DELETE CASCADE,
   user_wallet TEXT NOT NULL,
+  player_name TEXT,
   final_score INT DEFAULT 0,
   claimed_reward BOOLEAN DEFAULT false
 );

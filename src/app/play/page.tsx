@@ -21,6 +21,7 @@ export default function PlayPage() {
   }, [publicKey, setVisible]);
 
   const [roomCode, setRoomCode] = useState("");
+  const [playerName, setPlayerName] = useState("");
   const [joinMode, setJoinMode] = useState<"select" | "qr" | "code">("select");
   const [isJoined, setIsJoined] = useState(false);
   const [quizState, setQuizState] = useState<"waiting" | "playing" | "revealed" | "finished">("waiting");
@@ -49,14 +50,27 @@ export default function PlayPage() {
     }
   }, [quizState, timeLeft, selectedAnswer]);
 
-  const handleAnswerSelection = (index: number) => {
+  const handleAnswerSelection = async (index: number) => {
     setSelectedAnswer(index);
     if (!questions[currentQuestionIndex]) return;
     const correct = index === questions[currentQuestionIndex].correct_answer_index;
     setIsCorrect(correct);
+    
+    let newScore = score;
     if (correct) {
       // Base score + time bonus
-      setScore(s => s + 100 + (timeLeft * 10)); 
+      newScore = score + 100 + (timeLeft * 10);
+      setScore(newScore); 
+    }
+    
+    // Attempt to update score live on Supabase
+    if (quizInfo && publicKey) {
+      // fire and forget update
+      supabase.from("leaderboard")
+        .update({ final_score: newScore })
+        .eq("quiz_id", quizInfo.id)
+        .eq("user_wallet", publicKey.toString())
+        .then();
     }
     
     // Add small delay before revealing answer to create suspense
@@ -103,7 +117,7 @@ export default function PlayPage() {
     : "";
 
   const handleJoinWithCode = async () => {
-    if (roomCode.length >= 4) {
+    if (roomCode.length >= 4 && playerName.trim()) {
       setIsJoining(true);
       try {
         // Fetch Quiz
@@ -129,21 +143,48 @@ export default function PlayPage() {
         setQuestions(qsData);
         setTimeLeft(qsData[0].time_limit_seconds || 15);
 
-        // check profile
+        // check profile and update name
         if (publicKey) {
+          const walletStr = publicKey.toString();
           await supabase.from("profiles").upsert(
-            { wallet_address: publicKey.toString() },
+            { wallet_address: walletStr, username: playerName },
             { onConflict: 'wallet_address' }
           );
+          
+          // Join the leaderboard immediately
+          await supabase.from("leaderboard").upsert({
+            quiz_id: quizData.id,
+            user_wallet: walletStr,
+            player_name: playerName,
+            final_score: 0
+          });
         }
 
         setIsJoined(true);
+        
+        // Subscribe to quiz status changes (Host starting the quiz)
+        const channel = supabase
+          .channel(`quiz-status-${quizData.id}`)
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'quizzes',
+            filter: `id=eq.${quizData.id}`
+          }, (payload) => {
+            if (payload.new.status === 'playing') {
+              setQuizState('playing');
+            }
+          })
+          .subscribe();
+          
       } catch (err: any) {
         console.error("Error joining:", err);
         alert(err.message || "Failed to join room");
       } finally {
         setIsJoining(false);
       }
+    } else {
+      alert(lang === "ENG" ? "Please enter room code and your name." : "Harap masukkan kode ruangan dan nama Anda.");
     }
   };
 
@@ -559,10 +600,14 @@ export default function PlayPage() {
             </p>
 
             {/* Manual code input as fallback */}
-            <div className="pt-4 border-t border-black/5 dark:border-white/10">
-              <p className="text-xs text-gray-500 mb-3">
-                {lang === "ENG" ? "Or enter code manually:" : "Atau masukkan kode manual:"}
-              </p>
+            <div className="pt-4 border-t border-black/5 dark:border-white/10 space-y-3">
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
+                className="w-full px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-[#14F195]/50"
+              />
               <div className="flex gap-3">
                 <input
                   type="text"
@@ -574,10 +619,10 @@ export default function PlayPage() {
                 />
                 <button
                   onClick={handleJoinWithCode}
-                  disabled={roomCode.length < 4}
-                  className="px-5 py-3 rounded-xl bg-[#14F195] text-black font-bold hover:bg-[#0EC97F] transition-colors disabled:opacity-40"
+                  disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
+                  className="px-5 py-3 rounded-xl bg-[#14F195] text-black font-bold hover:bg-[#0EC97F] transition-colors disabled:opacity-40 flex items-center justify-center"
                 >
-                  <ArrowRight className="w-5 h-5" />
+                  {isJoining ? <span className="animate-spin text-xl">⟳</span> : <ArrowRight className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -612,22 +657,34 @@ export default function PlayPage() {
               </p>
             </div>
 
-            <input
-              type="text"
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              maxLength={6}
-              placeholder="_ _ _ _ _ _"
-              className="w-full px-8 py-6 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#9945FF]/30 focus:border-[#9945FF] text-black dark:text-white font-mono text-center text-4xl tracking-[0.4em] uppercase placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
-            />
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
+                className="w-full px-8 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#9945FF]/30 focus:border-[#9945FF] text-black dark:text-white text-center text-xl placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
+              />
+              <input
+                type="text"
+                value={roomCode}
+                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                maxLength={6}
+                placeholder="_ _ _ _ _ _"
+                className="w-full px-8 py-6 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#9945FF]/30 focus:border-[#9945FF] text-black dark:text-white font-mono text-center text-3xl tracking-[0.3em] uppercase placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
+              />
+            </div>
 
             <button
               onClick={handleJoinWithCode}
-              disabled={roomCode.length < 4}
+              disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
               className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
-              <Users className="w-6 h-6" />
-              {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}
+              {isJoining ? (
+                <span className="flex items-center gap-2"><span className="animate-spin text-xl">⟳</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
+              ) : (
+                <><Users className="w-6 h-6" /> {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}</>
+              )}
             </button>
 
             <button

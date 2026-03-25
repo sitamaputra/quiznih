@@ -103,22 +103,49 @@ export default function CreateQuizPage() {
   };
 
   const [roomCode, setRoomCode] = useState("");
+  const [quizId, setQuizId] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [playerCount, setPlayerCount] = useState(0);
+  const [participants, setParticipants] = useState<any[]>([]);
+  const [quizState, setQuizState] = useState<"waiting" | "playing" | "finished">("waiting");
 
-  // Simulate players joining
+  // Real-time Leaderboard Subscription
   useEffect(() => {
-    if (!isPublished) return;
-    const interval = setInterval(() => {
-      setPlayerCount((prev) => {
-        if (prev >= 8) { clearInterval(interval); return prev; }
-        return prev + 1;
-      });
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [isPublished]);
+    if (!quizId || !isPublished) return;
+
+    // 1. Initial Fetch
+    const fetchParticipants = async () => {
+      const { data } = await supabase
+        .from("leaderboard")
+        .select("*")
+        .eq("quiz_id", quizId);
+      if (data) setParticipants(data);
+    };
+    fetchParticipants();
+
+    // 2. Real-time Subscription
+    const channel = supabase
+      .channel(`leaderboard-${quizId}`)
+      .on('postgres_changes', {
+        event: '*', // Listen to INSERT and UPDATE
+        schema: 'public',
+        table: 'leaderboard',
+        filter: `quiz_id=eq.${quizId}`
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setParticipants(prev => [...prev, payload.new]);
+        } else if (payload.eventType === 'UPDATE') {
+          setParticipants(prev => prev.map(p => p.user_wallet === payload.new.user_wallet ? payload.new : p));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [quizId, isPublished]);
 
   const handlePublish = async () => {
     if (!publicKey) return;
@@ -143,7 +170,7 @@ export default function CreateQuizPage() {
           description,
           room_code: code,
           reward_pool_amount: Number(rewardPool),
-          is_active: true,
+          status: 'waiting',
         })
         .select()
         .single();
@@ -167,6 +194,7 @@ export default function CreateQuizPage() {
       if (questionsError) throw questionsError;
 
       // Success
+      setQuizId(quizData.id);
       setRoomCode(code);
       setIsPublished(true);
     } catch (err) {
@@ -174,6 +202,25 @@ export default function CreateQuizPage() {
       alert(lang === "ENG" ? "Failed to publish quiz. Check console." : "Gagal mempublikasikan kuis.");
     } finally {
       setIsPublishing(false);
+    }
+  };
+
+  const handleStartQuiz = async () => {
+    if (!quizId) return;
+    setIsStarting(true);
+    try {
+      const { error } = await supabase
+        .from("quizzes")
+        .update({ status: 'playing' })
+        .eq("id", quizId);
+      
+      if (error) throw error;
+      setQuizState("playing");
+    } catch (err) {
+      console.error("Error starting quiz:", err);
+      alert("Failed to start quiz.");
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -292,32 +339,44 @@ export default function CreateQuizPage() {
                 <h3 className="text-xl font-bold flex items-center gap-2">
                   👥 {lang === "ENG" ? "Waiting Room" : "Ruang Tunggu"}
                 </h3>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#14F195]/10 border border-[#14F195]/30">
+                             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#14F195]/10 border border-[#14F195]/30">
                   <div className="w-2 h-2 rounded-full bg-[#14F195] animate-pulse" />
                   <span className="text-sm font-semibold text-[#14F195]">
-                    {playerCount} {lang === "ENG" ? "players joined" : "pemain bergabung"}
+                    {participants.length} {lang === "ENG" ? "players online" : "pemain online"}
                   </span>
                 </div>
               </div>
-
-              {/* Simulated Player List */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {Array.from({ length: playerCount }).map((_, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-black/5 dark:border-white/5"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9945FF]/50 to-[#14F195]/50 flex items-center justify-center text-xs font-bold">
-                      {String.fromCharCode(65 + idx)}
-                    </div>
-                    <span className="text-sm font-mono truncate">
-                      {`${["8N", "Hk", "2d", "Fp", "Gz", "Jm", "Kp", "Lx"][idx % 8]}...${["3vJ", "Zq2", "9p1", "Kw9", "Mv5", "Rn7", "Tu3", "Wo8"][idx % 8]}`}
-                    </span>
-                  </motion.div>
-                ))}
+              
+              {/* Participant List (Live Leaderboard) */}
+              <div className="space-y-3">
+                {participants.length === 0 ? (
+                  <div className="py-10 text-center text-gray-500 italic">
+                    {lang === "ENG" ? "Waiting for players to join..." : "Menunggu pemain bergabung..."}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {participants
+                      .sort((a, b) => (b.final_score || 0) - (a.final_score || 0))
+                      .map((p, idx) => (
+                        <motion.div
+                          key={p.user_wallet}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 dark:bg-white/5 border border-white/10"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${
+                              idx === 0 ? "bg-[#FDE047] text-black" : "bg-white/10 text-gray-400"
+                            }`}>
+                              {idx + 1}
+                            </span>
+                            <span className="font-bold truncate max-w-[120px]">{p.player_name || "Anonymous"}</span>
+                          </div>
+                          <span className="font-mono text-[#14F195] font-bold">{p.final_score} pts</span>
+                        </motion.div>
+                      ))}
+                  </div>
+                )}
               </div>
 
               {/* Quiz Summary */}
@@ -329,7 +388,7 @@ export default function CreateQuizPage() {
                   💰 {rewardPool} SOL
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-[#FDE047]/10 text-sm font-semibold">
-                  ⏱ {questions.reduce((a, q) => a + q.timeLimit, 0)}s {lang === "ENG" ? "total" : "total"}
+                  ⏱ {questions.reduce((a, q) => a + (q.timeLimit || 0), 0)}s {lang === "ENG" ? "total" : "total"}
                 </div>
               </div>
             </div>
@@ -337,13 +396,17 @@ export default function CreateQuizPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => {
-                  // Simulate starting quiz
-                  alert(lang === "ENG" ? "Quiz started! 🚀" : "Kuis dimulai! 🚀");
-                }}
-                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all duration-300 flex items-center justify-center gap-3"
+                onClick={handleStartQuiz}
+                disabled={isStarting || participants.length === 0 || quizState === 'playing'}
+                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
               >
-                🚀 {lang === "ENG" ? "Start Quiz Now" : "Mulai Kuis Sekarang"}
+                {isStarting ? (
+                  <><Loader2 className="w-6 h-6 animate-spin" /> {lang === "ENG" ? "Starting..." : "Memulai..."}</>
+                ) : quizState === 'playing' ? (
+                  <>🚀 {lang === "ENG" ? "Quiz Live!" : "Kuis Sedang Berlangsung!"}</>
+                ) : (
+                  <>🚀 {lang === "ENG" ? "Start Quiz Now" : "Mulai Kuis Sekarang"}</>
+                )}
               </button>
               <Link
                 href="/dashboard"
