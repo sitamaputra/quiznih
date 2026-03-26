@@ -116,70 +116,144 @@ export default function PlayPage() {
     ? `${publicKey.toString().slice(0, 6)}...${publicKey.toString().slice(-4)}`
     : "";
 
+  // Demo quiz data (always works, no database needed)
+  const DEMO_QUIZ = {
+    id: 'demo-123456',
+    host_wallet: 'demo-host',
+    title: 'Web3 & Solana Trivia',
+    description: 'Uji pengetahuan Web3 kamu!',
+    room_code: '123456',
+    status: 'playing',
+    reward_pool_amount: 0.5,
+  };
+  const DEMO_QUESTIONS = [
+    {
+      id: 'dq1',
+      quiz_id: 'demo-123456',
+      question_text: 'Siapakah pencipta Bitcoin (nama samaran)?',
+      options: ['Satoshi Nakamoto', 'Vitalik Buterin', 'Elon Musk', 'Anatoly Yakovenko'],
+      correct_answer_index: 0,
+      time_limit_seconds: 15,
+      order_number: 0,
+    },
+    {
+      id: 'dq2',
+      quiz_id: 'demo-123456',
+      question_text: 'Apa kepanjangan dari NFT?',
+      options: ['Non-Fungible Token', 'New Financial Technology', 'Network File Transfer', 'Next Future Tech'],
+      correct_answer_index: 0,
+      time_limit_seconds: 15,
+      order_number: 1,
+    },
+    {
+      id: 'dq3',
+      quiz_id: 'demo-123456',
+      question_text: 'Blockchain mana yang dikenal dengan kecepatan 65.000 TPS?',
+      options: ['Ethereum', 'Bitcoin', 'Solana', 'Cardano'],
+      correct_answer_index: 2,
+      time_limit_seconds: 15,
+      order_number: 2,
+    },
+    {
+      id: 'dq4',
+      quiz_id: 'demo-123456',
+      question_text: 'Apa nama wallet paling populer di Solana?',
+      options: ['MetaMask', 'Phantom', 'Trust Wallet', 'Coinbase Wallet'],
+      correct_answer_index: 1,
+      time_limit_seconds: 15,
+      order_number: 3,
+    },
+    {
+      id: 'dq5',
+      quiz_id: 'demo-123456',
+      question_text: 'Apa itu DeFi?',
+      options: ['Decentralized Finance', 'Digital File', 'Defined Firewall', 'Desktop Finance'],
+      correct_answer_index: 0,
+      time_limit_seconds: 15,
+      order_number: 4,
+    },
+  ];
+
   const handleJoinWithCode = async () => {
     if (roomCode.length >= 4 && playerName.trim()) {
       setIsJoining(true);
       try {
-        // Fetch Quiz
-        const { data: quizData, error: quizError } = await supabase
-          .from("quizzes")
-          .select("*")
-          .eq("room_code", roomCode)
-          .single();
+        // Try database first
+        let quizFound = false;
+        try {
+          const { data: quizData, error: quizError } = await supabase
+            .from("quizzes")
+            .select("*")
+            .eq("room_code", roomCode)
+            .single();
 
-        if (quizError || !quizData) throw new Error("Quiz not found");
-        
-        // Fetch Questions
-        const { data: qsData, error: qsError } = await supabase
-          .from("questions")
-          .select("*")
-          .eq("quiz_id", quizData.id)
-          .order("order_number", { ascending: true });
+          if (!quizError && quizData) {
+            const { data: qsData, error: qsError } = await supabase
+              .from("questions")
+              .select("*")
+              .eq("quiz_id", quizData.id)
+              .order("order_number", { ascending: true });
 
-        if (qsError || !qsData) throw new Error("Failed fetching questions");
-        if (qsData.length === 0) throw new Error("Quiz has no questions");
+            if (!qsError && qsData && qsData.length > 0) {
+              setQuizInfo(quizData);
+              setQuestions(qsData);
+              setTimeLeft(qsData[0].time_limit_seconds || 15);
+              quizFound = true;
 
-        setQuizInfo(quizData);
-        setQuestions(qsData);
-        setTimeLeft(qsData[0].time_limit_seconds || 15);
+              // Register player
+              if (publicKey) {
+                const walletStr = publicKey.toString();
+                try {
+                  await supabase.from("profiles").upsert(
+                    { wallet_address: walletStr, username: playerName },
+                    { onConflict: 'wallet_address' }
+                  );
+                  await supabase.from("leaderboard").upsert({
+                    quiz_id: quizData.id,
+                    user_wallet: walletStr,
+                    player_name: playerName,
+                    final_score: 0
+                  });
+                } catch (_) { /* non-critical */ }
+              }
 
-        // check profile and update name
-        if (publicKey) {
-          const walletStr = publicKey.toString();
-          await supabase.from("profiles").upsert(
-            { wallet_address: walletStr, username: playerName },
-            { onConflict: 'wallet_address' }
-          );
-          
-          // Join the leaderboard immediately
-          await supabase.from("leaderboard").upsert({
-            quiz_id: quizData.id,
-            user_wallet: walletStr,
-            player_name: playerName,
-            final_score: 0
-          });
+              // Subscribe to quiz status
+              supabase
+                .channel(`quiz-status-${quizData.id}`)
+                .on('postgres_changes', {
+                  event: 'UPDATE',
+                  schema: 'public',
+                  table: 'quizzes',
+                  filter: `id=eq.${quizData.id}`
+                }, (payload) => {
+                  if (payload.new.status === 'playing') {
+                    setQuizState('playing');
+                  }
+                })
+                .subscribe();
+            }
+          }
+        } catch (_) { /* DB failed, will use fallback */ }
+
+        // Fallback: Demo mode for code 123456 (or if DB fails)
+        if (!quizFound) {
+          if (roomCode === '123456') {
+            setQuizInfo(DEMO_QUIZ);
+            setQuestions(DEMO_QUESTIONS);
+            setTimeLeft(DEMO_QUESTIONS[0].time_limit_seconds);
+            setQuizState('playing'); // Start immediately in demo
+            quizFound = true;
+          } else {
+            throw new Error(lang === "ENG" ? "Quiz not found. Check your room code." : "Kuis tidak ditemukan. Periksa kode ruangan Anda.");
+          }
         }
 
         setIsJoined(true);
-        
-        // Subscribe to quiz status changes (Host starting the quiz)
-        const channel = supabase
-          .channel(`quiz-status-${quizData.id}`)
-          .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'quizzes',
-            filter: `id=eq.${quizData.id}`
-          }, (payload) => {
-            if (payload.new.status === 'playing') {
-              setQuizState('playing');
-            }
-          })
-          .subscribe();
           
-      } catch (err: any) {
-        console.error("Error joining:", err);
-        alert(err.message || "Failed to join room");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("Error joining:", message);
+        alert(message);
       } finally {
         setIsJoining(false);
       }
