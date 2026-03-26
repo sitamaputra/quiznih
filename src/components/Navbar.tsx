@@ -1,5 +1,5 @@
 "use client";
-import { Wallet2, Menu, Globe2, Sun, Moon } from "lucide-react";
+import { Wallet2, Menu, Globe2, Sun, Moon, LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -63,17 +63,33 @@ export default function Navbar() {
               </button>
             </div>
 
-            <button 
-              onClick={handleWalletClick}
-              className="flex items-center gap-2 bg-[#9945FF]/10 dark:bg-[#9945FF]/20 hover:bg-[#9945FF]/30 dark:hover:bg-[#9945FF]/40 border border-[#9945FF] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(153,69,255,0.2)] hover:shadow-[0_0_25px_rgba(153,69,255,0.4)]"
-            >
-              <Wallet2 className="w-4 h-4" />
-              <span className="font-semibold text-sm">
-                {publicKey 
-                  ? `${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-4)}`
-                  : lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
-              </span>
-            </button>
+            {publicKey ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 bg-[#9945FF]/10 dark:bg-[#9945FF]/20 border border-[#9945FF] px-4 py-2 rounded-full shadow-[0_0_15px_rgba(153,69,255,0.2)]">
+                  <Wallet2 className="w-4 h-4 text-[#9945FF] dark:text-[#E2C8FF]" />
+                  <span className="font-semibold text-sm text-[#9945FF] dark:text-[#E2C8FF]">
+                    {`${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-4)}`}
+                  </span>
+                </div>
+                <button
+                  onClick={handleWalletClick}
+                  className="p-2.5 rounded-full border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all shadow-[0_0_10px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                  title={lang === "ENG" ? "Disconnect Wallet" : "Putuskan Dompet"}
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={handleWalletClick}
+                className="flex items-center gap-2 bg-[#9945FF]/10 dark:bg-[#9945FF]/20 hover:bg-[#9945FF]/30 dark:hover:bg-[#9945FF]/40 border border-[#9945FF] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(153,69,255,0.2)] hover:shadow-[0_0_25px_rgba(153,69,255,0.4)]"
+              >
+                <Wallet2 className="w-4 h-4" />
+                <span className="font-semibold text-sm">
+                  {lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
+                </span>
+              </button>
+            )}
           </div>
 
           <div className="md:hidden flex items-center gap-4">

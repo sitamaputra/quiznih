@@ -10,39 +10,9 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured, supabaseUrl } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 
-// QR Code display component
-function QRDisplay({ value }: { value: string }) {
-  const size = 17;
-  const grid: boolean[][] = [];
-  for (let r = 0; r < size; r++) {
-    grid[r] = [];
-    for (let c = 0; c < size; c++) {
-      // Finder patterns (top-left, top-right, bottom-left)
-      const inTL = r < 4 && c < 4;
-      const inTR = r < 4 && c >= size - 4;
-      const inBL = r >= size - 4 && c < 4;
-      if (inTL || inTR || inBL) {
-        const lr = r < 4 ? r : r - (size - 4);
-        const lc = c < 4 ? c : c - (size - 4);
-        grid[r][c] = lr === 0 || lr === 3 || lc === 0 || lc === 3 || (lr >= 1 && lr <= 2 && lc >= 1 && lc <= 2);
-      } else {
-        const code = value.charCodeAt((r * size + c) % value.length) || 42;
-        grid[r][c] = ((code * (r + 1) * (c + 1)) % 5) > 1;
-      }
-    }
-  }
-  return (
-    <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
-      {grid.flat().map((filled, idx) => (
-        <div
-          key={idx}
-          className={`w-[10px] h-[10px] sm:w-3 sm:h-3 rounded-[1px] ${filled ? "bg-black" : "bg-white"}`}
-        />
-      ))}
-    </div>
-  );
-}
+
 
 interface QuestionData {
   id: number;
@@ -336,17 +306,21 @@ export default function CreateQuizPage() {
               {/* QR Code Card */}
               <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 flex flex-col items-center space-y-6">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                  📱 {lang === "ENG" ? "QR Code" : "Kode QR"}
+                  📱 {lang === "ENG" ? "Scan to Join" : "Scan untuk Gabung"}
                 </h3>
                 {/* QR Code Visual */}
-                <div className="bg-white p-5 rounded-2xl shadow-lg">
-                  <QRDisplay value={`quiznih:${roomCode}`} />
+                <div className="bg-white p-5 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                  <QRCodeSVG value={`https://quiznih.vercel.app/play?code=${roomCode}`} size={160} />
                 </div>
-                <p className="text-xs text-gray-500 text-center">
-                  {lang === "ENG" 
-                    ? "Players can scan this to join instantly"
-                    : "Pemain bisa scan ini untuk bergabung langsung"}
-                </p>
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://quiznih.vercel.app/play?code=${roomCode}`);
+                    alert(lang === "ENG" ? "Play Link Copied!" : "Tautan Kuis Disalin!");
+                  }}
+                  className="px-6 py-2.5 bg-[#14F195]/20 text-[#14F195] rounded-full font-bold border border-[#14F195]/50 hover:bg-[#14F195]/30 transition-all shadow-[0_0_15px_rgba(20,241,149,0.3)] w-full text-center mt-2"
+                >
+                  🔗 {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
+                </button>
               </div>
 
               {/* Room Code Card */}

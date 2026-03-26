@@ -10,38 +10,9 @@ import Link from "next/link";
 import { useState, useEffect, use } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 
-// QR Code display component
-function QRDisplay({ value }: { value: string }) {
-  const size = 17;
-  const grid: boolean[][] = [];
-  for (let r = 0; r < size; r++) {
-    grid[r] = [];
-    for (let c = 0; c < size; c++) {
-      const inTL = r < 4 && c < 4;
-      const inTR = r < 4 && c >= size - 4;
-      const inBL = r >= size - 4 && c < 4;
-      if (inTL || inTR || inBL) {
-        const lr = r < 4 ? r : r - (size - 4);
-        const lc = c < 4 ? c : c - (size - 4);
-        grid[r][c] = lr === 0 || lr === 3 || lc === 0 || lc === 3 || (lr >= 1 && lr <= 2 && lc >= 1 && lc <= 2);
-      } else {
-        const code = value.charCodeAt((r * size + c) % value.length) || 42;
-        grid[r][c] = ((code * (r + 1) * (c + 1)) % 5) > 1;
-      }
-    }
-  }
-  return (
-    <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}>
-      {grid.flat().map((filled, idx) => (
-        <div
-          key={idx}
-          className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[1px] ${filled ? "bg-black" : "bg-white"}`}
-        />
-      ))}
-    </div>
-  );
-}
+
 
 export default function QuizControlRoom({ params }: { params: Promise<{ id: string }> }) {
   const { id: quizId } = use(params);
@@ -195,10 +166,19 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* QR Card */}
             <div className="glass rounded-[2rem] border border-white/5 p-8 flex flex-col items-center space-y-6">
-              <h3 className="text-lg font-bold">📱 {lang === "ENG" ? "QR Code" : "Kode QR"}</h3>
-              <div className="bg-white p-4 rounded-xl shadow-lg">
-                <QRDisplay value={`quiznih:${quizData.room_code}`} />
+              <h3 className="text-lg font-bold">📱 {lang === "ENG" ? "Scan to Join" : "Scan untuk Gabung"}</h3>
+              <div className="bg-white p-4 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                <QRCodeSVG value={`https://quiznih.vercel.app/play?code=${quizData.room_code}`} size={160} />
               </div>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(`https://quiznih.vercel.app/play?code=${quizData.room_code}`);
+                  alert(lang === "ENG" ? "Play Link Copied!" : "Tautan Kuis Disalin!");
+                }}
+                className="px-6 py-2.5 bg-[#14F195]/20 text-[#14F195] rounded-full font-bold border border-[#14F195]/50 hover:bg-[#14F195]/30 transition-all shadow-[0_0_15px_rgba(20,241,149,0.3)] w-full text-center"
+              >
+                🔗 {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
+              </button>
             </div>
 
             {/* Room Code Card */}

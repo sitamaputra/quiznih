@@ -23,6 +23,17 @@ export default function PlayPage() {
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [joinMode, setJoinMode] = useState<"select" | "qr" | "code">("select");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const codeUrl = params.get("code");
+      if (codeUrl) {
+        setRoomCode(codeUrl);
+        setJoinMode("code");
+      }
+    }
+  }, []);
   const [isJoined, setIsJoined] = useState(false);
   const [quizState, setQuizState] = useState<"waiting" | "playing" | "revealed" | "finished">("waiting");
   
