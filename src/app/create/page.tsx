@@ -157,11 +157,15 @@ export default function CreateQuizPage() {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       const walletStr = publicKey.toString();
 
-      // 1. Ensure Profile Exists
-      await supabase.from("profiles").upsert(
-        { wallet_address: walletStr },
-        { onConflict: 'wallet_address' }
-      );
+      // 1. Ensure Profile Exists (silently, don't block if fails)
+      try {
+        await supabase.from("profiles").upsert(
+          { wallet_address: walletStr },
+          { onConflict: 'wallet_address' }
+        );
+      } catch (_) {
+        // Non-critical, continue
+      }
 
       // 2. Insert Quiz
       const { data: quizData, error: quizError } = await supabase
@@ -177,7 +181,11 @@ export default function CreateQuizPage() {
         .select()
         .single();
 
-      if (quizError || !quizData) throw quizError;
+      if (quizError) {
+        const msg = quizError.message || JSON.stringify(quizError);
+        throw new Error(`Quiz insert failed: ${msg}`);
+      }
+      if (!quizData) throw new Error("Quiz insert returned no data.");
 
       // 3. Insert Questions
       const questionsToInsert = questions.map((q, idx) => ({
@@ -193,15 +201,19 @@ export default function CreateQuizPage() {
         .from("questions")
         .insert(questionsToInsert);
 
-      if (questionsError) throw questionsError;
+      if (questionsError) {
+        const msg = questionsError.message || JSON.stringify(questionsError);
+        throw new Error(`Questions insert failed: ${msg}`);
+      }
 
       // Success
       setQuizId(quizData.id);
       setRoomCode(code);
       setIsPublished(true);
-    } catch (err) {
-      console.error("Error publishing quiz:", err);
-      alert(lang === "ENG" ? "Failed to publish quiz. Check console." : "Gagal mempublikasikan kuis.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("Error publishing quiz:", message);
+      alert(`${lang === "ENG" ? "Failed to publish quiz" : "Gagal mempublikasikan kuis"}:\n\n${message}`);
     } finally {
       setIsPublishing(false);
     }
