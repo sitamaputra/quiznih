@@ -4,11 +4,11 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2
+  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured, supabaseUrl } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 // QR Code display component
@@ -263,6 +263,24 @@ export default function CreateQuizPage() {
           </div>
         )}
       </header>
+
+      {/* Supabase Connection Diagnostic */}
+      {!isSupabaseConfigured && (
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 mb-4">
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400">
+            <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+            <div className="text-sm">
+              <p className="font-bold mb-1">⚠️ Supabase Not Connected</p>
+              <p>Environment variables missing on Vercel. Add these in Vercel → Settings → Environment Variables:</p>
+              <code className="block mt-2 text-xs bg-black/30 p-2 rounded">
+                NEXT_PUBLIC_SUPABASE_URL = https://your-project.supabase.co<br/>
+                NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJ...your-anon-key
+              </code>
+              <p className="mt-2 text-xs">Current URL: <code>{supabaseUrl}</code></p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24">
         {/* Title */}
