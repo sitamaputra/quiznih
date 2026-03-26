@@ -4,7 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import { 
-  ArrowLeft, Wallet2, Plus, LayoutDashboard, Play, CheckCircle2, Trash2, Users, Trophy, ExternalLink 
+  ArrowLeft, Wallet2, Plus, LayoutDashboard, Play, CheckCircle2, Trash2, Users, Trophy, ExternalLink, LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 
 export default function ManageQuizzesPage() {
   const { lang } = useLanguage();
-  const { publicKey } = useWallet();
+  const { publicKey, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   const router = useRouter();
 
@@ -71,7 +71,7 @@ export default function ManageQuizzesPage() {
         <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-[#14F195]/10 blur-[150px] rounded-full" />
       </div>
 
-      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
+      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
         <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Dashboard" : "Dasbor"}</span>
@@ -80,6 +80,13 @@ export default function ManageQuizzesPage() {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#9945FF]/30">
             <Wallet2 className="w-4 h-4 text-[#9945FF]" />
             <span className="text-sm font-mono font-semibold">{walletShort}</span>
+            <button
+              onClick={() => disconnect()}
+              className="ml-2 p-1.5 rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors"
+              title={lang === "ENG" ? "Disconnect Wallet" : "Putuskan Koneksi"}
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         )}
       </header>

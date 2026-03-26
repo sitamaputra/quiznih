@@ -4,7 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift
+  ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift, LogOut
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function PlayPage() {
   const { lang } = useLanguage();
-  const { publicKey } = useWallet();
+  const { publicKey, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
 
   useEffect(() => {
@@ -571,6 +571,13 @@ export default function PlayPage() {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#14F195]/30">
             <Wallet2 className="w-4 h-4 text-[#14F195]" />
             <span className="text-sm font-mono font-semibold">{walletShort}</span>
+            <button
+              onClick={() => disconnect()}
+              className="ml-2 p-1.5 rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors"
+              title={lang === "ENG" ? "Disconnect Wallet" : "Putuskan Koneksi"}
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         )}
       </header>

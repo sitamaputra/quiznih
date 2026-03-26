@@ -4,7 +4,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle
+  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle, LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -54,7 +54,7 @@ interface QuestionData {
 
 export default function CreateQuizPage() {
   const { lang } = useLanguage();
-  const { publicKey } = useWallet();
+  const { publicKey, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   const router = useRouter();
 
@@ -260,6 +260,13 @@ export default function CreateQuizPage() {
           <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#9945FF]/30">
             <Wallet2 className="w-4 h-4 text-[#9945FF]" />
             <span className="text-sm font-mono font-semibold">{walletShort}</span>
+            <button
+              onClick={() => disconnect()}
+              className="ml-2 p-1.5 rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors"
+              title={lang === "ENG" ? "Disconnect Wallet" : "Putuskan Koneksi"}
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         )}
       </header>
