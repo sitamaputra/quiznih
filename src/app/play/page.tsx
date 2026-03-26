@@ -10,6 +10,7 @@ import confetti from "canvas-confetti";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import WalletDropdown from "@/components/WalletDropdown";
 
 export default function PlayPage() {
   const { lang } = useLanguage();
@@ -578,19 +579,7 @@ export default function PlayPage() {
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
         </Link>
-        {publicKey && (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#14F195]/30">
-            <Wallet2 className="w-4 h-4 text-[#14F195]" />
-            <span className="text-sm font-mono font-semibold">{walletShort}</span>
-            <button
-              onClick={() => disconnect()}
-              className="ml-2 p-1.5 rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors"
-              title={lang === "ENG" ? "Disconnect Wallet" : "Putuskan Koneksi"}
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        {publicKey && <WalletDropdown />}
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-12">

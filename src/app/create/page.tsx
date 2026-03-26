@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured, supabaseUrl } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
+import WalletDropdown from "@/components/WalletDropdown";
 
 
 
@@ -226,19 +227,7 @@ export default function CreateQuizPage() {
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
         </Link>
-        {publicKey && (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#9945FF]/30">
-            <Wallet2 className="w-4 h-4 text-[#9945FF]" />
-            <span className="text-sm font-mono font-semibold">{walletShort}</span>
-            <button
-              onClick={() => disconnect()}
-              className="ml-2 p-1.5 rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition-colors"
-              title={lang === "ENG" ? "Disconnect Wallet" : "Putuskan Koneksi"}
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        {publicKey && <WalletDropdown />}
       </header>
 
       {/* Supabase Connection Diagnostic */}
