@@ -27,6 +27,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
   const [isLoading, setIsLoading] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [viewMode, setViewMode] = useState<'manage' | 'live'>('manage');
 
   useEffect(() => {
     if (!publicKey) {
@@ -139,19 +140,47 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
         <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#14F195]/10 blur-[150px] rounded-full" />
       </div>
 
-      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
+      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between gap-4 flex-wrap">
         <Link href="/manage" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Back to Management" : "Kembali ke Manajemen"}</span>
         </Link>
-        <div className="px-4 py-2 rounded-full glass border border-[#9945FF]/30 text-sm font-mono font-bold">
-          {quizData.room_code}
+
+        <div className="flex items-center gap-2">
+          {quizData.status === 'playing' && (
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 dark:bg-white/5 border border-white/10">
+              <button
+                onClick={() => setViewMode('manage')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  viewMode === 'manage'
+                    ? 'bg-[#9945FF] text-white shadow-md'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <span>⚙️</span> {lang === "ENG" ? "Manage" : "Kelola"}
+              </button>
+              <button
+                onClick={() => setViewMode('live')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                  viewMode === 'live'
+                    ? 'bg-[#14F195] text-black shadow-md'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block" />
+                Live
+              </button>
+            </div>
+          )}
+          <div className="px-4 py-2 rounded-full glass border border-[#9945FF]/30 text-sm font-mono font-bold">
+            {quizData.room_code}
+          </div>
         </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 pt-8">
         {/* ===== LIVE LEADERBOARD VIEW (when playing) ===== */}
-        {quizData.status === 'playing' ? (
+        {quizData.status === 'playing' && viewMode === 'live' ? (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -434,10 +463,31 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          {/* Start Quiz Action */}
-          {quizData.status !== "finished" && (
+          {/* Action Buttons */}
+          {quizData.status === 'playing' ? (
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => setViewMode('live')}
+                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#14F195] to-[#0EC97F] text-black font-extrabold text-lg flex items-center justify-center gap-3 hover:shadow-[0_0_40px_rgba(20,241,149,0.4)] transition-all"
+              >
+                <span className="w-3 h-3 rounded-full bg-black animate-ping inline-block" />
+                {lang === "ENG" ? "View Live Leaderboard →" : "Lihat Leaderboard Live →"}
+              </button>
+              <button
+                onClick={async () => {
+                  if (!confirm(lang === "ENG" ? "End the quiz?" : "Akhiri kuis?")) return;
+                  await supabase.from("quizzes").update({ status: 'finished' }).eq("id", quizId);
+                  setQuizData((prev: any) => ({ ...prev, status: 'finished' }));
+                  confetti({ particleCount: 200, spread: 80, colors: ['#9945FF','#14F195','#FDE047'] });
+                }}
+                className="py-5 px-6 rounded-2xl border-2 border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold transition-all"
+              >
+                🏁 {lang === "ENG" ? "End Quiz" : "Akhiri Kuis"}
+              </button>
+            </div>
+          ) : quizData.status !== "finished" && (
             <button
-              onClick={handleStartQuiz}
+              onClick={() => { handleStartQuiz(); setViewMode('live'); }}
               disabled={isStarting}
               className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-extrabold text-xl hover:shadow-[0_0_50px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
