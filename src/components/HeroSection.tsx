@@ -42,7 +42,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight text-white"
+          className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-white"
         >
           {lang === "ENG" ? (
             <>
@@ -61,7 +61,7 @@ export default function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.6 }}
-          className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"
         >
           {lang === "ENG"
             ? "The ultimate decentralized trivia experience. Host quizzes for your community and automatically distribute crypto rewards with zero friction."
