@@ -50,6 +50,7 @@ export default function PlayPage() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [quizInfo, setQuizInfo] = useState<any>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [revealCountdown, setRevealCountdown] = useState(3);
 
   // Timer logic
   useEffect(() => {
@@ -88,8 +89,20 @@ export default function PlayPage() {
     // Add small delay before revealing answer to create suspense
     setTimeout(() => {
       setQuizState("revealed");
+      setRevealCountdown(3);
     }, 1500);
   };
+
+  // Auto-advance to next question after 3 seconds in revealed state
+  useEffect(() => {
+    if (quizState !== "revealed") return;
+    if (revealCountdown <= 0) {
+      nextQuestion();
+      return;
+    }
+    const t = setTimeout(() => setRevealCountdown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [quizState, revealCountdown]);
 
   const nextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -475,19 +488,27 @@ export default function PlayPage() {
                 </p>
               </div>
               
-              <div className="pt-8">
-                <span className="text-gray-500 animate-pulse">
-                  {lang === "ENG" ? "Waiting for next question..." : "Menunggu pertanyaan berikutnya..."}
-                </span>
+              <div className="pt-8 space-y-4">
+                {/* Countdown progress bar */}
+                <div className="text-sm text-gray-500 font-semibold">
+                  {lang === "ENG" ? `Next question in ${revealCountdown}s...` : `Soal berikutnya dalam ${revealCountdown} detik...`}
+                </div>
+                <div className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: "100%" }}
+                    animate={{ width: "0%" }}
+                    transition={{ duration: 3, ease: "linear" }}
+                    className="h-full bg-[#9945FF] rounded-full"
+                  />
+                </div>
+                {/* Manual skip button */}
+                <button
+                  onClick={nextQuestion}
+                  className="text-xs text-gray-400 hover:text-[#9945FF] transition-colors underline"
+                >
+                  {lang === "ENG" ? "Skip →" : "Lewati →"}
+                </button>
               </div>
-              
-              {/* Demo auto-next fallback */}
-              <button 
-                onClick={nextQuestion}
-                className="mt-8 px-6 py-2 text-xs bg-black/10 dark:bg-white/10 rounded-full hover:bg-black/20"
-              >
-                (Demo: Go to Next)
-              </button>
             </motion.div>
           </div>
         )}
