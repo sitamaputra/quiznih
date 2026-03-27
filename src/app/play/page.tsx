@@ -51,6 +51,25 @@ export default function PlayPage() {
   const [quizInfo, setQuizInfo] = useState<any>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [revealCountdown, setRevealCountdown] = useState(3);
+  const [selectedAvatar, setSelectedAvatar] = useState(0);
+
+  const AVATARS = [
+    { emoji: "🐶", name: "Doggo", color: "#F59E0B" },
+    { emoji: "🐱", name: "Kitty", color: "#EC4899" },
+    { emoji: "🐸", name: "Froggy", color: "#14F195" },
+    { emoji: "🦊", name: "Foxi", color: "#F97316" },
+    { emoji: "🐼", name: "Panda", color: "#6B7280" },
+    { emoji: "🦁", name: "Leo", color: "#EAB308" },
+    { emoji: "🐯", name: "Tiger", color: "#F97316" },
+    { emoji: "🐙", name: "Octo", color: "#9945FF" },
+    { emoji: "🦄", name: "Uni", color: "#EC4899" },
+    { emoji: "🐲", name: "Drago", color: "#14F195" },
+    { emoji: "🤖", name: "Robot", color: "#60A5FA" },
+    { emoji: "👾", name: "Alien", color: "#A78BFA" },
+  ];
+
+  const prevAvatar = () => setSelectedAvatar(i => (i - 1 + AVATARS.length) % AVATARS.length);
+  const nextAvatar = () => setSelectedAvatar(i => (i + 1) % AVATARS.length);
 
   // Timer logic
   useEffect(() => {
@@ -742,10 +761,61 @@ export default function PlayPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass rounded-[2.5rem] border border-[#9945FF]/30 p-10 max-w-md w-full text-center space-y-8"
+            className="glass rounded-[2.5rem] border border-[#9945FF]/30 p-10 max-w-md w-full text-center space-y-6"
           >
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-[#9945FF] to-[#7B3FE4] flex items-center justify-center shadow-[0_0_30px_rgba(153,69,255,0.3)]">
-              <Keyboard className="w-10 h-10 text-white" />
+            {/* Avatar Picker */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                {lang === "ENG" ? "Pick Your Character" : "Pilih Karaktermu"}
+              </p>
+              <div className="flex items-center justify-center gap-4">
+                <button
+                  onClick={prevAvatar}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-2xl transition-all flex items-center justify-center border border-white/10"
+                >◀</button>
+
+                <motion.div
+                  key={selectedAvatar}
+                  initial={{ scale: 0.5, rotate: -15, opacity: 0 }}
+                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  className="relative"
+                >
+                  <div
+                    className="w-28 h-28 rounded-3xl flex items-center justify-center text-6xl shadow-2xl border-4 relative"
+                    style={{ backgroundColor: `${AVATARS[selectedAvatar].color}22`, borderColor: AVATARS[selectedAvatar].color }}
+                  >
+                    <span>{AVATARS[selectedAvatar].emoji}</span>
+                    {/* Glow */}
+                    <div
+                      className="absolute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
+                      style={{ backgroundColor: AVATARS[selectedAvatar].color }}
+                    />
+                  </div>
+                  <p className="mt-2 font-extrabold text-sm" style={{ color: AVATARS[selectedAvatar].color }}>
+                    {AVATARS[selectedAvatar].name}
+                  </p>
+                </motion.div>
+
+                <button
+                  onClick={nextAvatar}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-2xl transition-all flex items-center justify-center border border-white/10"
+                >▶</button>
+              </div>
+
+              {/* Avatar strip dots */}
+              <div className="flex justify-center gap-1.5 flex-wrap max-w-[200px] mx-auto">
+                {AVATARS.map((av, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedAvatar(i)}
+                    className="text-lg transition-all hover:scale-125"
+                    style={{ opacity: i === selectedAvatar ? 1 : 0.35, transform: i === selectedAvatar ? "scale(1.3)" : "scale(1)" }}
+                  >
+                    {av.emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -780,12 +850,13 @@ export default function PlayPage() {
             <button
               onClick={handleJoinWithCode}
               disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
-              className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full py-5 rounded-2xl font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-black"
+              style={{ background: `linear-gradient(135deg, ${AVATARS[selectedAvatar].color}, #14F195)` }}
             >
               {isJoining ? (
                 <span className="flex items-center gap-2"><span className="animate-spin text-xl">⟳</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
               ) : (
-                <><Users className="w-6 h-6" /> {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}</>
+                <><span className="text-xl">{AVATARS[selectedAvatar].emoji}</span> {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}</>
               )}
             </button>
 
