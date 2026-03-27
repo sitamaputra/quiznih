@@ -4,7 +4,8 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle, LogOut
+  ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle, LogOut,
+  Upload, Gift, Shirt, Coffee, Sticker, ImageIcon, HelpCircle, FileJson
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -36,9 +37,76 @@ export default function CreateQuizPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [rewardPool, setRewardPool] = useState("0");
+  const [rewardType, setRewardType] = useState<"sol" | "kaos" | "tumbler" | "sticker" | "nft" | "lainnya">("sol");
+  const [rewardDesc, setRewardDesc] = useState("");
+  const [showImport, setShowImport] = useState(false);
+  const [importJson, setImportJson] = useState("");
+  const [importError, setImportError] = useState("");
   const [questions, setQuestions] = useState<QuestionData[]>([
     { id: 1, text: "", options: ["", "", "", ""], correctIndex: 0, timeLimit: 20 },
   ]);
+
+  const REWARD_TYPES = [
+    { value: "sol", label: "SOL", icon: "◎", desc: "Kripto Solana" },
+    { value: "kaos", label: "Kaos", icon: "👕", desc: "Merchandise Kaos" },
+    { value: "tumbler", label: "Tumbler", icon: "☕", desc: "Tumbler / Botol Minum" },
+    { value: "sticker", label: "Sticker", icon: "🎨", desc: "Sticker Pack" },
+    { value: "nft", label: "NFT", icon: "🖼️", desc: "NFT Gift" },
+    { value: "lainnya", label: "Hadiah Lain", icon: "🎁", desc: "Tentukan sendiri" },
+  ];
+
+  const QUIZ_TEMPLATES = [
+    {
+      label: lang === "ENG" ? "Solana Basics" : "Dasar Solana",
+      data: {
+        title: "Solana Quiz", description: "Test your Solana knowledge!",
+        questions: [
+          { id: 1, text: "Siapa pencipta Solana?", options: ["Vitalik Buterin", "Anatoly Yakovenko", "Satoshi Nakamoto", "Charles Hoskinson"], correctIndex: 1, timeLimit: 20 },
+          { id: 2, text: "Berapa TPS maksimum Solana?", options: ["1.000", "10.000", "65.000", "100.000"], correctIndex: 2, timeLimit: 20 },
+          { id: 3, text: "Apa mekanisme konsensus Solana?", options: ["Proof of Work", "Proof of Stake", "Proof of History", "Proof of Authority"], correctIndex: 2, timeLimit: 20 },
+        ]
+      }
+    },
+    {
+      label: lang === "ENG" ? "Web3 General" : "Web3 Umum",
+      data: {
+        title: "Web3 Knowledge Quiz", description: "General Web3 trivia!",
+        questions: [
+          { id: 1, text: "Kepanjangan dari NFT adalah?", options: ["Non-Fungible Token", "New Financial Transaction", "Network File Transfer", "None"], correctIndex: 0, timeLimit: 20 },
+          { id: 2, text: "Apa itu DeFi?", options: ["Defense Finance", "Decentralized Finance", "Digital Framework", "Distributed Files"], correctIndex: 1, timeLimit: 20 },
+          { id: 3, text: "Smart Contract pertama kali diperkenalkan di?", options: ["Bitcoin", "Solana", "Ethereum", "Polkadot"], correctIndex: 2, timeLimit: 20 },
+        ]
+      }
+    },
+  ];
+
+  const handleImport = () => {
+    setImportError("");
+    try {
+      const parsed = JSON.parse(importJson);
+      if (!parsed.questions || !Array.isArray(parsed.questions)) throw new Error("Format tidak valid");
+      if (parsed.title) setTitle(parsed.title);
+      if (parsed.description) setDescription(parsed.description);
+      setQuestions(parsed.questions.map((q: any, i: number) => ({
+        id: Date.now() + i,
+        text: q.text || q.question || "",
+        options: q.options || ["", "", "", ""],
+        correctIndex: q.correctIndex ?? q.correct_index ?? 0,
+        timeLimit: q.timeLimit || q.time_limit || 20,
+      })));
+      setShowImport(false);
+      setImportJson("");
+    } catch (e: any) {
+      setImportError(lang === "ENG" ? "Invalid JSON format. Check your data." : "Format JSON tidak valid. Periksa data Anda.");
+    }
+  };
+
+  const applyTemplate = (tpl: typeof QUIZ_TEMPLATES[0]) => {
+    setTitle(tpl.data.title);
+    setDescription(tpl.data.description);
+    setQuestions(tpl.data.questions.map((q, i) => ({ ...q, id: Date.now() + i })));
+    setShowImport(false);
+  };
 
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -253,18 +321,76 @@ export default function CreateQuizPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-            {lang === "ENG" ? "Create " : "Buat "}
-            <span className="text-gradient">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            {lang === "ENG"
-              ? "Design your quiz, set rewards, and share with players."
-              : "Rancang kuis, tentukan hadiah, dan bagikan ke pemain."}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
+                {lang === "ENG" ? "Create " : "Buat "}
+                <span className="text-gradient">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400">
+                {lang === "ENG"
+                  ? "Design your quiz, set rewards, and share with players."
+                  : "Rancang kuis, tentukan hadiah, dan bagikan ke pemain."}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowImport(!showImport)}
+              className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#9945FF]/10 border border-[#9945FF]/40 hover:bg-[#9945FF]/20 text-[#9945FF] font-bold transition-all shrink-0"
+            >
+              <FileJson className="w-5 h-5" />
+              {lang === "ENG" ? "Import Quiz" : "Import Kuis"}
+            </button>
+          </div>
         </motion.div>
+
+        {/* Import Panel */}
+        {showImport && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass rounded-[2rem] border border-[#9945FF]/30 p-8 mb-8 space-y-6"
+          >
+            <h3 className="font-extrabold text-xl">📥 {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
+
+            {/* Templates */}
+            <div>
+              <p className="text-sm font-semibold text-gray-500 mb-3">{lang === "ENG" ? "Starter Templates" : "Template Siap Pakai"}</p>
+              <div className="flex flex-wrap gap-3">
+                {QUIZ_TEMPLATES.map((tpl) => (
+                  <button
+                    key={tpl.label}
+                    onClick={() => applyTemplate(tpl)}
+                    className="px-4 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 font-semibold text-sm hover:border-[#9945FF]/50 hover:bg-[#9945FF]/10 transition-all"
+                  >
+                    🚀 {tpl.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* JSON Paste */}
+            <div>
+              <p className="text-sm font-semibold text-gray-500 mb-2">{lang === "ENG" ? "Or paste JSON" : "Atau tempel JSON"}</p>
+              <textarea
+                value={importJson}
+                onChange={(e) => { setImportJson(e.target.value); setImportError(""); }}
+                rows={5}
+                placeholder={'{ "title": "My Quiz", "questions": [{"text":"...","options":["A","B","C","D"],"correctIndex":0,"timeLimit":20}] }'}
+                className="w-full px-5 py-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#9945FF]/50 transition-all font-mono text-xs resize-none"
+              />
+              {importError && <p className="text-red-400 text-sm mt-2 font-semibold">⚠️ {importError}</p>}
+              <button
+                onClick={handleImport}
+                className="mt-3 px-6 py-2.5 rounded-xl bg-[#9945FF] text-white font-bold hover:bg-[#7B3FE4] transition-all flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                {lang === "ENG" ? "Apply Import" : "Terapkan Import"}
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {isPublished ? (
           /* Published State - Host Control Room */
@@ -452,18 +578,52 @@ export default function CreateQuizPage() {
                   />
                 </div>
 
+                {/* Reward Type Selector */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
-                    {lang === "ENG" ? "Reward Pool (SOL)" : "Total Hadiah (SOL)"}
+                  <label className="block text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
+                    {lang === "ENG" ? "Reward / Prize Pool" : "Jenis Hadiah"}
                   </label>
-                  <input
-                    type="number"
-                    value={rewardPool}
-                    onChange={(e) => setRewardPool(e.target.value)}
-                    min="0"
-                    step="0.01"
-                    className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#14F195]/50 transition-all text-lg font-mono"
-                  />
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-4">
+                    {REWARD_TYPES.map((rt) => (
+                      <button
+                        key={rt.value}
+                        type="button"
+                        onClick={() => setRewardType(rt.value as any)}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-2xl border-2 transition-all font-semibold text-xs ${
+                          rewardType === rt.value
+                            ? "border-[#14F195] bg-[#14F195]/15 text-[#14F195]"
+                            : "border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/5 text-gray-500 hover:border-[#14F195]/40"
+                        }`}
+                      >
+                        <span className="text-2xl">{rt.icon}</span>
+                        <span>{rt.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {rewardType === "sol" && (
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        value={rewardPool}
+                        onChange={(e) => setRewardPool(e.target.value)}
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="flex-1 px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#14F195]/30 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#14F195]/50 transition-all text-lg font-mono"
+                      />
+                      <span className="font-black text-[#14F195] text-xl">SOL</span>
+                    </div>
+                  )}
+                  {rewardType !== "sol" && (
+                    <input
+                      type="text"
+                      value={rewardDesc}
+                      onChange={(e) => setRewardDesc(e.target.value)}
+                      placeholder={lang === "ENG" ? `Describe the ${REWARD_TYPES.find(r=>r.value===rewardType)?.label} prize...` : `Deskripsi hadiah ${REWARD_TYPES.find(r=>r.value===rewardType)?.label}...`}
+                      className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#14F195]/30 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#14F195]/50 transition-all"
+                    />
+                  )}
                 </div>
               </div>
             </motion.div>
