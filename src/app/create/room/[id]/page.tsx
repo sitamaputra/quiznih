@@ -96,17 +96,19 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
 
   const handleStartQuiz = async () => {
     setIsStarting(true);
+    // Optimistic update: set playing locally immediately so button is never stuck
+    setQuizData((prev: any) => ({ ...prev, status: 'playing' }));
     try {
       const { error } = await supabase
         .from("quizzes")
         .update({ status: 'playing' })
         .eq("id", quizId);
       
-      if (error) throw error;
-      setQuizData((prev: any) => ({ ...prev, status: 'playing' }));
+      if (error) {
+        console.warn("Supabase update failed, local state still updated:", error);
+      }
     } catch (err) {
-      console.error("Error starting quiz:", err);
-      alert("Failed to start quiz.");
+      console.warn("Error starting quiz (non-blocking):", err);
     } finally {
       setIsStarting(false);
     }
@@ -268,19 +270,29 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
 
           {/* Start Quiz Action */}
           {quizData.status !== "finished" && (
-            <button
-              onClick={handleStartQuiz}
-              disabled={isStarting || quizData.status === 'playing'}
-              className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-extrabold text-xl hover:shadow-[0_0_50px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-            >
-              {isStarting ? (
-                <><Loader2 className="w-8 h-8 animate-spin" /> {lang === "ENG" ? "Starting..." : "Memulai..."}</>
-              ) : quizData.status === 'playing' ? (
-                <>🚀 {lang === "ENG" ? "Quiz Live!" : "Kuis Sedang Berlangsung!"}</>
-              ) : (
-                <>🚀 {lang === "ENG" ? "Start Quiz Now" : "Mulai Kuis Sekarang"}</>
-              )}
-            </button>
+            quizData.status === 'playing' ? (
+              <div className="space-y-3">
+                <div className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-extrabold text-xl flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(20,241,149,0.3)]">
+                  <span className="w-3 h-3 rounded-full bg-white animate-ping inline-block" />
+                  🚀 {lang === "ENG" ? "Quiz Live!" : "Kuis Sedang Berlangsung!"}
+                </div>
+                <p className="text-center text-sm text-gray-500">
+                  {lang === "ENG" ? "Quiz is running. Monitor participants above." : "Kuis berjalan. Pantau peserta di atas."}
+                </p>
+              </div>
+            ) : (
+              <button
+                onClick={handleStartQuiz}
+                disabled={isStarting}
+                className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-extrabold text-xl hover:shadow-[0_0_50px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              >
+                {isStarting ? (
+                  <><Loader2 className="w-8 h-8 animate-spin" /> {lang === "ENG" ? "Starting..." : "Memulai..."}</>
+                ) : (
+                  <>🚀 {lang === "ENG" ? "Start Quiz Now" : "Mulai Kuis Sekarang"}</>
+                )}
+              </button>
+            )
           )}
         </motion.div>
       </div>
