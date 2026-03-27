@@ -21,12 +21,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#14F195] to-[#9945FF] flex items-center justify-center font-bold text-white dark:text-black">
-              Q
-            </div>
-            <span className="font-bold text-xl tracking-wider">
-              Quiz<span className="text-gradient">nih</span>
-            </span>
+            <a href="/" className="flex items-center gap-2.5">
+              <img src="/logo.svg" alt="Quiznih" className="w-9 h-9 rounded-xl" />
+              <span className="font-extrabold text-xl tracking-wider">
+                Quiz<span className="text-gradient">nih</span>
+              </span>
+            </a>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
