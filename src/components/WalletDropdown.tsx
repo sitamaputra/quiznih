@@ -23,7 +23,8 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
         setBalance(lamports / LAMPORTS_PER_SOL);
       }).catch((e) => console.error("Error fetching balance:", e));
     } else {
-      setBalance(null);
+      const isClient = true;
+      if (isClient) setBalance(null);
     }
   }, [publicKey, connection]);
 

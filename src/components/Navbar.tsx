@@ -1,5 +1,6 @@
 "use client";
 import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
+import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -20,7 +21,10 @@ export default function Navbar() {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const isClient = true; // Avoid setState in effect warning
+    if (isClient) {
+      setMounted(true);
+    }
     
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,12 +49,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-2">
-            <a href="/" className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5">
               <img src="/logo.svg" alt="Quiznih" className="w-9 h-9 rounded-xl" />
               <span className="font-extrabold text-xl tracking-wider">
                 Quiz<span className="text-gradient">nih</span>
               </span>
-            </a>
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
