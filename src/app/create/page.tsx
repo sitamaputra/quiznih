@@ -5,7 +5,7 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle, LogOut,
-  Upload, Gift, Shirt, Coffee, Sticker, ImageIcon, HelpCircle, FileJson, ExternalLink, Coins, Zap
+  Upload, Gift, Shirt, Coffee, Sticker, ImageIcon, HelpCircle, FileJson, ExternalLink, Coins, Zap, MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -59,6 +59,7 @@ export default function CreateQuizPage() {
   const [showImport, setShowImport] = useState(false);
   const [importJson, setImportJson] = useState("");
   const [importError, setImportError] = useState("");
+  const [isPromptCopied, setIsPromptCopied] = useState(false);
   const [questions, setQuestions] = useState<QuestionData[]>([
     { id: 1, text: "", options: ["", "", "", ""], correctIndex: 0, timeLimit: 20 },
   ]);
@@ -123,6 +124,42 @@ export default function CreateQuizPage() {
     setDescription(tpl.data.description);
     setQuestions(tpl.data.questions.map((q, i) => ({ ...q, id: Date.now() + i })));
     setShowImport(false);
+  };
+
+  const handleCopyPrompt = () => {
+    const aiPrompt = lang === "ENG" 
+      ? `Create a multiple choice trivia quiz about [ENTER TOPIC HERE] with 5 questions.
+Return ONLY a valid JSON object in this exact format (no markdown formatting, no extra text):
+{
+  "title": "Quiz Title",
+  "description": "Short quiz description",
+  "questions": [
+    {
+      "text": "Question text?",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "correctIndex": 0,
+      "timeLimit": 20
+    }
+  ]
+}`
+      : `Buatkan kuis pilihan ganda tentang [MASUKKAN TOPIK DISINI] dengan 5 soal.
+Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa markdown formatting, tanpa teks awalan/akhiran):
+{
+  "title": "Judul Kuis",
+  "description": "Deskripsi singkat kuis",
+  "questions": [
+    {
+      "text": "Pertanyaan?",
+      "options": ["Opsi 1", "Opsi 2", "Opsi 3", "Opsi 4"],
+      "correctIndex": 0,
+      "timeLimit": 20
+    }
+  ]
+}`;
+    
+    navigator.clipboard.writeText(aiPrompt);
+    setIsPromptCopied(true);
+    setTimeout(() => setIsPromptCopied(false), 2000);
   };
 
   const addQuestion = () => {
@@ -384,42 +421,72 @@ export default function CreateQuizPage() {
             animate={{ opacity: 1, y: 0 }}
             className="glass rounded-[2rem] border border-[#9945FF]/30 p-8 mb-8 space-y-6"
           >
-            <h3 className="font-extrabold text-xl">📥 {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
-
-            {/* Templates */}
-            <div>
-              <p className="text-sm font-semibold text-gray-500 mb-3">{lang === "ENG" ? "Starter Templates" : "Template Siap Pakai"}</p>
-              <div className="flex flex-wrap gap-3">
-                {QUIZ_TEMPLATES.map((tpl) => (
-                  <button
-                    key={tpl.label}
-                    onClick={() => applyTemplate(tpl)}
-                    className="px-4 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 font-semibold text-sm hover:border-[#9945FF]/50 hover:bg-[#9945FF]/10 transition-all"
-                  >
-                    🚀 {tpl.label}
-                  </button>
-                ))}
-              </div>
+            <div className="flex justify-between items-center">
+              <h3 className="font-extrabold text-xl">📥 {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
             </div>
 
-            {/* JSON Paste */}
-            <div>
-              <p className="text-sm font-semibold text-gray-500 mb-2">{lang === "ENG" ? "Or paste JSON" : "Atau tempel JSON"}</p>
-              <textarea
-                value={importJson}
-                onChange={(e) => { setImportJson(e.target.value); setImportError(""); }}
-                rows={5}
-                placeholder={'{ "title": "My Quiz", "questions": [{"text":"...","options":["A","B","C","D"],"correctIndex":0,"timeLimit":20}] }'}
-                className="w-full px-5 py-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#9945FF]/50 transition-all font-mono text-xs resize-none"
-              />
-              {importError && <p className="text-red-400 text-sm mt-2 font-semibold">⚠️ {importError}</p>}
-              <button
-                onClick={handleImport}
-                className="mt-3 px-6 py-2.5 rounded-xl bg-[#9945FF] text-white font-bold hover:bg-[#7B3FE4] transition-all flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" />
-                {lang === "ENG" ? "Apply Import" : "Terapkan Import"}
-              </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left Column: Helpers */}
+              <div className="space-y-6">
+                {/* AI Prompt Generator */}
+                <div className="p-5 rounded-2xl bg-[#9945FF]/10 border border-[#9945FF]/30 space-y-3">
+                  <div className="flex items-center gap-2 text-[#9945FF] font-bold">
+                    <MessageSquare className="w-5 h-5" />
+                    <h4>{lang === "ENG" ? "Generate with AI" : "Buat via AI (ChatGPT/Claude)"}</h4>
+                  </div>
+                  <p className="text-sm text-gray-400">
+                    {lang === "ENG" 
+                      ? "Copy the prompt template below and paste it into any AI to generate a ready-to-use quiz JSON." 
+                      : "Salin template prompt di bawah ke AI pilihanmu untuk membuat struktur JSON kuis otomatis."}
+                  </p>
+                  <button
+                    onClick={handleCopyPrompt}
+                    className="w-full py-2.5 rounded-xl bg-[#9945FF]/20 text-[#9945FF] font-semibold text-sm hover:bg-[#9945FF]/30 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isPromptCopied ? (
+                      <><CheckCircle className="w-4 h-4" /> {lang === "ENG" ? "Copied!" : "Disalin!"}</>
+                    ) : (
+                      <><Copy className="w-4 h-4" /> {lang === "ENG" ? "Copy AI Prompt" : "Salin Prompt AI"}</>
+                    )}
+                  </button>
+                </div>
+
+                {/* Templates */}
+                <div className="p-5 rounded-2xl bg-white/5 dark:bg-white/5 border border-black/10 dark:border-white/10 space-y-3">
+                  <p className="text-sm font-semibold text-gray-500">{lang === "ENG" ? "Starter Templates" : "Template Siap Pakai"}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {QUIZ_TEMPLATES.map((tpl) => (
+                      <button
+                        key={tpl.label}
+                        onClick={() => applyTemplate(tpl)}
+                        className="px-4 py-2 rounded-xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 font-semibold text-xs hover:border-[#9945FF]/50 hover:text-[#9945FF] transition-all"
+                      >
+                        🚀 {tpl.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: JSON Paste */}
+              <div className="flex flex-col h-full">
+                <p className="text-sm font-semibold text-gray-500 mb-2">{lang === "ENG" ? "Paste JSON Result Here" : "Tempel Hasil JSON Disini"}</p>
+                <textarea
+                  value={importJson}
+                  onChange={(e) => { setImportJson(e.target.value); setImportError(""); }}
+                  placeholder={'{ "title": "My Quiz", "questions": [{"text":"...","options":["A","B","C","D"],"correctIndex":0,"timeLimit":20}] }'}
+                  className="flex-1 w-full p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#9945FF]/50 transition-all font-mono text-xs resize-none min-h-[200px]"
+                />
+                {importError && <p className="text-red-400 text-sm mt-2 font-semibold">⚠️ {importError}</p>}
+                <button
+                  onClick={handleImport}
+                  disabled={!importJson.trim()}
+                  className="mt-4 w-full py-4 rounded-xl bg-[#9945FF] text-white font-bold hover:bg-[#7B3FE4] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                >
+                  <Upload className="w-5 h-5" />
+                  {lang === "ENG" ? "Apply Import Data" : "Terapkan Data Import"}
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
