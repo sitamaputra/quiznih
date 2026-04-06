@@ -1,10 +1,9 @@
 "use client";
-import { Wallet2, Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
+import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import WalletDropdown from "./WalletDropdown";
 import AuthModal from "./AuthModal";
 import { supabase } from "@/lib/supabase";
@@ -13,8 +12,7 @@ export default function Navbar() {
   const { lang, toggleLang } = useLanguage();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { publicKey, disconnect } = useWallet();
-  const { setVisible } = useWalletModal();
+  const { publicKey } = useWallet();
   
   // Web2 Auth State
   const [isAuthOpen, setIsAuthOpen] = useState(false);
