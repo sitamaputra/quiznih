@@ -7,7 +7,7 @@ import { Wallet2, LogOut, Copy, CheckCircle2, ChevronDown, Coins } from "lucide-
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function WalletDropdown() {
+export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfDisconnected?: boolean }) {
   const { lang } = useLanguage();
   const { publicKey, disconnect, wallet } = useWallet();
   const { connection } = useConnection();
@@ -45,6 +45,7 @@ export default function WalletDropdown() {
   };
 
   if (!publicKey) {
+    if (hideIfDisconnected) return null;
     return (
       <button
         onClick={() => setVisible(true)}
