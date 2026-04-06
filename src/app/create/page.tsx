@@ -5,7 +5,7 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle, LogOut,
-  Upload, Gift, Shirt, Coffee, Sticker, ImageIcon, HelpCircle, FileJson
+  Upload, Gift, Shirt, Coffee, Sticker, ImageIcon, HelpCircle, FileJson, ExternalLink, Coins, Zap
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -13,6 +13,7 @@ import { supabase, isSupabaseConfigured, supabaseUrl } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import WalletDropdown from "@/components/WalletDropdown";
+import { useSolanaQuiz } from "@/hooks/useSolanaQuiz";
 
 
 
@@ -29,10 +30,26 @@ export default function CreateQuizPage() {
   const { publicKey, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   const router = useRouter();
+  const {
+    balance,
+    isDepositing,
+    isDevnet,
+    isAirdropping,
+    fetchBalance,
+    depositRewardPool,
+    requestDevnetAirdrop,
+    getExplorerUrl: getExplorer,
+  } = useSolanaQuiz();
+
+  // Deposit state
+  const [depositTx, setDepositTx] = useState<string | null>(null);
+  const [depositError, setDepositError] = useState<string | null>(null);
+  const [escrowAddress, setEscrowAddress] = useState<string | null>(null);
 
   useEffect(() => {
     if (!publicKey) setVisible(true);
-  }, [publicKey, setVisible]);
+    else fetchBalance();
+  }, [publicKey, setVisible, fetchBalance]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -191,6 +208,7 @@ export default function CreateQuizPage() {
   const handlePublish = async () => {
     if (!publicKey) return;
     setIsPublishing(true);
+    setDepositError(null);
     
     try {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -243,6 +261,20 @@ export default function CreateQuizPage() {
       if (questionsError) {
         const msg = questionsError.message || JSON.stringify(questionsError);
         throw new Error(`Questions insert failed: ${msg}`);
+      }
+
+      // 4. On-chain SOL deposit (if reward type is SOL and amount > 0)
+      const solAmount = Number(rewardPool);
+      if (rewardType === "sol" && solAmount > 0) {
+        const depositResult = await depositRewardPool(quizData.id, solAmount);
+        if (!depositResult.success) {
+          setDepositError(depositResult.error || "Deposit failed");
+          // Quiz is still created, just not funded on-chain
+          // User can retry deposit later
+        } else {
+          setDepositTx(depositResult.txSignature || null);
+          setEscrowAddress(depositResult.escrowAddress || null);
+        }
       }
 
       // Success
@@ -416,6 +448,94 @@ export default function CreateQuizPage() {
               </div>
             </div>
 
+            {/* On-Chain Deposit Status */}
+            {rewardType === "sol" && Number(rewardPool) > 0 && (
+              <div className={`glass rounded-[2rem] border p-8 space-y-4 ${
+                depositTx
+                  ? "border-[#14F195]/40"
+                  : depositError
+                  ? "border-yellow-500/40"
+                  : "border-[#9945FF]/30"
+              }`}>
+                <div className="flex items-center gap-3">
+                  <Coins className="w-6 h-6 text-[#14F195]" />
+                  <h3 className="text-xl font-bold">
+                    {lang === "ENG" ? "On-Chain Reward Pool" : "Reward Pool On-Chain"}
+                  </h3>
+                </div>
+
+                {depositTx ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[#14F195] font-bold">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>{lang === "ENG" ? "Deposit Confirmed!" : "Deposit Terkonfirmasi!"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-gray-500">TX:</span>
+                      <code className="text-xs font-mono text-gray-400 bg-black/10 dark:bg-white/5 px-2 py-1 rounded">
+                        {depositTx.slice(0, 20)}...{depositTx.slice(-8)}
+                      </code>
+                      <a
+                        href={getExplorer(depositTx)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs text-[#9945FF] hover:underline"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Explorer
+                      </a>
+                    </div>
+                    {escrowAddress && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm text-gray-500">{lang === "ENG" ? "Escrow:" : "Eskro:"}</span>
+                        <code className="text-xs font-mono text-gray-400 bg-black/10 dark:bg-white/5 px-2 py-1 rounded">
+                          {escrowAddress.slice(0, 12)}...{escrowAddress.slice(-8)}
+                        </code>
+                      </div>
+                    )}
+                    <div className="px-4 py-3 rounded-xl bg-[#14F195]/10 text-sm font-semibold text-[#14F195]">
+                      ◎ {rewardPool} SOL {lang === "ENG" ? "locked in escrow" : "terkunci di eskro"}
+                    </div>
+                  </div>
+                ) : depositError ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-yellow-500 font-bold">
+                      <AlertTriangle className="w-5 h-5" />
+                      <span>{lang === "ENG" ? "Deposit Not Completed" : "Deposit Belum Selesai"}</span>
+                    </div>
+                    <p className="text-sm text-gray-500">{depositError}</p>
+                    <button
+                      onClick={async () => {
+                        if (!quizId) return;
+                        setDepositError(null);
+                        const result = await depositRewardPool(quizId, Number(rewardPool));
+                        if (result.success) {
+                          setDepositTx(result.txSignature || null);
+                          setEscrowAddress(result.escrowAddress || null);
+                        } else {
+                          setDepositError(result.error || "Retry failed");
+                        }
+                      }}
+                      disabled={isDepositing}
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isDepositing ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" /> {lang === "ENG" ? "Processing..." : "Memproses..."}</>
+                      ) : (
+                        <><Coins className="w-4 h-4" /> {lang === "ENG" ? "Retry Deposit" : "Ulangi Deposit"}</>
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#9945FF]" />
+                    <span className="text-gray-500 font-medium">
+                      {lang === "ENG" ? "Processing deposit..." : "Memproses deposit..."}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* QR Code + Room Code */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* QR Code Card */}
@@ -552,6 +672,36 @@ export default function CreateQuizPage() {
               </h2>
 
               <div className="space-y-4">
+                {/* Wallet Balance Display */}
+                {publicKey && (
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#9945FF]/10 to-[#14F195]/10 border border-[#9945FF]/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center">
+                        <Wallet2 className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Your Balance" : "Saldo Anda"}</p>
+                        <p className="text-lg font-black text-[#14F195]">
+                          {balance !== null ? `◎ ${balance.toFixed(4)} SOL` : "Loading..."}
+                        </p>
+                      </div>
+                    </div>
+                    {isDevnet && (
+                      <button
+                        onClick={() => requestDevnetAirdrop(2)}
+                        disabled={isAirdropping}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#9945FF]/20 border border-[#9945FF]/30 text-[#9945FF] text-xs font-bold hover:bg-[#9945FF]/30 transition-all disabled:opacity-50"
+                      >
+                        {isAirdropping ? (
+                          <><Loader2 className="w-3 h-3 animate-spin" /> Airdrop...</>
+                        ) : (
+                          <><Zap className="w-3 h-3" /> Devnet Airdrop</>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
                     {lang === "ENG" ? "Quiz Title" : "Judul Kuis"}

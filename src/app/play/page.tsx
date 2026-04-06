@@ -4,13 +4,14 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift, LogOut
+  ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift, LogOut, ExternalLink, Loader2
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import WalletDropdown from "@/components/WalletDropdown";
+import { useSolanaQuiz } from "@/hooks/useSolanaQuiz";
 
 export default function PlayPage() {
   const { lang } = useLanguage();
@@ -20,6 +21,8 @@ export default function PlayPage() {
   useEffect(() => {
     if (!publicKey) setVisible(true);
   }, [publicKey, setVisible]);
+
+  const { claimReward, isClaiming: isClaimingOnChain, getExplorerUrl: getExplorer } = useSolanaQuiz();
 
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -142,18 +145,50 @@ export default function PlayPage() {
     }
   };
 
+  // On-chain claim state
+  const [claimTxSignature, setClaimTxSignature] = useState<string | null>(null);
+  const [claimRewardAmount, setClaimRewardAmount] = useState<number | null>(null);
+  const [claimRank, setClaimRank] = useState<number | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
+
   const handleClaimReward = async () => {
+    if (!quizInfo?.id) return;
     setIsClaiming(true);
-    // Simulate transaction delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsClaiming(false);
-    setHasClaimed(true);
-    confetti({
-      particleCount: 100,
-      spread: 60,
-      origin: { y: 0.7 },
-      colors: ['#14F195']
-    });
+    setClaimError(null);
+
+    try {
+      const result = await claimReward(quizInfo.id);
+      
+      if (result.success) {
+        setHasClaimed(true);
+        setClaimTxSignature(result.txSignature || null);
+        setClaimRewardAmount(result.rewardAmount || null);
+        setClaimRank(result.rank || null);
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.7 },
+          colors: ['#14F195', '#9945FF', '#FDE047']
+        });
+      } else {
+        setClaimError(result.error || "Failed to claim reward");
+        // Still show success for non-SOL quizzes or demo quizzes
+        if (quizInfo.id?.startsWith('demo')) {
+          setHasClaimed(true);
+          confetti({
+            particleCount: 100,
+            spread: 60,
+            origin: { y: 0.7 },
+            colors: ['#14F195']
+          });
+        }
+      }
+    } catch (err: any) {
+      console.error("Claim error:", err);
+      setClaimError(err.message || "An error occurred");
+    } finally {
+      setIsClaiming(false);
+    }
   };
 
   const walletShort = publicKey
@@ -562,20 +597,56 @@ export default function PlayPage() {
                 </div>
                 <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/5 dark:border-white/5">
                   <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Rank</div>
-                  <div className="text-3xl font-black text-[#14F195]">#3</div>
+                  <div className="text-3xl font-black text-[#14F195]">#{claimRank || "?"}</div>
                 </div>
               </div>
               
-              {/* Reward Section (Simulated top 3 win) */}
-              <div className="p-6 rounded-2xl bg-[#14F195]/10 border border-[#14F195]/30">
+              {/* Reward Section */}
+              <div className="p-6 rounded-2xl bg-[#14F195]/10 border border-[#14F195]/30 space-y-3">
                 <h3 className="font-bold text-lg mb-1">
-                  {lang === "ENG" ? "Congratulations! You Won" : "Selamat! Anda Menang"}
+                  {hasClaimed 
+                    ? (lang === "ENG" ? "Reward Claimed!" : "Hadiah Diklaim!")
+                    : (lang === "ENG" ? "Claim Your Reward" : "Klaim Hadiah Anda")}
                 </h3>
-                <div className="text-4xl font-black text-[#14F195] drop-shadow-sm my-2">0.5 SOL</div>
-                <p className="text-xs text-gray-500">
-                  {lang === "ENG" ? "Reward will be deposited to your wallet." : "Hadiah akan dikirimkan ke wallet Anda."}
-                </p>
+                {claimRewardAmount && (
+                  <div className="text-4xl font-black text-[#14F195] drop-shadow-sm my-2">
+                    ◎ {claimRewardAmount.toFixed(4)} SOL
+                  </div>
+                )}
+                {!claimRewardAmount && quizInfo?.reward_pool_amount && (
+                  <div className="text-4xl font-black text-[#14F195] drop-shadow-sm my-2">
+                    ◎ {quizInfo.reward_pool_amount} SOL
+                  </div>
+                )}
+                {claimTxSignature && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-center gap-2 text-[#14F195] font-bold text-sm">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{lang === "ENG" ? "On-chain transfer confirmed" : "Transfer on-chain dikonfirmasi"}</span>
+                    </div>
+                    <a
+                      href={getExplorer(claimTxSignature)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#9945FF]/10 border border-[#9945FF]/30 text-[#9945FF] text-xs font-bold hover:bg-[#9945FF]/20 transition-all"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      {lang === "ENG" ? "View on Solana Explorer" : "Lihat di Solana Explorer"}
+                    </a>
+                  </div>
+                )}
+                {!hasClaimed && (
+                  <p className="text-xs text-gray-500">
+                    {lang === "ENG" ? "SOL will be sent directly to your wallet." : "SOL akan dikirim langsung ke wallet Anda."}
+                  </p>
+                )}
               </div>
+
+              {claimError && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                  {claimError}
+                </div>
+              )}
 
               <button
                 onClick={handleClaimReward}
@@ -583,9 +654,9 @@ export default function PlayPage() {
                 className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#FDE047] to-[#EAB308] text-black font-extrabold text-lg hover:shadow-[0_0_30px_rgba(253,224,71,0.5)] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 {isClaiming ? (
-                  <span className="flex items-center gap-2"><div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"/> Processing...</span>
+                  <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> {lang === "ENG" ? "Claiming on-chain..." : "Mengklaim on-chain..."}</span>
                 ) : hasClaimed ? (
-                  <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> Claimed!</span>
+                  <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> {lang === "ENG" ? "Claimed!" : "Berhasil Diklaim!"}</span>
                 ) : (
                   <span className="flex items-center gap-2"><Gift className="w-5 h-5" /> {lang === "ENG" ? "Claim Reward" : "Klaim Hadiah"}</span>
                 )}

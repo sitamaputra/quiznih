@@ -46,7 +46,7 @@ export default function WalletDropdown() {
 
   if (!publicKey) {
     return (
-      <button 
+      <button
         onClick={() => setVisible(true)}
         className="flex items-center gap-2 bg-[#9945FF]/10 dark:bg-[#9945FF]/20 hover:bg-[#9945FF]/30 dark:hover:bg-[#9945FF]/40 border border-[#9945FF] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(153,69,255,0.2)] hover:shadow-[0_0_25px_rgba(153,69,255,0.4)]"
       >
@@ -122,7 +122,7 @@ export default function WalletDropdown() {
                 </div>
                 {copied && <CheckCircle2 className="w-4 h-4 text-[#14F195]" />}
               </button>
-              
+
               <button
                 onClick={() => disconnect()}
                 className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors font-semibold text-sm"
