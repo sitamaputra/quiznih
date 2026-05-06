@@ -29,31 +29,31 @@ export const wagmiConfig = createConfig({
 export const WALLET_INSTALL_LIST = [
   {
     name: "MetaMask",
-    icon: "https://raw.githubusercontent.com/nicoolasbns/wallet-icons/refs/heads/main/metamask.png",
+    icon: "/wallets/metamask.svg",
     downloadUrl: "https://metamask.io/download/",
     color: "#F6851B",
   },
   {
     name: "Rabby Wallet",
-    icon: "https://raw.githubusercontent.com/nicoolasbns/wallet-icons/refs/heads/main/rabby.png",
+    icon: "/wallets/rabby.svg",
     downloadUrl: "https://rabby.io/",
     color: "#7C7AF9",
   },
   {
     name: "OKX Wallet",
-    icon: "https://raw.githubusercontent.com/nicoolasbns/wallet-icons/refs/heads/main/okx.png",
+    icon: "/wallets/okx.svg",
     downloadUrl: "https://www.okx.com/web3",
     color: "#000000",
   },
   {
     name: "Bitget Wallet",
-    icon: "https://raw.githubusercontent.com/nicoolasbns/wallet-icons/refs/heads/main/bitget.png",
+    icon: "/wallets/bitget.svg",
     downloadUrl: "https://web3.bitget.com/",
     color: "#00D4AA",
   },
   {
     name: "Trust Wallet",
-    icon: "https://raw.githubusercontent.com/nicoolasbns/wallet-icons/refs/heads/main/trustwallet.png",
+    icon: "/wallets/trust.svg",
     downloadUrl: "https://trustwallet.com/",
     color: "#3375BB",
   },
