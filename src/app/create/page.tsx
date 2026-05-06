@@ -66,23 +66,23 @@ export default function CreateQuizPage() {
   ]);
 
   const REWARD_TYPES = [
-    { value: "CELO", label: "CELO", icon: "â—Ž", desc: "Kripto CELOana" },
-    { value: "kaos", label: "Kaos", icon: "ðŸ‘•", desc: "Merchandise Kaos" },
-    { value: "tumbler", label: "Tumbler", icon: "â˜•", desc: "Tumbler / Botol Minum" },
-    { value: "sticker", label: "Sticker", icon: "ðŸŽ¨", desc: "Sticker Pack" },
-    { value: "nft", label: "NFT", icon: "ðŸ–¼ï¸", desc: "NFT Gift" },
-    { value: "lainnya", label: "Hadiah Lain", icon: "ðŸŽ", desc: "Tentukan sendiri" },
+    { value: "CELO", label: "CELO", icon: "◎", desc: "Crypto CELO" },
+    { value: "kaos", label: "Kaos", icon: "👕", desc: "Merchandise Kaos" },
+    { value: "tumbler", label: "Tumbler", icon: "☕", desc: "Tumbler / Botol Minum" },
+    { value: "sticker", label: "Sticker", icon: "🎨", desc: "Sticker Pack" },
+    { value: "nft", label: "NFT", icon: "🖼️", desc: "NFT Gift" },
+    { value: "lainnya", label: "Hadiah Lain", icon: "🎁", desc: "Tentukan sendiri" },
   ];
 
   const QUIZ_TEMPLATES = [
     {
-      label: lang === "ENG" ? "CELOana Basics" : "Dasar CELOana",
+      label: lang === "ENG" ? "Celo Basics" : "Dasar Celo",
       data: {
-        title: "CELOana Quiz", description: "Test your CELOana knowledge!",
+        title: "Celo Quiz", description: "Test your Celo knowledge!",
         questions: [
-          { id: 1, text: "Siapa pencipta CELOana?", options: ["Vitalik Buterin", "Anatoly Yakovenko", "Satoshi Nakamoto", "Charles Hoskinson"], correctIndex: 1, timeLimit: 20 },
-          { id: 2, text: "Berapa TPS maksimum CELOana?", options: ["1.000", "10.000", "65.000", "100.000"], correctIndex: 2, timeLimit: 20 },
-          { id: 3, text: "Apa mekanisme konsensus CELOana?", options: ["Proof of Work", "Proof of Stake", "Proof of History", "Proof of Authority"], correctIndex: 2, timeLimit: 20 },
+          { id: 1, text: "Siapa pencipta Celo?", options: ["Rene Reinsberg", "Marek Olszewski", "Satoshi Nakamoto", "Charles Hoskinson"], correctIndex: 0, timeLimit: 20 },
+          { id: 2, text: "Token native Celo adalah?", options: ["ETH", "SOL", "CELO", "BNB"], correctIndex: 2, timeLimit: 20 },
+          { id: 3, text: "Celo fokus pada?", options: ["Gaming", "Mobile-first DeFi", "NFT Marketplace", "Mining"], correctIndex: 1, timeLimit: 20 },
         ]
       }
     },
@@ -93,7 +93,7 @@ export default function CreateQuizPage() {
         questions: [
           { id: 1, text: "Kepanjangan dari NFT adalah?", options: ["Non-Fungible Token", "New Financial Transaction", "Network File Transfer", "None"], correctIndex: 0, timeLimit: 20 },
           { id: 2, text: "Apa itu DeFi?", options: ["Defense Finance", "Decentralized Finance", "Digital Framework", "Distributed Files"], correctIndex: 1, timeLimit: 20 },
-          { id: 3, text: "Smart Contract pertama kali diperkenalkan di?", options: ["Bitcoin", "CELOana", "Ethereum", "Polkadot"], correctIndex: 2, timeLimit: 20 },
+          { id: 3, text: "Smart Contract pertama kali diperkenalkan di?", options: ["Bitcoin", "Celo", "Ethereum", "Polkadot"], correctIndex: 2, timeLimit: 20 },
         ]
       }
     },
@@ -302,9 +302,9 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
       }
 
       // 4. On-chain CELO deposit (if reward type is CELO and amount > 0)
-      const CELOAmount = Number(rewardPool);
-      if (rewardType === "CELO" && CELOAmount > 0) {
-        const depositResult = await depositRewardPool(quizData.id, CELOAmount);
+      const celoAmount = Number(rewardPool);
+      if (rewardType === "CELO" && celoAmount > 0) {
+        const depositResult = await depositRewardPool(quizData.id, celoAmount);
         if (!depositResult.success) {
           setDepositError(depositResult.error || "Deposit failed");
           // Quiz is still created, just not funded on-chain
@@ -355,8 +355,8 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
     <main className="min-h-screen w-full text-black dark:text-white relative">
       {/* Background */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="abCELOute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-        <div className="abCELOute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
       </div>
 
       {/* Header */}
@@ -423,7 +423,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
             className="glass rounded-[2rem] border border-[#35D07F]/30 p-8 mb-8 space-y-6"
           >
             <div className="flex justify-between items-center">
-              <h3 className="font-extrabold text-xl">ðŸ“¥ {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
+              <h3 className="font-extrabold text-xl">📥 {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -462,7 +462,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                         onClick={() => applyTemplate(tpl)}
                         className="px-4 py-2 rounded-xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 font-semibold text-xs hover:border-[#35D07F]/50 hover:text-[#35D07F] transition-all"
                       >
-                        ðŸš€ {tpl.label}
+                        🚀 {tpl.label}
                       </button>
                     ))}
                   </div>
@@ -561,7 +561,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       </div>
                     )}
                     <div className="px-4 py-3 rounded-xl bg-[#FCFF52]/10 text-sm font-semibold text-[#FCFF52]">
-                      â—Ž {rewardPool} CELO {lang === "ENG" ? "locked in escrow" : "terkunci di eskro"}
+                      ◎ {rewardPool} CELO {lang === "ENG" ? "locked in escrow" : "terkunci di eskro"}
                     </div>
                   </div>
                 ) : depositError ? (
@@ -609,7 +609,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               {/* QR Code Card */}
               <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 flex flex-col items-center space-y-6">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                  ðŸ“± {lang === "ENG" ? "Scan to Join" : "Scan untuk Gabung"}
+                  📱 {lang === "ENG" ? "Scan to Join" : "Scan untuk Gabung"}
                 </h3>
                 {/* QR Code Visual */}
                 <div className="bg-white p-5 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.2)]">
@@ -622,14 +622,14 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   }}
                   className="px-6 py-2.5 bg-[#FCFF52]/20 text-[#FCFF52] rounded-full font-bold border border-[#FCFF52]/50 hover:bg-[#FCFF52]/30 transition-all shadow-[0_0_15px_rgba(20,241,149,0.3)] w-full text-center mt-2"
                 >
-                  ðŸ”— {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
+                  🔗 {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
                 </button>
               </div>
 
               {/* Room Code Card */}
               <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 flex flex-col items-center justify-center space-y-6">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                  ðŸ”‘ {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
+                  🔑 {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
                 </h3>
                 <div className="px-10 py-5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-mono text-4xl md:text-5xl font-extrabold tracking-[0.3em] shadow-[0_0_40px_rgba(153,69,255,0.2)]">
                   {roomCode}
@@ -653,7 +653,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
             <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold flex items-center gap-2">
-                  ðŸ‘¥ {lang === "ENG" ? "Waiting Room" : "Ruang Tunggu"}
+                  👥 {lang === "ENG" ? "Waiting Room" : "Ruang Tunggu"}
                 </h3>
                              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30">
                   <div className="w-2 h-2 rounded-full bg-[#FCFF52] animate-pulse" />
@@ -698,10 +698,10 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               {/* Quiz Summary */}
               <div className="flex flex-wrap gap-4 pt-4 border-t border-black/5 dark:border-white/5">
                 <div className="px-4 py-2 rounded-xl bg-[#35D07F]/10 text-sm font-semibold">
-                  ðŸ“ {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
+                  📝 {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-[#FCFF52]/10 text-sm font-semibold">
-                  ðŸ’° {rewardPool} CELO
+                  💰 {rewardPool} CELO
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-[#FDE047]/10 text-sm font-semibold">
                   â± {questions.reduce((a, q) => a + (q.timeLimit || 0), 0)}s {lang === "ENG" ? "total" : "total"}
@@ -715,7 +715,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                 onClick={() => router.push(`/create/room/${quizId}`)}
                 className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-white dark:text-black font-extrabold text-lg flex items-center justify-center gap-3 transition-all"
               >
-                ðŸŽ® {lang === "ENG" ? "Go to Control Room" : "Ke Ruang Kontrol"}
+                🎮 {lang === "ENG" ? "Go to Control Room" : "Ke Ruang Kontrol"}
               </button>
               <Link
                 href="/manage"
@@ -736,7 +736,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               className="glass rounded-[2rem] p-8 border border-black/10 dark:border-white/10 space-y-6"
             >
               <h2 className="text-xl font-bold flex items-center gap-2">
-                ðŸ“ {lang === "ENG" ? "Quiz Information" : "Informasi Kuis"}
+                📋 {lang === "ENG" ? "Quiz Information" : "Informasi Kuis"}
               </h2>
 
               <div className="space-y-4">
@@ -750,7 +750,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       <div>
                         <p className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Your Balance" : "Saldo Anda"}</p>
                         <p className="text-lg font-black text-[#FCFF52]">
-                          {balance !== null ? `â—Ž ${balance.toFixed(4)} CELO` : "Loading..."}
+                          {balance !== null ? `◎ ${balance.toFixed(4)} CELO` : "Loading..."}
                         </p>
                       </div>
                     </div>
@@ -778,7 +778,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder={lang === "ENG" ? "e.g. CELOana Ecosystem Mastery" : "contoh: Penguasaan Ekosistem CELOana"}
+                    placeholder={lang === "ENG" ? "e.g. Celo Ecosystem Mastery" : "contoh: Penguasaan Ekosistem Celo"}
                     className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#35D07F]/50 transition-all text-lg"
                   />
                 </div>
@@ -896,7 +896,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       />
                       <button
                         onClick={() => updateQuestion(q.id, "correctIndex", optIdx)}
-                        className={`abCELOute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md transition-all ${
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md transition-all ${
                           q.correctIndex === optIdx
                             ? "bg-[#FCFF52] text-black"
                             : "bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-[#FCFF52]/50"

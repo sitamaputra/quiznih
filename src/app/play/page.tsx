@@ -58,18 +58,18 @@ export default function PlayPage() {
   const [selectedAvatar, setSelectedAvatar] = useState(0);
 
   const AVATARS = [
-    { emoji: "ðŸ¶", name: "Doggo", color: "#F59E0B" },
-    { emoji: "ðŸ±", name: "Kitty", color: "#EC4899" },
-    { emoji: "ðŸ¸", name: "Froggy", color: "#FCFF52" },
-    { emoji: "ðŸ¦Š", name: "Foxi", color: "#F97316" },
-    { emoji: "ðŸ¼", name: "Panda", color: "#6B7280" },
-    { emoji: "ðŸ¦", name: "Leo", color: "#EAB308" },
-    { emoji: "ðŸ¯", name: "Tiger", color: "#F97316" },
-    { emoji: "ðŸ™", name: "Octo", color: "#35D07F" },
-    { emoji: "ðŸ¦„", name: "Uni", color: "#EC4899" },
-    { emoji: "ðŸ²", name: "Drago", color: "#FCFF52" },
-    { emoji: "ðŸ¤–", name: "Robot", color: "#60A5FA" },
-    { emoji: "ðŸ‘¾", name: "Alien", color: "#A78BFA" },
+    { emoji: "🐶", name: "Doggo", color: "#F59E0B" },
+    { emoji: "🐱", name: "Kitty", color: "#EC4899" },
+    { emoji: "🐸", name: "Froggy", color: "#FCFF52" },
+    { emoji: "🦊", name: "Foxi", color: "#F97316" },
+    { emoji: "🐼", name: "Panda", color: "#6B7280" },
+    { emoji: "🦁", name: "Leo", color: "#EAB308" },
+    { emoji: "🐯", name: "Tiger", color: "#F97316" },
+    { emoji: "🐙", name: "Octo", color: "#35D07F" },
+    { emoji: "🦄", name: "Uni", color: "#EC4899" },
+    { emoji: "🐲", name: "Drago", color: "#FCFF52" },
+    { emoji: "🤖", name: "Robot", color: "#60A5FA" },
+    { emoji: "👾", name: "Alien", color: "#A78BFA" },
   ];
 
   const prevAvatar = () => setSelectedAvatar(i => (i - 1 + AVATARS.length) % AVATARS.length);
@@ -200,7 +200,7 @@ export default function PlayPage() {
   const DEMO_QUIZ = {
     id: 'demo-123456',
     host_wallet: 'demo-host',
-    title: 'Web3 & CELOana Trivia',
+    title: 'Web3 & Celo Trivia',
     description: 'Uji pengetahuan Web3 kamu!',
     room_code: '123456',
     status: 'playing',
@@ -229,7 +229,7 @@ export default function PlayPage() {
       id: 'dq3',
       quiz_id: 'demo-123456',
       question_text: 'Blockchain mana yang dikenal dengan kecepatan 65.000 TPS?',
-      options: ['Ethereum', 'Bitcoin', 'CELOana', 'Cardano'],
+      options: ['Ethereum', 'Bitcoin', 'Celo', 'Cardano'],
       correct_answer_index: 2,
       time_limit_seconds: 15,
       order_number: 2,
@@ -237,8 +237,8 @@ export default function PlayPage() {
     {
       id: 'dq4',
       quiz_id: 'demo-123456',
-      question_text: 'Apa nama wallet paling populer di CELOana?',
-      options: ['MetaMask', 'Phantom', 'Trust Wallet', 'Coinbase Wallet'],
+      question_text: 'Apa nama wallet mobile yang dibuat khusus untuk Celo?',
+      options: ['MetaMask', 'Valora', 'Trust Wallet', 'Coinbase Wallet'],
       correct_answer_index: 1,
       time_limit_seconds: 15,
       order_number: 3,
@@ -387,7 +387,7 @@ export default function PlayPage() {
     return (
       <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
         <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="abCELOute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+          <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
         </div>
 
         <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
@@ -431,7 +431,7 @@ export default function PlayPage() {
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Players" : "Pemain"}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-[#35D07F]">{questions.length}</div>
+                  📝 {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Questions" : "Soal"}</div>
                 </div>
                 <div>
@@ -471,7 +471,7 @@ export default function PlayPage() {
               {/* Progress & Timer */}
               <div className="flex items-center justify-between glass px-6 py-4 rounded-full border border-black/10 dark:border-white/10">
                 <span className="font-bold text-gray-500">
-                  {lang === "ENG" ? "Question" : "Soal"} {currentQuestionIndex + 1} / {questions.length}
+                  📝 {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
                 </span>
                 <div className="flex items-center gap-2 text-[#35D07F] font-extrabold text-xl">
                   <Clock className="w-5 h-5" />
@@ -576,7 +576,7 @@ export default function PlayPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               className="glass rounded-[3rem] border border-[#FDE047]/40 p-10 max-w-md w-full text-center space-y-8 relative overflow-hidden"
             >
-              <div className="abCELOute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#FDE047]/20 blur-[80px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#FDE047]/20 blur-[80px] rounded-full pointer-events-none" />
               
               <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-[#FDE047] to-[#EAB308] flex items-center justify-center shadow-[0_0_40px_rgba(253,224,71,0.4)]">
                 <Trophy className="w-12 h-12 text-black" />
@@ -632,7 +632,7 @@ export default function PlayPage() {
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-xs font-bold hover:bg-[#35D07F]/20 transition-all"
                     >
                       <ExternalLink className="w-3 h-3" />
-                      {lang === "ENG" ? "View on CELOana Explorer" : "Lihat di CELOana Explorer"}
+                      {lang === "ENG" ? "View on Celo Explorer" : "Lihat di Celo Explorer"}
                     </a>
                   </div>
                 )}
@@ -681,8 +681,8 @@ export default function PlayPage() {
     <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
       {/* Background */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="abCELOute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
-        <div className="abCELOute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
       </div>
 
       {/* Header */}
@@ -775,12 +775,12 @@ export default function PlayPage() {
 
             {/* QR Scanner Placeholder */}
             <div className="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border-2 border-[#FCFF52]/50 bg-black/80 flex items-center justify-center">
-              <div className="abCELOute inset-4 border-2 border-[#FCFF52] rounded-2xl border-dashed animate-pulse" />
+              <div className="absolute inset-4 border-2 border-[#FCFF52] rounded-2xl border-dashed animate-pulse" />
               <QrCode className="w-16 h-16 text-[#FCFF52]/50" />
 
               {/* Scanning line animation */}
               <motion.div
-                className="abCELOute left-4 right-4 h-0.5 bg-[#FCFF52] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
+                className="absolute left-4 right-4 h-0.5 bg-[#FCFF52] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
                 animate={{ top: ["10%", "85%", "10%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -860,7 +860,7 @@ export default function PlayPage() {
                     <span>{AVATARS[selectedAvatar].emoji}</span>
                     {/* Glow */}
                     <div
-                      className="abCELOute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
+                      className="absolute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
                       style={{ backgroundColor: AVATARS[selectedAvatar].color }}
                     />
                   </div>
