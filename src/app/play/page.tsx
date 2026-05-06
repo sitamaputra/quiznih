@@ -561,7 +561,7 @@ export default function PlayPage() {
                   onClick={nextQuestion}
                   className="text-xs text-gray-400 hover:text-[#35D07F] transition-colors underline"
                 >
-                  {lang === "ENG" ? "Skip â†’" : "Lewati â†’"}
+                  {lang === "ENG" ? "Skip ▶" : "Lewati ▶"}
                 </button>
               </div>
             </motion.div>
@@ -611,12 +611,12 @@ export default function PlayPage() {
                 </h3>
                 {claimRewardAmount && (
                   <div className="text-4xl font-black text-[#FCFF52] drop-shadow-sm my-2">
-                    â—Ž {claimRewardAmount.toFixed(4)} CELO
+                    ◎ {claimRewardAmount.toFixed(4)} CELO
                   </div>
                 )}
                 {!claimRewardAmount && quizInfo?.reward_pool_amount && (
                   <div className="text-4xl font-black text-[#FCFF52] drop-shadow-sm my-2">
-                    â—Ž {quizInfo.reward_pool_amount} CELO
+                    ◎ {quizInfo.reward_pool_amount} CELO
                   </div>
                 )}
                 {claimTxSignature && (
@@ -815,7 +815,7 @@ export default function PlayPage() {
                   disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
                   className="px-5 py-3 rounded-xl bg-[#FCFF52] text-black font-bold hover:bg-[#0EC97F] transition-colors disabled:opacity-40 flex items-center justify-center"
                 >
-                  {isJoining ? <span className="animate-spin text-xl">âŸ³</span> : <ArrowRight className="w-5 h-5" />}
+                  {isJoining ? <span className="animate-spin text-xl">⏳</span> : <ArrowRight className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -824,7 +824,7 @@ export default function PlayPage() {
               onClick={() => setJoinMode("select")}
               className="text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
             >
-              â† {lang === "ENG" ? "Back" : "Kembali"}
+              ⬅️ {lang === "ENG" ? "Back" : "Kembali"}
             </button>
           </motion.div>
         )}
@@ -844,7 +844,7 @@ export default function PlayPage() {
                 <button
                   onClick={prevAvatar}
                   className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-2xl transition-all flex items-center justify-center border border-white/10"
-                >â—€</button>
+                >◀</button>
 
                 <motion.div
                   key={selectedAvatar}
@@ -872,7 +872,7 @@ export default function PlayPage() {
                 <button
                   onClick={nextAvatar}
                   className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-2xl transition-all flex items-center justify-center border border-white/10"
-                >â–¶</button>
+                >▶</button>
               </div>
 
               {/* Avatar strip dots */}
@@ -926,7 +926,7 @@ export default function PlayPage() {
               style={{ background: `linear-gradient(135deg, ${AVATARS[selectedAvatar].color}, #FCFF52)` }}
             >
               {isJoining ? (
-                <span className="flex items-center gap-2"><span className="animate-spin text-xl">âŸ³</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
+                <span className="flex items-center gap-2"><span className="animate-spin text-xl">⏳</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
               ) : (
                 <><span className="text-xl">{AVATARS[selectedAvatar].emoji}</span> {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}</>
               )}
@@ -936,7 +936,7 @@ export default function PlayPage() {
               onClick={() => setJoinMode("select")}
               className="text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
             >
-              â† {lang === "ENG" ? "Back" : "Kembali"}
+              ⬅️ {lang === "ENG" ? "Back" : "Kembali"}
             </button>
           </motion.div>
         )}

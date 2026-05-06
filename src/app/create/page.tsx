@@ -374,8 +374,8 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
           <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400">
             <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
-              <p className="font-bold mb-1">âš ï¸ Supabase Not Connected</p>
-              <p>Environment variables missing on Vercel. Add these in Vercel â†’ Settings â†’ Environment Variables:</p>
+              <p className="font-bold mb-1">⚠️ Supabase Not Connected</p>
+              <p>Environment variables missing on Vercel. Add these in Vercel → Settings → Environment Variables:</p>
               <code className="block mt-2 text-xs bg-black/30 p-2 rounded">
                 NEXT_PUBLIC_SUPABASE_URL = https://your-project.supabase.co<br/>
                 NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJ...your-anon-key
@@ -478,7 +478,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   placeholder={'{ "title": "My Quiz", "questions": [{"text":"...","options":["A","B","C","D"],"correctIndex":0,"timeLimit":20}] }'}
                   className="flex-1 w-full p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#35D07F]/50 transition-all font-mono text-xs resize-none min-h-[200px]"
                 />
-                {importError && <p className="text-red-400 text-sm mt-2 font-semibold">âš ï¸ {importError}</p>}
+                {importError && <p className="text-red-400 text-sm mt-2 font-semibold">⚠️ {importError}</p>}
                 <button
                   onClick={handleImport}
                   disabled={!importJson.trim()}
@@ -704,7 +704,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   💰 {rewardPool} CELO
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-[#FDE047]/10 text-sm font-semibold">
-                  â± {questions.reduce((a, q) => a + (q.timeLimit || 0), 0)}s {lang === "ENG" ? "total" : "total"}
+                  ⏱ {questions.reduce((a, q) => a + (q.timeLimit || 0), 0)}s {lang === "ENG" ? "total" : "total"}
                 </div>
               </div>
             </div>
@@ -902,7 +902,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                             : "bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-[#FCFF52]/50"
                         }`}
                       >
-                        âœ“
+                        ✓
                       </button>
                     </div>
                   ))}
@@ -910,7 +910,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
 
                 <div className="flex items-center gap-4">
                   <label className="text-sm text-gray-500 font-semibold">
-                    â± {lang === "ENG" ? "Time limit:" : "Batas waktu:"}
+                    ⏱ {lang === "ENG" ? "Time limit:" : "Batas waktu:"}
                   </label>
                   <select
                     value={q.timeLimit}
