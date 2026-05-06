@@ -32,11 +32,7 @@ export default function DashboardPage() {
     : "";
 
   const handleConnectAndNavigate = (path: string) => {
-    if (isConnected) {
-      router.push(path);
-    } else if (connectors.length > 0) {
-      connect({ connector: connectors[0] });
-    }
+    router.push(path);
   };
 
   return (
