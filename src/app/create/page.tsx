@@ -244,7 +244,22 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
   }, [quizId, isPublished]);
 
   const handlePublish = async () => {
-    if (!publicKey) return;
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured) {
+      alert(lang === "ENG" 
+        ? "Database not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel environment variables." 
+        : "Database belum dikonfigurasi. Silakan atur NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di variabel lingkungan Vercel.");
+      return;
+    }
+
+    // Check wallet connection
+    if (!publicKey) {
+      alert(lang === "ENG" 
+        ? "Please connect your wallet first to publish a quiz." 
+        : "Silakan hubungkan wallet Anda terlebih dahulu untuk mempublikasikan kuis.");
+      return;
+    }
+
     setIsPublishing(true);
     setDepositError(null);
     
@@ -365,7 +380,25 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
         </Link>
-        {publicKey && <WalletDropdown />}
+        {publicKey ? (
+          <WalletDropdown />
+        ) : (
+          <button
+            onClick={() => {
+              if (connectors.length > 0) {
+                connect({ connector: connectors[0] });
+              } else {
+                alert(lang === "ENG" 
+                  ? "No wallet detected. Please install MetaMask or another Web3 wallet." 
+                  : "Wallet tidak terdeteksi. Silakan install MetaMask atau wallet Web3 lainnya.");
+              }
+            }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-bold text-sm hover:shadow-[0_0_20px_rgba(53,208,127,0.4)] transition-all"
+          >
+            <Wallet2 className="w-4 h-4" />
+            {lang === "ENG" ? "Connect Wallet" : "Hubungkan Wallet"}
+          </button>
+        )}
       </header>
 
       {/* Supabase Connection Diagnostic */}
