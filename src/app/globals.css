@@ -3,8 +3,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-solana-purple: #9945FF;
-  --color-solana-green: #14F195;
+  --color-celo-green: #35D07F;
+  --color-celo-gold: #FCFF52;
+  --color-celo-dark: #1A1A2E;
 }
 
 :root {
@@ -40,7 +41,7 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(90deg, #14F195 0%, #9945FF 100%);
+  background: linear-gradient(90deg, #35D07F 0%, #FCFF52 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -1,6 +1,6 @@
 export type Profile = {
   id: string; // UUID
-  wallet_address: string;
+  wallet_address: string; // EVM address (0x...)
   username: string | null;
   avatar_url: string | null;
   total_score: number;
@@ -9,18 +9,17 @@ export type Profile = {
 
 export type Quiz = {
   id: string; // UUID
-  host_wallet: string;
+  host_wallet: string; // EVM address (0x...)
   title: string;
   description: string | null;
   room_code: string;
-  reward_pool_amount: number;
+  reward_pool_amount: number; // In CELO
   status: "waiting" | "playing" | "finished";
 
-  // Solana On-Chain Escrow
-  escrow_pubkey: string | null;
-  escrow_secret: string | null;
+  // Celo On-Chain Escrow (via QuizEscrow contract)
+  contract_quiz_id: string | null; // bytes32 quiz ID on contract
   deposit_status: "none" | "pending" | "confirmed";
-  deposit_tx: string | null;
+  deposit_tx: string | null; // Transaction hash
   escrow_balance: number;
 
   created_at: string;
@@ -39,12 +38,12 @@ export type Question = {
 export type LeaderboardEntry = {
   id: string; // UUID
   quiz_id: string;
-  user_wallet: string;
+  user_wallet: string; // EVM address (0x...)
   player_name: string | null;
   final_score: number;
   claimed_reward: boolean;
 
   // On-Chain Claim
-  claim_tx: string | null;
-  reward_amount: number;
+  claim_tx: string | null; // Transaction hash
+  reward_amount: number; // In CELO
 };

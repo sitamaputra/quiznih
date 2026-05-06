@@ -4,11 +4,11 @@ import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
 
 const players = [
-  { rank: 1, name: "CryptoKing.sol", score: 9850, wallet: "8N...3vJ", trend: "up" },
-  { rank: 2, name: "Satoshi_Fan", score: 9200, wallet: "Hk...Zq2", trend: "up" },
-  { rank: 3, name: "DiamondHands", score: 8750, wallet: "2d...9p1", trend: "down" },
-  { rank: 4, name: "Degenerate Ape", score: 8100, wallet: "Fp...Kw9", trend: "same" },
-  { rank: 5, name: "NFT_Collector", score: 7900, wallet: "Gz...Mv5", trend: "up" },
+  { rank: 1, name: "CeloKing.eth", score: 9850, wallet: "0x8N...3vJ", trend: "up" },
+  { rank: 2, name: "Satoshi_Fan", score: 9200, wallet: "0xHk...Zq2", trend: "up" },
+  { rank: 3, name: "DiamondHands", score: 8750, wallet: "0x2d...9p1", trend: "down" },
+  { rank: 4, name: "MiniPay_Pro", score: 8100, wallet: "0xFp...Kw9", trend: "same" },
+  { rank: 5, name: "NFT_Collector", score: 7900, wallet: "0xGz...Mv5", trend: "up" },
 ];
 
 export default function Leaderboard() {
@@ -43,7 +43,7 @@ export default function Leaderboard() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="glass rounded-3xl border border-black/10 dark:border-white/10 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(153,69,255,0.1)]"
+          className="glass rounded-3xl border border-black/10 dark:border-white/10 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(53,208,127,0.1)]"
         >
           <div className="grid grid-cols-12 gap-4 p-6 bg-black/5 dark:bg-white/5 font-semibold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider border-b border-black/5 dark:border-white/5">
             <div className="col-span-2 text-center">{lang === "ENG" ? "Rank" : "Peringkat"}</div>
@@ -61,7 +61,7 @@ export default function Leaderboard() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 className={`grid grid-cols-12 gap-4 p-6 items-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${
-                  player.rank === 1 ? 'bg-[#9945FF]/5 dark:bg-[#9945FF]/10' : ''
+                  player.rank === 1 ? 'bg-[#35D07F]/5 dark:bg-[#35D07F]/10' : ''
                 }`}
               >
                 <div className="col-span-2 flex justify-center">
@@ -85,7 +85,7 @@ export default function Leaderboard() {
                   )}
                 </div>
 
-                <div className="col-span-3 text-right font-mono text-xl text-emerald-600 dark:text-[#14F195]">
+                <div className="col-span-3 text-right font-mono text-xl text-emerald-600 dark:text-[#35D07F]">
                   {player.score.toLocaleString()}
                 </div>
 

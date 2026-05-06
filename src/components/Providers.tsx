@@ -2,11 +2,11 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { LanguageProvider } from "@/context/LanguageContext";
-import { SolanaProvider } from "@/components/SolanaProvider";
+import { CeloProvider } from "@/components/CeloProvider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SolanaProvider>
+    <CeloProvider>
       <NextThemesProvider
         attribute="class"
         defaultTheme="dark"
@@ -17,6 +17,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           {children}
         </LanguageProvider>
       </NextThemesProvider>
-    </SolanaProvider>
+    </CeloProvider>
   );
 }

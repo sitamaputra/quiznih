@@ -4,21 +4,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAccount, useConnect, useConnectors } from "wagmi";
+import { IS_TESTNET, isMiniPayEnvironment } from "@/lib/celo";
 
 export default function HeroSection() {
   const { lang } = useLanguage();
-  const { publicKey, disconnect } = useWallet();
-  const { setVisible } = useWalletModal();
-
-  const handleWalletClick = () => {
-    if (publicKey) {
-      disconnect();
-    } else {
-      setVisible(true);
-    }
-  };
+  const { isConnected } = useAccount();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
+  const isMiniPay = isMiniPayEnvironment();
 
   return (
     <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden w-full flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
@@ -32,10 +26,12 @@ export default function HeroSection() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#14F195]/30 bg-[#14F195]/10 text-emerald-600 dark:text-[#14F195] text-sm font-medium mb-4 animate-pulse"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#35D07F]/30 bg-[#35D07F]/10 text-emerald-600 dark:text-[#35D07F] text-sm font-medium mb-4 animate-pulse"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-[#14F195]"></span>
-          {lang === "ENG" ? "Live on Solana Devnet" : "Aktif di Solana Devnet"}
+          <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-[#35D07F]"></span>
+          {lang === "ENG" 
+            ? (IS_TESTNET ? "Live on Celo Alfajores Testnet" : "Live on Celo") 
+            : (IS_TESTNET ? "Aktif di Celo Alfajores Testnet" : "Aktif di Celo")}
         </motion.div>
         
         <motion.h1 
@@ -64,8 +60,8 @@ export default function HeroSection() {
           className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"
         >
           {lang === "ENG"
-            ? "The ultimate decentralized trivia experience. Host quizzes for your community and automatically distribute crypto rewards with zero friction."
-            : "Pengalaman trivia terdesentralisasi terbaik. Host kuis untuk komunitasmu dan bagikan hadiah kripto secara otomatis tanpa hambatan."}
+            ? "The ultimate decentralized trivia experience on Celo. Host quizzes for your community and automatically distribute crypto rewards with zero friction."
+            : "Pengalaman trivia terdesentralisasi terbaik di Celo. Host kuis untuk komunitasmu dan bagikan hadiah kripto secara otomatis tanpa hambatan."}
         </motion.p>
         
         <motion.div 
@@ -74,11 +70,22 @@ export default function HeroSection() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8"
         >
-          <Link href="/dashboard" className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-cyan-500 text-white px-12 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/25 group">
+          <Link href="/dashboard" className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black px-12 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg shadow-[#35D07F]/25 group">
             <PlayCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
             {lang === "ENG" ? "Play Now" : "Main Sekarang"}
           </Link>
         </motion.div>
+
+        {isMiniPay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0, duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#FCFF52]/30 bg-[#FCFF52]/10 text-[#FCFF52] text-xs font-semibold"
+          >
+            ⚡ {lang === "ENG" ? "Running inside MiniPay" : "Berjalan di dalam MiniPay"}
+          </motion.div>
+        )}
       </motion.div>
     </section>
   );

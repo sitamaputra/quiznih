@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail, Lock, User, LogIn, ChevronRight, Chrome, Wallet2 } from "lucide-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAccount, useConnect, useConnectors } from "wagmi";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/context/LanguageContext";
+import { isMiniPayEnvironment } from "@/lib/celo";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,13 +15,25 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { lang } = useLanguage();
-  const { setVisible } = useWalletModal();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
+  const { isConnected } = useAccount();
+  const isMiniPay = isMiniPayEnvironment();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If in MiniPay, auto-connect and close
+  useEffect(() => {
+    if (isMiniPay && isOpen && connectors.length > 0) {
+      connect({ connector: connectors[0] });
+      onClose();
+      if (onSuccess) onSuccess();
+    }
+  }, [isMiniPay, isOpen, connectors, connect, onClose, onSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,17 +77,23 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         provider: 'google',
         options: {
           redirectTo: window.location.origin,
-          // Secara eksplisit hanya meminta otorisasi dasar (tidak ngambil data/file private user)
           queryParams: {
-            access_type: 'online', // Tidak perlu refresh token offline untuk sekedar connect
-            prompt: 'select_account', // Memastikan user tetap milih akun
+            access_type: 'online',
+            prompt: 'select_account',
           },
-          scopes: 'email profile' // Hanya ambil identitas publik & email untuk login (tidak ambil data gdrive/kontak dll)
+          scopes: 'email profile'
         }
       });
       if (error) throw error;
     } catch (err: any) {
       setError(err.message || "Google login failed");
+    }
+  };
+
+  const handleWalletConnect = () => {
+    if (connectors.length > 0) {
+      connect({ connector: connectors[0] });
+      onClose();
     }
   };
 
@@ -125,7 +144,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
-                        className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#9945FF] transition-colors"
+                        className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
                         placeholder="cool_player_99"
                       />
                     </div>
@@ -141,7 +160,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#9945FF] transition-colors"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -156,7 +175,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#9945FF] transition-colors"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
                       placeholder="••••••••"
                     />
                   </div>
@@ -167,7 +186,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-extrabold text-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 mt-4"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-extrabold text-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 mt-4"
                 >
                   {loading 
                     ? (lang === "ENG" ? "Processing..." : "Memproses...") 
@@ -198,14 +217,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
               <button
                 type="button"
-                onClick={() => {
-                  onClose();
-                  setVisible(true);
-                }}
-                className="w-full mt-3 py-3.5 rounded-xl bg-[#9945FF]/10 text-[#9945FF] border border-[#9945FF] font-extrabold text-base flex items-center justify-center gap-3 hover:bg-[#9945FF]/20 active:scale-95 transition-all"
+                onClick={handleWalletConnect}
+                className="w-full mt-3 py-3.5 rounded-xl bg-[#35D07F]/10 text-[#35D07F] border border-[#35D07F] font-extrabold text-base flex items-center justify-center gap-3 hover:bg-[#35D07F]/20 active:scale-95 transition-all"
               >
                 <Wallet2 className="w-5 h-5" />
-                {lang === "ENG" ? "Connect Solana Wallet" : "Hubungkan Dompet Solana"}
+                {lang === "ENG" ? "Connect Celo Wallet" : "Hubungkan Dompet Celo"}
               </button>
 
               <div className="mt-6 text-center text-sm text-gray-400">
@@ -214,7 +230,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   : (lang === "ENG" ? "Already have an account? " : "Sudah punya akun? ")}
                 <button
                   onClick={() => { setIsLogin(!isLogin); setError(null); }}
-                  className="text-[#14F195] font-bold hover:underline"
+                  className="text-[#35D07F] font-bold hover:underline"
                 >
                   {isLogin 
                     ? (lang === "ENG" ? "Sign Up" : "Daftar Sekarang")

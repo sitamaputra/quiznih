@@ -2,22 +2,33 @@
 import { X, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { useConnect, useConnectors } from "wagmi";
 
 interface WalletModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const wallets = [
-  { name: "Phantom", icon: "👻", color: "bg-[#AB9FF2]/20 border-[#AB9FF2]/50" },
-  { name: "Backpack", icon: "🎒", color: "bg-[#E33E3F]/20 border-[#E33E3F]/50" },
-  { name: "Jupiter", icon: "🪐", color: "bg-[#19FB9B]/20 border-[#19FB9B]/50" },
-  { name: "Solflare", icon: "☀️", color: "bg-[#FCB017]/20 border-[#FCB017]/50" },
-  { name: "Magic Eden", icon: "🪄", color: "bg-[#E33E3F]/20 border-[#E33E3F]/50" },
+const walletOptions = [
+  { name: "MiniPay", icon: "💚", color: "bg-[#35D07F]/20 border-[#35D07F]/50", description: "Opera MiniPay Wallet" },
+  { name: "MetaMask", icon: "🦊", color: "bg-[#F6851B]/20 border-[#F6851B]/50", description: "Popular browser wallet" },
+  { name: "Valora", icon: "🟢", color: "bg-[#35D07F]/20 border-[#35D07F]/50", description: "Mobile-first Celo wallet" },
+  { name: "WalletConnect", icon: "🔗", color: "bg-[#3B99FC]/20 border-[#3B99FC]/50", description: "Connect any wallet" },
 ];
 
 export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
   const { lang } = useLanguage();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
+
+  const handleConnect = (index: number) => {
+    if (connectors.length > index) {
+      connect({ connector: connectors[index] });
+    } else if (connectors.length > 0) {
+      connect({ connector: connectors[0] });
+    }
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -51,12 +62,12 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
             <p className="text-gray-600 dark:text-gray-400 mb-8 text-sm leading-relaxed">
               {lang === "ENG" 
-                ? "Choose your preferred wallet to join the kuisroom and start earning rewards."
-                : "Pilih dompet favorit Anda untuk bergabung di ruang kuis dan mulai mengumpulkan hadiah."}
+                ? "Choose your preferred wallet to connect to Celo and start earning quiz rewards."
+                : "Pilih dompet favorit Anda untuk terhubung ke Celo dan mulai mengumpulkan hadiah kuis."}
             </p>
 
             <div className="space-y-4">
-              {wallets.map((wallet, idx) => (
+              {walletOptions.map((wallet, idx) => (
                 <motion.button
                   key={wallet.name}
                   initial={{ opacity: 0, x: -10 }}
@@ -64,13 +75,17 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                   transition={{ delay: idx * 0.05 }}
                   whileHover={{ scale: 1.02, x: 5 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => handleConnect(idx)}
                   className={`w-full flex items-center justify-between p-4 rounded-2xl border ${wallet.color} transition-all duration-300 group`}
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-2xl grayscale group-hover:grayscale-0 transition-all duration-300">{wallet.icon}</span>
-                    <span className="font-bold text-lg text-black dark:text-white">
-                      {wallet.name === "Jupiter" ? "Jupwallet" : wallet.name}
-                    </span>
+                    <div className="text-left">
+                      <span className="font-bold text-lg text-black dark:text-white block">
+                        {wallet.name}
+                      </span>
+                      <span className="text-xs text-gray-500">{wallet.description}</span>
+                    </div>
                   </div>
                   <ExternalLink className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </motion.button>
@@ -79,10 +94,15 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
             <div className="mt-10 pt-6 border-t border-black/5 dark:border-white/10 text-center">
               <p className="text-xs text-gray-500">
-                {lang === "ENG" ? "New to Solana?" : "Baru di Solana?"}{" "}
-                <button className="text-solana-purple font-bold hover:underline">
+                {lang === "ENG" ? "New to Celo?" : "Baru di Celo?"}{" "}
+                <a 
+                  href="https://celo.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[#35D07F] font-bold hover:underline"
+                >
                   {lang === "ENG" ? "Learn More" : "Pelajari Lebih Lanjut"}
-                </button>
+                </a>
               </p>
             </div>
           </motion.div>

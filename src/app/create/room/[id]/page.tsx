@@ -1,7 +1,7 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAccount, useConnect, useConnectors } from "wagmi";
+
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Wallet2, Send, Copy, CheckCircle, Loader2, Users, Trophy, Trash2, ShieldX
@@ -18,8 +18,9 @@ import confetti from "canvas-confetti";
 export default function QuizControlRoom({ params }: { params: Promise<{ id: string }> }) {
   const { id: quizId } = use(params);
   const { lang } = useLanguage();
-  const { publicKey } = useWallet();
-  const { setVisible } = useWalletModal();
+  const { address: publicKey } = useAccount();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
   const router = useRouter();
 
   const [quizData, setQuizData] = useState<any>(null);
@@ -30,8 +31,8 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
   const [viewMode, setViewMode] = useState<'manage' | 'live'>('manage');
 
   useEffect(() => {
-    if (!publicKey) {
-      setVisible(true);
+    if (!publicKey && connectors.length > 0) {
+      connect({ connector: connectors[0] });
       return;
     }
 
@@ -48,7 +49,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
         if (qError || !qData) throw qError || new Error("Quiz not found");
         
         // Security: Ensure the user is the host
-        if (qData.host_wallet !== publicKey.toString()) {
+        if (qData.host_wallet !== publicKey) {
           alert("Unauthorized");
           router.push("/dashboard");
           return;
@@ -130,14 +131,14 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
     }
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-bold text-[#9945FF]">Loading Room...</div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center font-bold text-[#35D07F]">Loading Room...</div>;
   if (!quizData) return <div className="min-h-screen flex items-center justify-center">Quiz not found</div>;
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#9945FF]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#14F195]/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
       </div>
 
       <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between gap-4 flex-wrap">
@@ -153,7 +154,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 onClick={() => setViewMode('manage')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   viewMode === 'manage'
-                    ? 'bg-[#9945FF] text-white shadow-md'
+                    ? 'bg-[#35D07F] text-white shadow-md'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -163,7 +164,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 onClick={() => setViewMode('live')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   viewMode === 'live'
-                    ? 'bg-[#14F195] text-black shadow-md'
+                    ? 'bg-[#FCFF52] text-black shadow-md'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -172,7 +173,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
               </button>
             </div>
           )}
-          <div className="px-4 py-2 rounded-full glass border border-[#9945FF]/30 text-sm font-mono font-bold">
+          <div className="px-4 py-2 rounded-full glass border border-[#35D07F]/30 text-sm font-mono font-bold">
             {quizData.room_code}
           </div>
         </div>
@@ -187,7 +188,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             className="space-y-8"
           >
             {/* Live Banner */}
-            <div className="glass rounded-[2.5rem] p-8 border border-[#14F195]/40 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_40px_rgba(20,241,149,0.15)]">
+            <div className="glass rounded-[2.5rem] p-8 border border-[#FCFF52]/40 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_40px_rgba(20,241,149,0.15)]">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-red-500 text-white text-xs font-extrabold uppercase tracking-widest">
@@ -199,13 +200,13 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 <p className="text-gray-500 text-sm">{lang === "ENG" ? "Real-time player scores" : "Skor pemain secara real-time"}</p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="text-center px-5 py-3 rounded-2xl bg-[#14F195]/10 border border-[#14F195]/30">
-                  <div className="text-2xl font-black text-[#14F195]">{participants.length}</div>
+                <div className="text-center px-5 py-3 rounded-2xl bg-[#FCFF52]/10 border border-[#FCFF52]/30">
+                  <div className="text-2xl font-black text-[#FCFF52]">{participants.length}</div>
                   <div className="text-xs text-gray-500 font-bold">{lang === "ENG" ? "Players" : "Pemain"}</div>
                 </div>
                 <button
                   onClick={() => {
-                    confetti({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ['#9945FF','#14F195','#FDE047'] });
+                    confetti({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ['#35D07F','#FCFF52','#FDE047'] });
                   }}
                   className="px-4 py-3 rounded-2xl bg-[#FDE047]/10 border border-[#FDE047]/30 text-[#FDE047] font-bold text-sm hover:bg-[#FDE047]/20 transition-all"
                 >
@@ -267,8 +268,8 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                           <div className="text-right">
                             <motion.div
                               key={p.final_score}
-                              initial={{ scale: 1.3, color: '#14F195' }}
-                              animate={{ scale: 1, color: idx === 0 ? '#FDE047' : '#14F195' }}
+                              initial={{ scale: 1.3, color: '#FCFF52' }}
+                              animate={{ scale: 1, color: idx === 0 ? '#FDE047' : '#FCFF52' }}
                               className="text-2xl font-black"
                             >
                               {p.final_score || 0}
@@ -302,7 +303,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 if (!confirm(lang === "ENG" ? "End the quiz and show final results?" : "Akhiri kuis dan tampilkan hasil akhir?")) return;
                 await supabase.from("quizzes").update({ status: 'finished' }).eq("id", quizId);
                 setQuizData((prev: any) => ({ ...prev, status: 'finished' }));
-                confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, colors: ['#9945FF','#14F195','#FDE047'] });
+                confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, colors: ['#35D07F','#FCFF52','#FDE047'] });
               }}
               className="w-full py-5 rounded-2xl border-2 border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-extrabold text-lg flex items-center justify-center gap-3 transition-all"
             >
@@ -331,12 +332,12 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                       }`}>
                         <span className="text-2xl">{['🥇','🥈','🥉'][idx]}</span>
                         <span className="font-extrabold text-lg">{p.player_name}</span>
-                        <span className="font-black text-[#14F195] text-xl">{p.final_score||0} pts</span>
+                        <span className="font-black text-[#FCFF52] text-xl">{p.final_score||0} pts</span>
                       </div>
                     ))}
                 </div>
               )}
-              <Link href="/manage" className="inline-block mt-4 px-8 py-3 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold hover:shadow-[0_0_30px_rgba(153,69,255,0.4)] transition-all">
+              <Link href="/manage" className="inline-block mt-4 px-8 py-3 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-white font-bold hover:shadow-[0_0_30px_rgba(153,69,255,0.4)] transition-all">
                 {lang === "ENG" ? "Back to Dashboard" : "Kembali ke Dasbor"}
               </Link>
             </div>
@@ -354,7 +355,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             <h1 className="text-3xl md:text-5xl font-extrabold text-gradient">{quizData.title}</h1>
             <p className="text-gray-500">{quizData.description}</p>
             <div className="flex gap-4">
-              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-widest text-[#9945FF]">
+              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-widest text-[#35D07F]">
                 {quizData.status}
               </span>
             </div>
@@ -372,7 +373,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                   navigator.clipboard.writeText(`https://quiznih.vercel.app/play?code=${quizData.room_code}`);
                   alert(lang === "ENG" ? "Play Link Copied!" : "Tautan Kuis Disalin!");
                 }}
-                className="px-6 py-2.5 bg-[#14F195]/20 text-[#14F195] rounded-full font-bold border border-[#14F195]/50 hover:bg-[#14F195]/30 transition-all shadow-[0_0_15px_rgba(20,241,149,0.3)] w-full text-center"
+                className="px-6 py-2.5 bg-[#FCFF52]/20 text-[#FCFF52] rounded-full font-bold border border-[#FCFF52]/50 hover:bg-[#FCFF52]/30 transition-all shadow-[0_0_15px_rgba(20,241,149,0.3)] w-full text-center"
               >
                 🔗 {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
               </button>
@@ -390,7 +391,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2000);
                 }}
-                className="text-sm font-bold text-[#9945FF] hover:underline"
+                className="text-sm font-bold text-[#35D07F] hover:underline"
               >
                 {copied ? (lang === "ENG" ? "Copied!" : "Tersalin!") : (lang === "ENG" ? "Copy Code" : "Salin Kode")}
               </button>
@@ -401,10 +402,10 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
           <div className="glass rounded-[2rem] border border-white/5 p-8 space-y-8">
             <div className="flex items-center justify-between border-b border-white/5 pb-6">
               <h3 className="text-2xl font-bold flex items-center gap-3">
-                <Users className="w-6 h-6 text-[#14F195]" />
+                <Users className="w-6 h-6 text-[#FCFF52]" />
                 {lang === "ENG" ? "Participants" : "Peserta"}
               </h3>
-              <div className="px-4 py-1.5 rounded-full bg-[#14F195]/10 border border-[#14F195]/30 text-[#14F195] font-bold text-sm">
+              <div className="px-4 py-1.5 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] font-bold text-sm">
                 {participants.length} {lang === "ENG" ? "Players Online" : "Pemain Online"}
               </div>
             </div>
@@ -439,7 +440,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-mono text-[#14F195] font-bold">{p.final_score || 0} pts</span>
+                          <span className="font-mono text-[#FCFF52] font-bold">{p.final_score || 0} pts</span>
                           <button
                             onClick={() => {
                               const reason = prompt(
@@ -468,7 +469,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => setViewMode('live')}
-                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#14F195] to-[#0EC97F] text-black font-extrabold text-lg flex items-center justify-center gap-3 hover:shadow-[0_0_40px_rgba(20,241,149,0.4)] transition-all"
+                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#FCFF52] to-[#0EC97F] text-black font-extrabold text-lg flex items-center justify-center gap-3 hover:shadow-[0_0_40px_rgba(20,241,149,0.4)] transition-all"
               >
                 <span className="w-3 h-3 rounded-full bg-black animate-ping inline-block" />
                 {lang === "ENG" ? "View Live Leaderboard →" : "Lihat Leaderboard Live →"}
@@ -478,7 +479,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                   if (!confirm(lang === "ENG" ? "End the quiz?" : "Akhiri kuis?")) return;
                   await supabase.from("quizzes").update({ status: 'finished' }).eq("id", quizId);
                   setQuizData((prev: any) => ({ ...prev, status: 'finished' }));
-                  confetti({ particleCount: 200, spread: 80, colors: ['#9945FF','#14F195','#FDE047'] });
+                  confetti({ particleCount: 200, spread: 80, colors: ['#35D07F','#FCFF52','#FDE047'] });
                 }}
                 className="py-5 px-6 rounded-2xl border-2 border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold transition-all"
               >
@@ -489,7 +490,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             <button
               onClick={() => { handleStartQuiz(); setViewMode('live'); }}
               disabled={isStarting}
-              className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-extrabold text-xl hover:shadow-[0_0_50px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-white font-extrabold text-xl hover:shadow-[0_0_50px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               {isStarting ? (
                 <><Loader2 className="w-8 h-8 animate-spin" /> {lang === "ENG" ? "Starting..." : "Memulai..."}</>

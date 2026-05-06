@@ -1,7 +1,7 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAccount, useConnect, useConnectors } from "wagmi";
+
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift, LogOut, ExternalLink, Loader2
@@ -11,18 +11,19 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import WalletDropdown from "@/components/WalletDropdown";
-import { useSolanaQuiz } from "@/hooks/useSolanaQuiz";
+import { useCeloQuiz } from "@/hooks/useCeloQuiz";
 
 export default function PlayPage() {
   const { lang } = useLanguage();
-  const { publicKey, disconnect } = useWallet();
-  const { setVisible } = useWalletModal();
+  const { address: publicKey, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
 
   useEffect(() => {
-    if (!publicKey) setVisible(true);
-  }, [publicKey, setVisible]);
+    if (!publicKey && connectors.length > 0) connect({ connector: connectors[0] });
+  }, [publicKey, connectors, connect]);
 
-  const { claimReward, isClaiming: isClaimingOnChain, getExplorerUrl: getExplorer } = useSolanaQuiz();
+  const { getExplorerTxUrl: getExplorer } = useCeloQuiz();
 
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -57,18 +58,18 @@ export default function PlayPage() {
   const [selectedAvatar, setSelectedAvatar] = useState(0);
 
   const AVATARS = [
-    { emoji: "🐶", name: "Doggo", color: "#F59E0B" },
-    { emoji: "🐱", name: "Kitty", color: "#EC4899" },
-    { emoji: "🐸", name: "Froggy", color: "#14F195" },
-    { emoji: "🦊", name: "Foxi", color: "#F97316" },
-    { emoji: "🐼", name: "Panda", color: "#6B7280" },
-    { emoji: "🦁", name: "Leo", color: "#EAB308" },
-    { emoji: "🐯", name: "Tiger", color: "#F97316" },
-    { emoji: "🐙", name: "Octo", color: "#9945FF" },
-    { emoji: "🦄", name: "Uni", color: "#EC4899" },
-    { emoji: "🐲", name: "Drago", color: "#14F195" },
-    { emoji: "🤖", name: "Robot", color: "#60A5FA" },
-    { emoji: "👾", name: "Alien", color: "#A78BFA" },
+    { emoji: "ðŸ¶", name: "Doggo", color: "#F59E0B" },
+    { emoji: "ðŸ±", name: "Kitty", color: "#EC4899" },
+    { emoji: "ðŸ¸", name: "Froggy", color: "#FCFF52" },
+    { emoji: "ðŸ¦Š", name: "Foxi", color: "#F97316" },
+    { emoji: "ðŸ¼", name: "Panda", color: "#6B7280" },
+    { emoji: "ðŸ¦", name: "Leo", color: "#EAB308" },
+    { emoji: "ðŸ¯", name: "Tiger", color: "#F97316" },
+    { emoji: "ðŸ™", name: "Octo", color: "#35D07F" },
+    { emoji: "ðŸ¦„", name: "Uni", color: "#EC4899" },
+    { emoji: "ðŸ²", name: "Drago", color: "#FCFF52" },
+    { emoji: "ðŸ¤–", name: "Robot", color: "#60A5FA" },
+    { emoji: "ðŸ‘¾", name: "Alien", color: "#A78BFA" },
   ];
 
   const prevAvatar = () => setSelectedAvatar(i => (i - 1 + AVATARS.length) % AVATARS.length);
@@ -104,7 +105,7 @@ export default function PlayPage() {
       supabase.from("leaderboard")
         .update({ final_score: newScore })
         .eq("quiz_id", quizInfo.id)
-        .eq("user_wallet", publicKey.toString())
+        .eq("user_wallet", publicKey)
         .then();
     }
     
@@ -140,7 +141,7 @@ export default function PlayPage() {
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#9945FF', '#14F195', '#FDE047']
+        colors: ['#35D07F', '#FCFF52', '#FDE047']
       });
     }
   };
@@ -168,18 +169,18 @@ export default function PlayPage() {
           particleCount: 150,
           spread: 70,
           origin: { y: 0.7 },
-          colors: ['#14F195', '#9945FF', '#FDE047']
+          colors: ['#FCFF52', '#35D07F', '#FDE047']
         });
       } else {
         setClaimError(result.error || "Failed to claim reward");
-        // Still show success for non-SOL quizzes or demo quizzes
+        // Still show success for non-CELO quizzes or demo quizzes
         if (quizInfo.id?.startsWith('demo')) {
           setHasClaimed(true);
           confetti({
             particleCount: 100,
             spread: 60,
             origin: { y: 0.7 },
-            colors: ['#14F195']
+            colors: ['#FCFF52']
           });
         }
       }
@@ -192,14 +193,14 @@ export default function PlayPage() {
   };
 
   const walletShort = publicKey
-    ? `${publicKey.toString().slice(0, 6)}...${publicKey.toString().slice(-4)}`
+    ? `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}`
     : "";
 
   // Demo quiz data (always works, no database needed)
   const DEMO_QUIZ = {
     id: 'demo-123456',
     host_wallet: 'demo-host',
-    title: 'Web3 & Solana Trivia',
+    title: 'Web3 & CELOana Trivia',
     description: 'Uji pengetahuan Web3 kamu!',
     room_code: '123456',
     status: 'playing',
@@ -228,7 +229,7 @@ export default function PlayPage() {
       id: 'dq3',
       quiz_id: 'demo-123456',
       question_text: 'Blockchain mana yang dikenal dengan kecepatan 65.000 TPS?',
-      options: ['Ethereum', 'Bitcoin', 'Solana', 'Cardano'],
+      options: ['Ethereum', 'Bitcoin', 'CELOana', 'Cardano'],
       correct_answer_index: 2,
       time_limit_seconds: 15,
       order_number: 2,
@@ -236,7 +237,7 @@ export default function PlayPage() {
     {
       id: 'dq4',
       quiz_id: 'demo-123456',
-      question_text: 'Apa nama wallet paling populer di Solana?',
+      question_text: 'Apa nama wallet paling populer di CELOana?',
       options: ['MetaMask', 'Phantom', 'Trust Wallet', 'Coinbase Wallet'],
       correct_answer_index: 1,
       time_limit_seconds: 15,
@@ -281,7 +282,7 @@ export default function PlayPage() {
 
               // Register player
               if (publicKey) {
-                const walletStr = publicKey.toString();
+                const walletStr = publicKey;
                 try {
                   await supabase.from("profiles").upsert(
                     { wallet_address: walletStr, username: playerName },
@@ -386,7 +387,7 @@ export default function PlayPage() {
     return (
       <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
         <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#14F195]/15 blur-[150px] rounded-full" />
+          <div className="abCELOute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
         </div>
 
         <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
@@ -395,8 +396,8 @@ export default function PlayPage() {
             <span className="text-sm font-medium">{lang === "ENG" ? "Leave Room" : "Keluar Ruangan"}</span>
           </button>
           {publicKey && (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#14F195]/30">
-              <Wallet2 className="w-4 h-4 text-[#14F195]" />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#FCFF52]/30">
+              <Wallet2 className="w-4 h-4 text-[#FCFF52]" />
               <span className="text-sm font-mono font-semibold">{walletShort}</span>
             </div>
           )}
@@ -408,11 +409,11 @@ export default function PlayPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass rounded-[2.5rem] border border-[#14F195]/30 p-12 max-w-lg w-full text-center space-y-8"
+              className="glass rounded-[2.5rem] border border-[#FCFF52]/30 p-12 max-w-lg w-full text-center space-y-8"
             >
               <div className="space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-[#14F195]/20 flex items-center justify-center">
-                  <Clock className="w-8 h-8 text-[#14F195]" />
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-[#FCFF52]/20 flex items-center justify-center">
+                  <Clock className="w-8 h-8 text-[#FCFF52]" />
                 </div>
                 <h2 className="text-3xl font-extrabold">
                   {lang === "ENG" ? "Waiting for Host..." : "Menunggu Host..."}
@@ -426,21 +427,21 @@ export default function PlayPage() {
 
               <div className="flex flex-wrap justify-center gap-8 text-center pt-4">
                 <div>
-                  <div className="text-2xl font-extrabold text-[#14F195]">12</div>
+                  <div className="text-2xl font-extrabold text-[#FCFF52]">12</div>
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Players" : "Pemain"}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-[#9945FF]">{questions.length}</div>
+                  <div className="text-2xl font-extrabold text-[#35D07F]">{questions.length}</div>
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Questions" : "Soal"}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-extrabold text-[#FDE047]">{quizInfo?.reward_pool_amount || 0} SOL</div>
+                  <div className="text-2xl font-extrabold text-[#FDE047]">{quizInfo?.reward_pool_amount || 0} CELO</div>
                   <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Prize Pool" : "Total Hadiah"}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 justify-center">
-                <div className="w-3 h-3 rounded-full bg-[#14F195] animate-pulse" />
+                <div className="w-3 h-3 rounded-full bg-[#FCFF52] animate-pulse" />
                 <span className="text-sm text-gray-500 font-medium">
                   {lang === "ENG" ? "Connected & waiting..." : "Terhubung & menunggu..."}
                 </span>
@@ -472,14 +473,14 @@ export default function PlayPage() {
                 <span className="font-bold text-gray-500">
                   {lang === "ENG" ? "Question" : "Soal"} {currentQuestionIndex + 1} / {questions.length}
                 </span>
-                <div className="flex items-center gap-2 text-[#9945FF] font-extrabold text-xl">
+                <div className="flex items-center gap-2 text-[#35D07F] font-extrabold text-xl">
                   <Clock className="w-5 h-5" />
                   {timeLeft}s
                 </div>
               </div>
 
               {/* Question */}
-              <div className="glass p-10 rounded-[2.5rem] border border-[#9945FF]/30 text-center shadow-[0_0_30px_rgba(153,69,255,0.15)]">
+              <div className="glass p-10 rounded-[2.5rem] border border-[#35D07F]/30 text-center shadow-[0_0_30px_rgba(153,69,255,0.15)]">
                 <h2 className="text-2xl md:text-3xl font-extrabold leading-tight">
                   {questions[currentQuestionIndex]?.question_text}
                 </h2>
@@ -494,8 +495,8 @@ export default function PlayPage() {
                     onClick={() => handleAnswerSelection(idx)}
                     className={`p-6 rounded-2xl text-lg font-bold transition-all ${
                       selectedAnswer === idx
-                        ? "bg-[#9945FF] text-white shadow-[0_0_20px_rgba(153,69,255,0.4)] scale-[1.02]"
-                        : "glass hover:bg-[#9945FF]/10 hover:border-[#9945FF]/50 border border-black/10 dark:border-white/10"
+                        ? "bg-[#35D07F] text-white shadow-[0_0_20px_rgba(153,69,255,0.4)] scale-[1.02]"
+                        : "glass hover:bg-[#35D07F]/10 hover:border-[#35D07F]/50 border border-black/10 dark:border-white/10"
                     } ${selectedAnswer !== null && selectedAnswer !== idx ? "opacity-50" : ""}`}
                   >
                     <div className="flex items-center gap-4">
@@ -523,7 +524,7 @@ export default function PlayPage() {
             >
               <div className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg ${
                 isCorrect 
-                  ? "bg-[#14F195] shadow-[0_0_50px_rgba(20,241,149,0.5)]" 
+                  ? "bg-[#FCFF52] shadow-[0_0_50px_rgba(20,241,149,0.5)]" 
                   : "bg-red-500 shadow-[0_0_50px_rgba(239,68,68,0.5)]"
               }`}>
                 {isCorrect ? <CheckCircle2 className="w-16 h-16 text-black" /> : <XCircle className="w-16 h-16 text-white" />}
@@ -537,7 +538,7 @@ export default function PlayPage() {
               
               <div className="glass p-6 rounded-[2rem] border border-black/10 dark:border-white/10 inline-block">
                 <p className="text-sm text-gray-500 mb-2">{lang === "ENG" ? "Correct Answer:" : "Jawaban Benar:"}</p>
-                <p className="text-xl font-bold text-[#14F195]">
+                <p className="text-xl font-bold text-[#FCFF52]">
                   {questions[currentQuestionIndex]?.options?.[questions[currentQuestionIndex]?.correct_answer_index]}
                 </p>
               </div>
@@ -552,15 +553,15 @@ export default function PlayPage() {
                     initial={{ width: "100%" }}
                     animate={{ width: "0%" }}
                     transition={{ duration: 3, ease: "linear" }}
-                    className="h-full bg-[#9945FF] rounded-full"
+                    className="h-full bg-[#35D07F] rounded-full"
                   />
                 </div>
                 {/* Manual skip button */}
                 <button
                   onClick={nextQuestion}
-                  className="text-xs text-gray-400 hover:text-[#9945FF] transition-colors underline"
+                  className="text-xs text-gray-400 hover:text-[#35D07F] transition-colors underline"
                 >
-                  {lang === "ENG" ? "Skip →" : "Lewati →"}
+                  {lang === "ENG" ? "Skip â†’" : "Lewati â†’"}
                 </button>
               </div>
             </motion.div>
@@ -575,7 +576,7 @@ export default function PlayPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               className="glass rounded-[3rem] border border-[#FDE047]/40 p-10 max-w-md w-full text-center space-y-8 relative overflow-hidden"
             >
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#FDE047]/20 blur-[80px] rounded-full pointer-events-none" />
+              <div className="abCELOute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#FDE047]/20 blur-[80px] rounded-full pointer-events-none" />
               
               <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-[#FDE047] to-[#EAB308] flex items-center justify-center shadow-[0_0_40px_rgba(253,224,71,0.4)]">
                 <Trophy className="w-12 h-12 text-black" />
@@ -593,34 +594,34 @@ export default function PlayPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/5 dark:border-white/5">
                   <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Score</div>
-                  <div className="text-3xl font-black text-[#9945FF]">{score}</div>
+                  <div className="text-3xl font-black text-[#35D07F]">{score}</div>
                 </div>
                 <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/5 dark:border-white/5">
                   <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Rank</div>
-                  <div className="text-3xl font-black text-[#14F195]">#{claimRank || "?"}</div>
+                  <div className="text-3xl font-black text-[#FCFF52]">#{claimRank || "?"}</div>
                 </div>
               </div>
               
               {/* Reward Section */}
-              <div className="p-6 rounded-2xl bg-[#14F195]/10 border border-[#14F195]/30 space-y-3">
+              <div className="p-6 rounded-2xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 space-y-3">
                 <h3 className="font-bold text-lg mb-1">
                   {hasClaimed 
                     ? (lang === "ENG" ? "Reward Claimed!" : "Hadiah Diklaim!")
                     : (lang === "ENG" ? "Claim Your Reward" : "Klaim Hadiah Anda")}
                 </h3>
                 {claimRewardAmount && (
-                  <div className="text-4xl font-black text-[#14F195] drop-shadow-sm my-2">
-                    ◎ {claimRewardAmount.toFixed(4)} SOL
+                  <div className="text-4xl font-black text-[#FCFF52] drop-shadow-sm my-2">
+                    â—Ž {claimRewardAmount.toFixed(4)} CELO
                   </div>
                 )}
                 {!claimRewardAmount && quizInfo?.reward_pool_amount && (
-                  <div className="text-4xl font-black text-[#14F195] drop-shadow-sm my-2">
-                    ◎ {quizInfo.reward_pool_amount} SOL
+                  <div className="text-4xl font-black text-[#FCFF52] drop-shadow-sm my-2">
+                    â—Ž {quizInfo.reward_pool_amount} CELO
                   </div>
                 )}
                 {claimTxSignature && (
                   <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-2 text-[#14F195] font-bold text-sm">
+                    <div className="flex items-center justify-center gap-2 text-[#FCFF52] font-bold text-sm">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>{lang === "ENG" ? "On-chain transfer confirmed" : "Transfer on-chain dikonfirmasi"}</span>
                     </div>
@@ -628,16 +629,16 @@ export default function PlayPage() {
                       href={getExplorer(claimTxSignature)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#9945FF]/10 border border-[#9945FF]/30 text-[#9945FF] text-xs font-bold hover:bg-[#9945FF]/20 transition-all"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-xs font-bold hover:bg-[#35D07F]/20 transition-all"
                     >
                       <ExternalLink className="w-3 h-3" />
-                      {lang === "ENG" ? "View on Solana Explorer" : "Lihat di Solana Explorer"}
+                      {lang === "ENG" ? "View on CELOana Explorer" : "Lihat di CELOana Explorer"}
                     </a>
                   </div>
                 )}
                 {!hasClaimed && (
                   <p className="text-xs text-gray-500">
-                    {lang === "ENG" ? "SOL will be sent directly to your wallet." : "SOL akan dikirim langsung ke wallet Anda."}
+                    {lang === "ENG" ? "CELO will be sent directly to your wallet." : "CELO akan dikirim langsung ke wallet Anda."}
                   </p>
                 )}
               </div>
@@ -680,8 +681,8 @@ export default function PlayPage() {
     <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
       {/* Background */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#14F195]/15 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#9945FF]/10 blur-[150px] rounded-full" />
+        <div className="abCELOute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+        <div className="abCELOute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
       </div>
 
       {/* Header */}
@@ -719,9 +720,9 @@ export default function PlayPage() {
               transition={{ delay: 0.1 }}
               whileHover={{ scale: 1.03, y: -3 }}
               onClick={() => setJoinMode("qr")}
-              className="glass rounded-[2rem] p-8 border border-[#14F195]/30 hover:border-[#14F195]/60 transition-all text-left space-y-5 group"
+              className="glass rounded-[2rem] p-8 border border-[#FCFF52]/30 hover:border-[#FCFF52]/60 transition-all text-left space-y-5 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#14F195] to-[#0EC97F] flex items-center justify-center shadow-[0_0_25px_rgba(20,241,149,0.25)] group-hover:shadow-[0_0_40px_rgba(20,241,149,0.4)] transition-shadow">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FCFF52] to-[#0EC97F] flex items-center justify-center shadow-[0_0_25px_rgba(20,241,149,0.25)] group-hover:shadow-[0_0_40px_rgba(20,241,149,0.4)] transition-shadow">
                 <QrCode className="w-8 h-8 text-black" />
               </div>
               <div>
@@ -743,9 +744,9 @@ export default function PlayPage() {
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.03, y: -3 }}
               onClick={() => setJoinMode("code")}
-              className="glass rounded-[2rem] p-8 border border-[#9945FF]/30 hover:border-[#9945FF]/60 transition-all text-left space-y-5 group"
+              className="glass rounded-[2rem] p-8 border border-[#35D07F]/30 hover:border-[#35D07F]/60 transition-all text-left space-y-5 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#9945FF] to-[#7B3FE4] flex items-center justify-center shadow-[0_0_25px_rgba(153,69,255,0.25)] group-hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-shadow">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#35D07F] to-[#7B3FE4] flex items-center justify-center shadow-[0_0_25px_rgba(153,69,255,0.25)] group-hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-shadow">
                 <Keyboard className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -766,20 +767,20 @@ export default function PlayPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass rounded-[2.5rem] border border-[#14F195]/30 p-10 max-w-md w-full text-center space-y-8"
+            className="glass rounded-[2.5rem] border border-[#FCFF52]/30 p-10 max-w-md w-full text-center space-y-8"
           >
             <h3 className="text-2xl font-bold">
               {lang === "ENG" ? "Scan QR Code" : "Scan QR Code"}
             </h3>
 
             {/* QR Scanner Placeholder */}
-            <div className="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border-2 border-[#14F195]/50 bg-black/80 flex items-center justify-center">
-              <div className="absolute inset-4 border-2 border-[#14F195] rounded-2xl border-dashed animate-pulse" />
-              <QrCode className="w-16 h-16 text-[#14F195]/50" />
+            <div className="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border-2 border-[#FCFF52]/50 bg-black/80 flex items-center justify-center">
+              <div className="abCELOute inset-4 border-2 border-[#FCFF52] rounded-2xl border-dashed animate-pulse" />
+              <QrCode className="w-16 h-16 text-[#FCFF52]/50" />
 
               {/* Scanning line animation */}
               <motion.div
-                className="absolute left-4 right-4 h-0.5 bg-[#14F195] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
+                className="abCELOute left-4 right-4 h-0.5 bg-[#FCFF52] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
                 animate={{ top: ["10%", "85%", "10%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -798,7 +799,7 @@ export default function PlayPage() {
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
-                className="w-full px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-[#14F195]/50"
+                className="w-full px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-[#FCFF52]/50"
               />
               <div className="flex gap-3">
                 <input
@@ -807,14 +808,14 @@ export default function PlayPage() {
                   onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                   maxLength={6}
                   placeholder="ABCXYZ"
-                  className="flex-1 px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white font-mono text-center text-lg tracking-widest uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#14F195]/50"
+                  className="flex-1 px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white font-mono text-center text-lg tracking-widest uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCFF52]/50"
                 />
                 <button
                   onClick={handleJoinWithCode}
                   disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
-                  className="px-5 py-3 rounded-xl bg-[#14F195] text-black font-bold hover:bg-[#0EC97F] transition-colors disabled:opacity-40 flex items-center justify-center"
+                  className="px-5 py-3 rounded-xl bg-[#FCFF52] text-black font-bold hover:bg-[#0EC97F] transition-colors disabled:opacity-40 flex items-center justify-center"
                 >
-                  {isJoining ? <span className="animate-spin text-xl">⟳</span> : <ArrowRight className="w-5 h-5" />}
+                  {isJoining ? <span className="animate-spin text-xl">âŸ³</span> : <ArrowRight className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -823,7 +824,7 @@ export default function PlayPage() {
               onClick={() => setJoinMode("select")}
               className="text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
             >
-              ← {lang === "ENG" ? "Back" : "Kembali"}
+              â† {lang === "ENG" ? "Back" : "Kembali"}
             </button>
           </motion.div>
         )}
@@ -832,7 +833,7 @@ export default function PlayPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass rounded-[2.5rem] border border-[#9945FF]/30 p-10 max-w-md w-full text-center space-y-6"
+            className="glass rounded-[2.5rem] border border-[#35D07F]/30 p-10 max-w-md w-full text-center space-y-6"
           >
             {/* Avatar Picker */}
             <div className="space-y-3">
@@ -843,7 +844,7 @@ export default function PlayPage() {
                 <button
                   onClick={prevAvatar}
                   className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-2xl transition-all flex items-center justify-center border border-white/10"
-                >◀</button>
+                >â—€</button>
 
                 <motion.div
                   key={selectedAvatar}
@@ -859,7 +860,7 @@ export default function PlayPage() {
                     <span>{AVATARS[selectedAvatar].emoji}</span>
                     {/* Glow */}
                     <div
-                      className="absolute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
+                      className="abCELOute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
                       style={{ backgroundColor: AVATARS[selectedAvatar].color }}
                     />
                   </div>
@@ -871,7 +872,7 @@ export default function PlayPage() {
                 <button
                   onClick={nextAvatar}
                   className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-2xl transition-all flex items-center justify-center border border-white/10"
-                >▶</button>
+                >â–¶</button>
               </div>
 
               {/* Avatar strip dots */}
@@ -906,7 +907,7 @@ export default function PlayPage() {
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
-                className="w-full px-8 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#9945FF]/30 focus:border-[#9945FF] text-black dark:text-white text-center text-xl placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
+                className="w-full px-8 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#35D07F]/30 focus:border-[#35D07F] text-black dark:text-white text-center text-xl placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
               />
               <input
                 type="text"
@@ -914,7 +915,7 @@ export default function PlayPage() {
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                 maxLength={6}
                 placeholder="_ _ _ _ _ _"
-                className="w-full px-8 py-6 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#9945FF]/30 focus:border-[#9945FF] text-black dark:text-white font-mono text-center text-3xl tracking-[0.3em] uppercase placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
+                className="w-full px-8 py-6 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#35D07F]/30 focus:border-[#35D07F] text-black dark:text-white font-mono text-center text-3xl tracking-[0.3em] uppercase placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
               />
             </div>
 
@@ -922,10 +923,10 @@ export default function PlayPage() {
               onClick={handleJoinWithCode}
               disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
               className="w-full py-5 rounded-2xl font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-black"
-              style={{ background: `linear-gradient(135deg, ${AVATARS[selectedAvatar].color}, #14F195)` }}
+              style={{ background: `linear-gradient(135deg, ${AVATARS[selectedAvatar].color}, #FCFF52)` }}
             >
               {isJoining ? (
-                <span className="flex items-center gap-2"><span className="animate-spin text-xl">⟳</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
+                <span className="flex items-center gap-2"><span className="animate-spin text-xl">âŸ³</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
               ) : (
                 <><span className="text-xl">{AVATARS[selectedAvatar].emoji}</span> {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}</>
               )}
@@ -935,7 +936,7 @@ export default function PlayPage() {
               onClick={() => setJoinMode("select")}
               className="text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
             >
-              ← {lang === "ENG" ? "Back" : "Kembali"}
+              â† {lang === "ENG" ? "Back" : "Kembali"}
             </button>
           </motion.div>
         )}

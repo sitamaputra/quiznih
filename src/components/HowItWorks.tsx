@@ -11,10 +11,10 @@ export default function HowItWorks() {
       icon: <span className="text-3xl">⚡️</span>,
       title: lang === "ENG" ? "Instant Payouts" : "Pembayaran Instan",
       description: lang === "ENG" 
-        ? "Reward top players instantly via smart contracts using USDC or SOL."
-        : "Hadiah untuk pemain top dikirim langsung via smart contract menggunakan USDC atau SOL.",
-      color: "from-purple-500/20 to-transparent",
-      border: "border-purple-500/30",
+        ? "Reward top players instantly via smart contracts using CELO or cUSD."
+        : "Hadiah untuk pemain top dikirim langsung via smart contract menggunakan CELO atau cUSD.",
+      color: "from-[#35D07F]/20 to-transparent",
+      border: "border-[#35D07F]/30",
     },
     {
       icon: <span className="text-3xl">🛡️</span>,
@@ -27,12 +27,12 @@ export default function HowItWorks() {
     },
     {
       icon: <span className="text-3xl">🔗</span>,
-      title: lang === "ENG" ? "Solana Blinks" : "Solana Blinks",
+      title: lang === "ENG" ? "MiniPay Ready" : "Siap MiniPay",
       description: lang === "ENG"
-        ? "Play quizzes directly on X (Twitter) without leaving the app."
-        : "Mainkan kuis langsung di X (Twitter) tanpa harus keluar dari aplikasi.",
-      color: "from-purple-500/20 to-transparent",
-      border: "border-purple-500/30",
+        ? "Play quizzes directly from MiniPay wallet with auto-connect and instant payouts."
+        : "Mainkan kuis langsung dari dompet MiniPay dengan auto-connect dan pembayaran instan.",
+      color: "from-[#FCFF52]/20 to-transparent",
+      border: "border-[#FCFF52]/30",
     }
   ];
 

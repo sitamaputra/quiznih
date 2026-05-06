@@ -1,29 +1,17 @@
 /**
  * API Route: POST /api/quiz/claim-reward
- * Distributes SOL rewards from the escrow wallet to quiz winners.
+ * Records reward claims from quiz winners on Celo.
  * 
- * This is server-side because only the server has the escrow secret key.
+ * On Celo, rewards are distributed directly through the QuizEscrow smart contract
+ * by the quiz host calling distributeRewards(). This API records the claim in the DB.
  * 
  * Flow:
  * 1. Verify the user is a winner (in leaderboard, eligible rank)
- * 2. Load escrow keypair from Supabase
- * 3. Sign & send SOL transfer from escrow to winner
- * 4. Mark reward as claimed
+ * 2. Calculate reward amount based on rank
+ * 3. Record the claim in Supabase
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import {
-  keypairFromSecret,
-  getConnection,
-  solToLamports,
-  getExplorerUrl,
-} from "@/lib/solana";
-import {
-  PublicKey,
-  Transaction,
-  SystemProgram,
-  sendAndConfirmTransaction,
-} from "@solana/web3.js";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -39,7 +27,7 @@ const REWARD_DISTRIBUTION = [0.5, 0.3, 0.2];
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { quizId, userWallet } = body;
+    const { quizId, userWallet, txHash } = body;
 
     if (!quizId || !userWallet) {
       return NextResponse.json(
@@ -48,7 +36,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Get quiz info with escrow details
+    // 1. Get quiz info
     const { data: quiz, error: quizError } = await supabase
       .from("quizzes")
       .select("*")
@@ -57,13 +45,6 @@ export async function POST(req: NextRequest) {
 
     if (quizError || !quiz) {
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
-    }
-
-    if (!quiz.escrow_secret || !quiz.escrow_pubkey) {
-      return NextResponse.json(
-        { error: "No escrow configured for this quiz" },
-        { status: 400 }
-      );
     }
 
     if (quiz.deposit_status !== "confirmed") {
@@ -135,35 +116,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 6. Build and send the reward transaction
-    const connection = getConnection();
-    const escrowKeypair = keypairFromSecret(quiz.escrow_secret);
-    const winnerPubkey = new PublicKey(userWallet);
-
-    // Leave a small amount for rent exemption
-    const lamports = solToLamports(rewardAmount);
-
-    const transaction = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: escrowKeypair.publicKey,
-        toPubkey: winnerPubkey,
-        lamports,
-      })
-    );
-
-    const signature = await sendAndConfirmTransaction(
-      connection,
-      transaction,
-      [escrowKeypair],
-      { commitment: "confirmed" }
-    );
-
-    // 7. Mark reward as claimed in DB
+    // 6. Mark reward as claimed in DB
+    // On Celo, the actual transfer is done via the QuizEscrow contract's distributeRewards()
     await supabase
       .from("leaderboard")
       .update({
         claimed_reward: true,
-        claim_tx: signature,
+        claim_tx: txHash || null,
         reward_amount: rewardAmount,
       })
       .eq("quiz_id", quizId)
@@ -173,13 +132,12 @@ export async function POST(req: NextRequest) {
       success: true,
       rewardAmount,
       rank: userRank + 1,
-      txSignature: signature,
-      explorerUrl: getExplorerUrl(signature),
+      txHash: txHash || null,
     });
   } catch (err: any) {
     console.error("Claim reward error:", err);
     return NextResponse.json(
-      { error: err.message || "Failed to distribute reward" },
+      { error: err.message || "Failed to record reward claim" },
       { status: 500 }
     );
   }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useAccount } from "wagmi";
 import WalletDropdown from "./WalletDropdown";
 import AuthModal from "./AuthModal";
 import { supabase } from "@/lib/supabase";
@@ -13,7 +13,7 @@ export default function Navbar() {
   const { lang, toggleLang } = useLanguage();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { publicKey } = useWallet();
+  const { address, isConnected } = useAccount();
   
   // Web2 Auth State
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -88,10 +88,10 @@ export default function Navbar() {
             {mounted && (
               <div className="relative flex items-center gap-3">
                 {/* 1. Master Login Button (If completely unauthenticated) */}
-                {!user && !publicKey && (
+                {!user && !isConnected && (
                   <button
                     onClick={() => setIsAuthOpen(true)}
-                    className="flex items-center gap-2 bg-[#9945FF] hover:bg-[#7b3fe4] text-white px-5 py-2.5 rounded-full transition-all font-semibold text-sm shadow-[0_0_15px_rgba(153,69,255,0.4)]"
+                    className="flex items-center gap-2 bg-[#35D07F] hover:bg-[#2bb86e] text-black px-5 py-2.5 rounded-full transition-all font-semibold text-sm shadow-[0_0_15px_rgba(53,208,127,0.4)]"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>{lang === "ENG" ? "Sign In / Connect" : "Masuk / Hubung"}</span>
@@ -128,7 +128,7 @@ export default function Navbar() {
                   </div>
                 )}
 
-                {/* 3. Solana Wallet Component */}
+                {/* 3. Celo Wallet Component */}
                 <WalletDropdown hideIfDisconnected={!user} />
               </div>
             )}

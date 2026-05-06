@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="w-full border-t border-black/10 dark:border-white/10 mt-24 py-12 relative px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#0A0A0A]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#14F195] to-[#9945FF] flex items-center justify-center font-bold text-white dark:text-black text-xs">
+          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#35D07F] to-[#FCFF52] flex items-center justify-center font-bold text-white dark:text-black text-xs">
             Q
           </div>
           <span className="font-bold text-lg text-black dark:text-white">
@@ -19,8 +19,8 @@ export default function Footer() {
 
         <p className="text-sm text-gray-600 dark:text-gray-500 text-center">
           &copy; 2026 Quiznih. {lang === "ENG" 
-            ? "Built for Superteam Indonesia on Solana."
-            : "Dibangun untuk Superteam Indonesia di atas Solana."}
+            ? "Built on Celo for MiniPay."
+            : "Dibangun di atas Celo untuk MiniPay."}
         </p>
 
         <div className="flex gap-4">

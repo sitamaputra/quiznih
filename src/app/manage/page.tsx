@@ -1,7 +1,6 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAccount, useConnect, useConnectors } from "wagmi";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Wallet2, Plus, LayoutDashboard, Play, CheckCircle2, Trash2, Users, Trophy, ExternalLink, LogOut
@@ -14,18 +13,21 @@ import WalletDropdown from "@/components/WalletDropdown";
 
 export default function ManageQuizzesPage() {
   const { lang } = useLanguage();
-  const { publicKey, disconnect } = useWallet();
-  const { setVisible } = useWalletModal();
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
   const router = useRouter();
 
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!publicKey) {
-      setVisible(true);
+    if (!address && connectors.length > 0) {
+      connect({ connector: connectors[0] });
       return;
     }
+
+    if (!address) return;
 
     const fetchMyQuizzes = async () => {
       setIsLoading(true);
@@ -33,7 +35,7 @@ export default function ManageQuizzesPage() {
         const { data, error } = await supabase
           .from("quizzes")
           .select("*, questions(count)")
-          .eq("host_wallet", publicKey.toString())
+          .eq("host_wallet", address)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -46,7 +48,7 @@ export default function ManageQuizzesPage() {
     };
 
     fetchMyQuizzes();
-  }, [publicKey, setVisible]);
+  }, [address, connectors, connect]);
 
   const handleDelete = async (quizId: string) => {
     if (!confirm(lang === "ENG" ? "Are you sure you want to delete this quiz?" : "Anda yakin ingin menghapus kuis ini?")) return;
@@ -61,15 +63,15 @@ export default function ManageQuizzesPage() {
     }
   };
 
-  const walletShort = publicKey
-    ? `${publicKey.toString().slice(0, 6)}...${publicKey.toString().slice(-4)}`
+  const walletShort = address
+    ? `${address.slice(0, 6)}...${address.slice(-4)}`
     : "";
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-[#9945FF]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-[#14F195]/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
       </div>
 
       <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
@@ -77,7 +79,7 @@ export default function ManageQuizzesPage() {
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-medium">{lang === "ENG" ? "Dashboard" : "Dasbor"}</span>
         </Link>
-        {publicKey && <WalletDropdown />}
+        {isConnected && <WalletDropdown />}
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
@@ -87,7 +89,7 @@ export default function ManageQuizzesPage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center gap-4">
-              <LayoutDashboard className="w-10 h-10 text-[#9945FF]" />
+              <LayoutDashboard className="w-10 h-10 text-[#35D07F]" />
               {lang === "ENG" ? "My " : "Kuis "}
               <span className="text-gradient">{lang === "ENG" ? "Quizzes" : "Saya"}</span>
             </h1>
@@ -100,7 +102,7 @@ export default function ManageQuizzesPage() {
 
           <Link
             href="/create"
-            className="flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold hover:shadow-[0_0_30px_rgba(153,69,255,0.4)] transition-all"
+            className="flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-bold hover:shadow-[0_0_30px_rgba(53,208,127,0.4)] transition-all"
           >
             <Plus className="w-5 h-5" />
             {lang === "ENG" ? "Create New" : "Buat Baru"}
@@ -124,7 +126,7 @@ export default function ManageQuizzesPage() {
             <p className="text-gray-500 mb-8">
               {lang === "ENG" ? "You haven't created any quizzes." : "Anda belum membuat kuis apapun."}
             </p>
-            <Link href="/create" className="text-[#9945FF] font-bold hover:underline">
+            <Link href="/create" className="text-[#35D07F] font-bold hover:underline">
               {lang === "ENG" ? "Start building now" : "Mulai buat sekarang"} →
             </Link>
           </div>
@@ -136,7 +138,7 @@ export default function ManageQuizzesPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.05 }}
-                className="group glass rounded-3xl p-6 border border-white/10 hover:border-[#9945FF]/40 transition-all flex flex-col justify-between"
+                className="group glass rounded-3xl p-6 border border-white/10 hover:border-[#35D07F]/40 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -144,7 +146,7 @@ export default function ManageQuizzesPage() {
                       quiz.status === "waiting" 
                         ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500/30"
                         : quiz.status === "playing"
-                        ? "bg-[#14F195]/20 text-[#14F195] border border-[#14F195]/30"
+                        ? "bg-[#FCFF52]/20 text-[#FCFF52] border border-[#FCFF52]/30"
                         : "bg-gray-500/20 text-gray-400 border border-gray-500/20"
                     }`}>
                       {quiz.status}
@@ -162,8 +164,7 @@ export default function ManageQuizzesPage() {
                   <div className="flex flex-wrap gap-3 mb-8">
                     <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 text-xs font-semibold">
                       <Users className="w-3.5 h-3.5 text-gray-400" />
-                      {/* We'd normally fetch real count, but let's show prize pool for now */}
-                      {quiz.reward_pool_amount} SOL
+                      {quiz.reward_pool_amount} CELO
                     </div>
                   </div>
                 </div>
