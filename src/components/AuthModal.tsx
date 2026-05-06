@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, Lock, User, LogIn, ChevronRight, Chrome, Wallet2 } from "lucide-react";
+import { X, Mail, Lock, User, LogIn, ChevronRight, Chrome, Wallet2, ExternalLink, Loader2 } from "lucide-react";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/context/LanguageContext";
 import { isMiniPayEnvironment } from "@/lib/celo";
+import { WALLET_LIST } from "@/lib/wagmi";
+import Image from "next/image";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -15,7 +17,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { lang } = useLanguage();
-  const { connect } = useConnect();
+  const { connect, isPending: isConnecting } = useConnect();
   const connectors = useConnectors();
   const { isConnected } = useAccount();
   const isMiniPay = isMiniPayEnvironment();
@@ -25,6 +27,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null);
 
   // If in MiniPay, auto-connect and close
   useEffect(() => {
@@ -34,6 +37,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       if (onSuccess) onSuccess();
     }
   }, [isMiniPay, isOpen, connectors, connect, onClose, onSuccess]);
+
+  // Close modal when wallet is connected
+  useEffect(() => {
+    if (isConnected && connectingWalletId) {
+      setConnectingWalletId(null);
+      onClose();
+      if (onSuccess) onSuccess();
+    }
+  }, [isConnected, connectingWalletId, onClose, onSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,10 +102,56 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     }
   };
 
-  const handleWalletConnect = () => {
-    if (connectors.length > 0) {
-      connect({ connector: connectors[0] });
-      onClose();
+  const handleWalletConnect = (walletId: string) => {
+    setConnectingWalletId(walletId);
+    setError(null);
+
+    // Map wallet ID to the correct connector
+    const connectorMap: Record<string, number> = {
+      metamask: 1,  // index matches wagmiConfig connectors order
+      rabby: 2,
+      okx: 3,
+      bitget: 4,
+      trust: 5,
+    };
+
+    const connectorIndex = connectorMap[walletId] ?? 0;
+
+    if (connectors.length > connectorIndex) {
+      connect(
+        { connector: connectors[connectorIndex] },
+        {
+          onError: (err) => {
+            setConnectingWalletId(null);
+            // If wallet extension is not installed, open install page
+            const installUrls: Record<string, string> = {
+              metamask: "https://metamask.io/download/",
+              rabby: "https://rabby.io/",
+              okx: "https://www.okx.com/web3",
+              bitget: "https://web3.bitget.com/",
+              trust: "https://trustwallet.com/",
+            };
+            if (err.message?.includes("provider") || err.message?.includes("not found")) {
+              window.open(installUrls[walletId] || "#", "_blank");
+            } else {
+              setError(err.message || "Connection failed");
+            }
+          },
+        }
+      );
+    } else {
+      // Fallback: try generic injected
+      if (connectors.length > 0) {
+        connect(
+          { connector: connectors[0] },
+          {
+            onError: (err) => {
+              setConnectingWalletId(null);
+              setError(err.message || "No wallet detected");
+            },
+          }
+        );
+      }
     }
   };
 
@@ -112,7 +170,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[101] p-4"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[101] p-4 max-h-[90vh] overflow-y-auto"
           >
             <div className="glass rounded-[2rem] border border-white/20 p-8 shadow-2xl relative overflow-hidden bg-black/80 dark:bg-black/90">
               <button
@@ -206,6 +264,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </div>
               </div>
 
+              {/* Google Login */}
               <button
                 type="button"
                 onClick={handleGoogleLogin}
@@ -215,14 +274,51 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 Google
               </button>
 
-              <button
-                type="button"
-                onClick={handleWalletConnect}
-                className="w-full mt-3 py-3.5 rounded-xl bg-[#35D07F]/10 text-[#35D07F] border border-[#35D07F] font-extrabold text-base flex items-center justify-center gap-3 hover:bg-[#35D07F]/20 active:scale-95 transition-all"
-              >
-                <Wallet2 className="w-5 h-5" />
-                {lang === "ENG" ? "Connect Celo Wallet" : "Hubungkan Dompet Celo"}
-              </button>
+              {/* Web3 Wallet Section */}
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Wallet2 className="w-4 h-4 text-[#35D07F]" />
+                  <span className="text-sm font-bold text-gray-300">
+                    {lang === "ENG" ? "Web3 Wallets" : "Dompet Web3"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-2.5">
+                  {WALLET_LIST.map((wallet, idx) => (
+                    <motion.button
+                      key={wallet.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 + idx * 0.04 }}
+                      type="button"
+                      disabled={isConnecting && connectingWalletId === wallet.id}
+                      onClick={() => handleWalletConnect(wallet.id)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/25 transition-all duration-200 group disabled:opacity-60"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden"
+                          style={{ backgroundColor: `${wallet.color}15` }}
+                        >
+                          <img
+                            src={wallet.icon}
+                            alt={wallet.name}
+                            className="w-6 h-6"
+                          />
+                        </div>
+                        <span className="font-bold text-sm text-white group-hover:text-[#35D07F] transition-colors">
+                          {wallet.name}
+                        </span>
+                      </div>
+                      {connectingWalletId === wallet.id ? (
+                        <Loader2 className="w-4 h-4 text-[#35D07F] animate-spin" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
 
               <div className="mt-6 text-center text-sm text-gray-400">
                 {isLogin 
