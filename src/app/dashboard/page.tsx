@@ -100,13 +100,13 @@ export default function DashboardPage() {
               </div>
 
               <div>
-                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white">
-                  {lang === "ENG" ? "SYS_HOST" : "SYS_HOST"}
+                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white tracking-tight">
+                  {lang === "ENG" ? "Create Quiz" : "Buat Kuis"} <span className="text-[#35D07F] text-sm align-top">[HOST]</span>
                 </h2>
                 <p className="text-gray-400 leading-relaxed text-sm">
                   {lang === "ENG"
-                    ? "Generate smart-contract powered assessments. Distribute CELO tokens."
-                    : "Buat asesmen berbasis smart-contract. Distribusikan token CELO."}
+                    ? "Initialize smart-contract assessments and distribute CELO tokens to participants."
+                    : "Inisialisasi asesmen smart-contract dan distribusikan token CELO ke peserta."}
                 </p>
               </div>
 
@@ -145,13 +145,13 @@ export default function DashboardPage() {
               </div>
 
               <div>
-                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white">
-                  {lang === "ENG" ? "SYS_CLIENT" : "SYS_CLIENT"}
+                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white tracking-tight">
+                  {lang === "ENG" ? "Play Quiz" : "Main Kuis"} <span className="text-[#FCFF52] text-sm align-top">[CLIENT]</span>
                 </h2>
                 <p className="text-gray-400 leading-relaxed text-sm">
                   {lang === "ENG"
-                    ? "Connect to an active node. Compete in real-time. Extract rewards."
-                    : "Koneksi ke node aktif. Bersaing real-time. Ekstrak hadiah."}
+                    ? "Connect to an active host node, compete in real-time, and extract rewards."
+                    : "Koneksi ke host aktif, bersaing secara real-time, dan ekstrak hadiah CELO."}
                 </p>
               </div>
 
@@ -183,12 +183,12 @@ export default function DashboardPage() {
 
               <div>
                 <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
-                  RND_SEED
+                  {lang === "ENG" ? "Spin Wheel" : "Roda Putar"} <span className="text-[#06B6D4] text-[10px] ml-1">[RND_SEED]</span>
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Cryptographic random selection protocol."
-                    : "Protokol seleksi acak kriptografik."}
+                    ? "Cryptographic random selection protocol for fair prize distribution."
+                    : "Protokol seleksi acak kriptografik untuk distribusi hadiah yang adil."}
                 </p>
               </div>
 
@@ -217,12 +217,12 @@ export default function DashboardPage() {
 
               <div>
                 <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
-                  TELEMETRY
+                  {lang === "ENG" ? "Live Report" : "Laporan Live"} <span className="text-[#35D07F] text-[10px] ml-1">[TELEMETRY]</span>
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Real-time market tracking and participant wagers."
-                    : "Pelacakan pasar real-time dan taruhan peserta."}
+                    ? "Monitor quiz activity in real-time and place spectator predictions."
+                    : "Pantau aktivitas kuis real-time dan pasang prediksi penonton."}
                 </p>
               </div>
 
@@ -251,18 +251,20 @@ export default function DashboardPage() {
 
               <div>
                 <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
-                  COMMS_LINK
+                  {lang === "ENG" ? "Live Q&A" : "Tanya Jawab"} <span className="text-[#FCFF52] text-[10px] ml-1">[COMMS]</span>
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Encrypted query submission & peer consensus."
-                    : "Pengajuan kueri terenkripsi & konsensus rekan."}
+                    ? "Create interactive Q&A rooms or join existing ones for secure peer consensus."
+                    : "Buat ruang tanya jawab interaktif atau gabung untuk konsensus peserta."}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-[#FCFF52] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
-                <span>💬</span>
-                <span>{lang === "ENG" ? "Connect" : "Koneksi"}</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-[#FCFF52] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
+                  <span>🚀</span>
+                  <span>{lang === "ENG" ? "Create / Join Q&A" : "Buat / Gabung Q&A"}</span>
+                </div>
               </div>
             </div>
           </motion.div>

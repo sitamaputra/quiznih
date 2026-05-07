@@ -96,10 +96,12 @@ export default function ManageQuizzesPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
               DATABASE_ACCESS
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center gap-4 font-mono uppercase">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center gap-4 font-mono uppercase tracking-tight">
               <LayoutDashboard className="w-10 h-10 text-[#35D07F]" />
-              {lang === "ENG" ? "System " : "Kuis "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Records" : "Saya"}</span>
+              {lang === "ENG" ? "Manage " : "Kelola "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">
+                {lang === "ENG" ? "Quizzes" : "Kuis"}
+              </span>
             </h1>
             <p className="text-gray-400 max-w-lg font-mono text-sm">
               {lang === "ENG" 
@@ -124,18 +126,18 @@ export default function ManageQuizzesPage() {
             ))}
           </div>
         ) : quizzes.length === 0 ? (
-          <div className="bg-black/50 backdrop-blur-md rounded-[3rem] p-20 text-center border border-white/10">
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-white/5 flex items-center justify-center mb-6">
-              <Plus className="w-10 h-10 text-gray-500" />
+          <div className="bg-black/50 backdrop-blur-md rounded-[3rem] p-20 text-center border border-white/10 shadow-[0_0_40px_rgba(53,208,127,0.1)]">
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+              <Plus className="w-10 h-10 text-[#35D07F]" />
             </div>
             <h3 className="text-2xl font-bold mb-2 font-mono text-white">
-              {lang === "ENG" ? "NO_RECORDS_FOUND" : "NO_RECORDS_FOUND"}
+              {lang === "ENG" ? "NO QUIZZES FOUND" : "TIDAK ADA KUIS"}
             </h3>
-            <p className="text-gray-500 mb-8 font-mono text-sm">
-              {lang === "ENG" ? "You haven't created any quizzes." : "Anda belum membuat kuis apapun."}
+            <p className="text-gray-400 mb-8 font-mono text-sm">
+              {lang === "ENG" ? "You haven't initialized any quiz sessions yet." : "Anda belum menginisialisasi sesi kuis apapun."}
             </p>
-            <Link href="/create" className="text-[#35D07F] font-bold hover:underline font-mono">
-              {lang === "ENG" ? "Init Sequence Now" : "Mulai Sekuens"} →
+            <Link href="/create" className="text-[#35D07F] font-bold hover:underline font-mono uppercase tracking-widest text-sm">
+              {lang === "ENG" ? "Create Your First Quiz" : "Buat Kuis Pertama Anda"} →
             </Link>
           </div>
         ) : (
