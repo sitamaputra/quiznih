@@ -62,6 +62,9 @@ export default function LiveReportPage() {
   const [liveTime, setLiveTime] = useState(0);
   const { takeScreenshot, startRecording, stopRecording, isRecording, recordingTime, formatRecTime } = useCapture();
   const captureRef = useRef<HTMLDivElement>(null);
+  const [scoreHistory, setScoreHistory] = useState<{time:number;scores:{[wallet:string]:number}}[]>([]);
+  const [showWinner, setShowWinner] = useState(false);
+  const CHART_COLORS = ["#FDE047","#35D07F","#60A5FA","#F472B6","#A78BFA","#F59E0B"];
 
   // Live timer
   useEffect(() => {
@@ -83,6 +86,24 @@ export default function LiveReportPage() {
     }, 3000);
     return () => clearInterval(t);
   }, [isDemo, isWatching]);
+
+  // Record score history for chart
+  useEffect(() => {
+    if (!isWatching || players.length === 0) return;
+    const t = setInterval(() => {
+      setScoreHistory(prev => {
+        const entry: {time:number;scores:{[w:string]:number}} = { time: Date.now(), scores: {} };
+        players.forEach(p => { entry.scores[p.user_wallet] = p.final_score || 0; });
+        return [...prev.slice(-30), entry]; // keep last 30 data points
+      });
+    }, 2000);
+    return () => clearInterval(t);
+  }, [isWatching, players]);
+
+  const handleFinish = () => {
+    setShowWinner(true);
+    confetti({ particleCount: 250, spread: 100, origin: { y: 0.4 }, colors: ["#35D07F","#FCFF52","#FDE047","#A78BFA"] });
+  };
 
   const handleWatch = async () => {
     if (!roomCode.trim()) return;
@@ -397,6 +418,69 @@ export default function LiveReportPage() {
                 </motion.div>
               ))}
             </div>
+
+            {/* Real-time Trading Chart */}
+            {scoreHistory.length > 1 && (
+              <div className="glass rounded-[2rem] border border-white/10 p-6 space-y-3">
+                <h3 className="font-bold flex items-center gap-2 text-sm">
+                  <TrendingUp className="w-4 h-4 text-[#35D07F]" />
+                  {lang === "ENG" ? "Score Chart (Real-time)" : "Grafik Skor (Real-time)"}
+                </h3>
+                {/* Player Legend */}
+                <div className="flex flex-wrap gap-2">
+                  {sortedPlayers.slice(0, 6).map((p, i) => (
+                    <div key={p.user_wallet} className="flex items-center gap-1.5 text-xs">
+                      <div className="w-3 h-3 rounded-sm" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                      <span className="text-gray-400 font-mono">{p.player_name?.slice(0, 8) || "Anon"}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* SVG Chart */}
+                <div className="w-full h-[200px] relative">
+                  <svg viewBox="0 0 600 200" className="w-full h-full" preserveAspectRatio="none">
+                    {/* Grid lines */}
+                    {[0, 50, 100, 150, 200].map(y => (
+                      <line key={y} x1="0" y1={y} x2="600" y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                    ))}
+                    {/* Player lines */}
+                    {sortedPlayers.slice(0, 6).map((player, pIdx) => {
+                      const maxScore = Math.max(...players.map(p => p.final_score || 1), 1);
+                      const points = scoreHistory.map((entry, i) => {
+                        const x = (i / Math.max(scoreHistory.length - 1, 1)) * 600;
+                        const score = entry.scores[player.user_wallet] || 0;
+                        const y = 190 - (score / maxScore) * 180;
+                        return `${x},${y}`;
+                      }).join(" ");
+                      const color = CHART_COLORS[pIdx % CHART_COLORS.length];
+                      return (
+                        <g key={player.user_wallet}>
+                          {/* Glow area */}
+                          <polyline points={points + ` 600,200 0,200`} fill={`${color}10`} stroke="none" />
+                          {/* Line */}
+                          <polyline points={points} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+                          {/* Current dot */}
+                          {scoreHistory.length > 0 && (
+                            <circle
+                              cx="600"
+                              cy={190 - ((scoreHistory[scoreHistory.length - 1]?.scores[player.user_wallet] || 0) / maxScore) * 180}
+                              r="4" fill={color}
+                            >
+                              <animate attributeName="r" values="3;5;3" dur="1.5s" repeatCount="indefinite" />
+                            </circle>
+                          )}
+                        </g>
+                      );
+                    })}
+                  </svg>
+                  {/* Y-axis labels */}
+                  <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-[9px] text-gray-600 font-mono">
+                    <span>{Math.max(...players.map(p => p.final_score || 0))}</span>
+                    <span>{Math.floor(Math.max(...players.map(p => p.final_score || 0)) / 2)}</span>
+                    <span>0</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT: Sidebar */}
@@ -489,15 +573,74 @@ export default function LiveReportPage() {
               </div>
             </div>
 
-            {/* Celebrate */}
-            <button onClick={() => confetti({ particleCount: 200, spread: 80, origin: { y: 0.5 }, colors: ["#35D07F","#FCFF52","#FDE047"] })}
-              className="w-full py-4 rounded-2xl bg-[#FDE047]/10 border border-[#FDE047]/30 text-[#FDE047] font-bold hover:bg-[#FDE047]/20 transition-all flex items-center justify-center gap-2"
+            {/* Finish & Celebrate */}
+            <button onClick={handleFinish}
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-extrabold hover:shadow-[0_0_40px_rgba(53,208,127,0.4)] transition-all flex items-center justify-center gap-2 text-lg"
             >
-              🎉 {lang === "ENG" ? "Celebrate!" : "Rayakan!"}
+              🏆 {lang === "ENG" ? "Finish & Show Winner" : "Selesai & Tampilkan Pemenang"}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Winner Popup - Centered Overlay */}
+      <AnimatePresence>
+        {showWinner && sortedPlayers.length > 0 && (
+          <>
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-50"
+              onClick={() => setShowWinner(false)}
+            />
+            <motion.div
+              initial={{opacity:0,scale:0.5,y:40}}
+              animate={{opacity:1,scale:1,y:0}}
+              exit={{opacity:0,scale:0.5,y:40}}
+              transition={{type:"spring",stiffness:300,damping:25}}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg p-4"
+            >
+              <div className="rounded-[2.5rem] border-2 border-[#FCFF52]/50 p-10 text-center space-y-5 shadow-[0_0_100px_rgba(252,255,82,0.3)] bg-[#0a0a12]/95 backdrop-blur-xl">
+                <motion.div initial={{scale:0}} animate={{scale:1}} transition={{delay:0.2,type:"spring",stiffness:200}}
+                  className="text-7xl"
+                >{sortedPlayers[0]?.avatar_emoji || "🏆"}</motion.div>
+                <motion.h2 initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.3}}
+                  className="text-4xl font-extrabold text-gradient"
+                >
+                  🎉 {lang === "ENG" ? "Winner!" : "Pemenang!"}
+                </motion.h2>
+                <motion.div initial={{opacity:0,scale:0.9}} animate={{opacity:1,scale:1}} transition={{delay:0.4}}
+                  className="px-8 py-5 rounded-2xl bg-[#FDE047]/10 border border-[#FDE047]/30 inline-block"
+                >
+                  <div className="text-3xl font-black text-[#FDE047]">{sortedPlayers[0]?.player_name}</div>
+                  <div className="text-lg font-mono text-[#FCFF52] mt-1">{sortedPlayers[0]?.final_score || 0} pts</div>
+                </motion.div>
+
+                {/* Top 3 */}
+                <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.5}}
+                  className="flex items-center justify-center gap-4 pt-2"
+                >
+                  {sortedPlayers.slice(0, 3).map((p, i) => (
+                    <div key={p.user_wallet} className="text-center">
+                      <div className="text-2xl">{MEDALS[i]}</div>
+                      <div className="text-sm font-bold text-white truncate max-w-[100px]">{p.player_name}</div>
+                      <div className="text-xs font-mono text-gray-400">{p.final_score} pts</div>
+                      {activePrizes[i] && (
+                        <div className="text-xs text-[#FCFF52] font-bold mt-1">🎁 {activePrizes[i]}</div>
+                      )}
+                    </div>
+                  ))}
+                </motion.div>
+
+                <motion.button initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.6}}
+                  onClick={() => setShowWinner(false)}
+                  className="mt-4 px-8 py-3 rounded-xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] font-bold hover:bg-[#FCFF52]/20 transition-all text-sm"
+                >
+                  {lang === "ENG" ? "Close" : "Tutup"}
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

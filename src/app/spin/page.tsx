@@ -375,33 +375,58 @@ export default function SpinWheelPage() {
                 :<><Sparkles className="w-7 h-7"/> {lang==="ENG"?"SPIN!":"PUTAR!"}</>}
             </motion.button>
             <span className="text-xs text-gray-600">{lang==="ENG"?`Duration: ${actualDuration}s`:`Durasi: ${actualDuration} detik`}</span>
-
-            {/* Result */}
-            <AnimatePresence>
-              {showResult&&winner&&(
-                <motion.div initial={{opacity:0,scale:0.8,y:20}} animate={{opacity:1,scale:1,y:0}} exit={{opacity:0,scale:0.8}}
-                  className="glass rounded-[2.5rem] border border-[#FCFF52]/40 p-10 text-center space-y-4 w-full max-w-md shadow-[0_0_60px_rgba(252,255,82,0.15)]">
-                  <div className="text-7xl">{winner.emoji}</div>
-                  <h2 className="text-3xl font-extrabold text-gradient">
-                    {mode==="name"?(lang==="ENG"?"Winner!":"Pemenang!"):(lang==="ENG"?"You Won!":"Kamu Menang!")}
-                  </h2>
-                  <div className="px-8 py-5 rounded-2xl text-2xl font-black" style={{background:winner.color+"20",color:winner.color}}>
-                    {winner.label}
-                  </div>
-                  {mode==="name"&&activePrize&&(
-                    <div className="px-6 py-3 rounded-xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] font-bold text-lg">
-                      🎁 {lang==="ENG"?"Prize":"Hadiah"}: {activePrize}
-                    </div>
-                  )}
-                  <button onClick={()=>{setShowResult(false);setWinner(null);}} className="text-sm text-gray-500 hover:text-white transition-colors">
-                    {lang==="ENG"?"Close":"Tutup"}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         </div>
       </div>
+
+      {/* Winner Popup - Centered Overlay */}
+      <AnimatePresence>
+        {showResult&&winner&&(
+          <>
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+              className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
+              onClick={()=>{setShowResult(false);setWinner(null);}}
+            />
+            <motion.div
+              initial={{opacity:0,scale:0.5,y:40}}
+              animate={{opacity:1,scale:1,y:0}}
+              exit={{opacity:0,scale:0.5,y:40}}
+              transition={{type:"spring",stiffness:300,damping:25}}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg p-4"
+            >
+              <div className="rounded-[2.5rem] border-2 border-[#FCFF52]/50 p-10 text-center space-y-5 shadow-[0_0_100px_rgba(252,255,82,0.25)] bg-[#0a0a12]/95 backdrop-blur-xl">
+                <motion.div
+                  initial={{scale:0}} animate={{scale:1}} transition={{delay:0.2,type:"spring",stiffness:200}}
+                  className="text-8xl"
+                >{winner.emoji}</motion.div>
+                <motion.h2 initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.3}}
+                  className="text-4xl font-extrabold text-gradient"
+                >
+                  {mode==="name"?(lang==="ENG"?"🎉 Winner!":"🎉 Pemenang!"):(lang==="ENG"?"🎉 You Won!":"🎉 Kamu Menang!")}
+                </motion.h2>
+                <motion.div initial={{opacity:0,scale:0.9}} animate={{opacity:1,scale:1}} transition={{delay:0.4}}
+                  className="px-8 py-5 rounded-2xl text-3xl font-black mx-auto inline-block" style={{background:winner.color+"20",color:winner.color}}
+                >
+                  {winner.label}
+                </motion.div>
+                {mode==="name"&&activePrize&&(
+                  <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.5}}
+                    className="px-6 py-3 rounded-xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] font-bold text-xl"
+                  >
+                    🎁 {lang==="ENG"?"Prize":"Hadiah"}: {activePrize}
+                  </motion.div>
+                )}
+                <motion.button initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.6}}
+                  onClick={()=>{setShowResult(false);setWinner(null);}}
+                  className="mt-4 px-8 py-3 rounded-xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] font-bold hover:bg-[#FCFF52]/20 transition-all text-sm"
+                >
+                  {lang==="ENG"?"Close":"Tutup"}
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
