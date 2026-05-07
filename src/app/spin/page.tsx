@@ -75,7 +75,7 @@ export default function SpinWheelPage() {
     if (!canvas || items.length === 0) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const size = canvas.width, center = size/2, radius = center-10;
+    const size = canvas.width, center = size/2, radius = center-12;
     const sliceAngle = (2*Math.PI)/items.length;
     ctx.clearRect(0,0,size,size);
 
@@ -97,20 +97,20 @@ export default function SpinWheelPage() {
       ctx.save(); ctx.translate(center,center);
       ctx.rotate(sa+sliceAngle/2); ctx.textAlign = "center";
       ctx.fillStyle = "#000";
-      const fs = Math.max(9, 18 - items.length);
+      const fs = Math.max(14, 26 - items.length);
       ctx.font = `bold ${fs}px 'Outfit', sans-serif`;
-      const tr = radius*0.6;
-      ctx.fillText(item.emoji, tr, -8);
-      ctx.font = `bold ${Math.max(8, fs-3)}px 'Outfit', sans-serif`;
-      const lbl = item.label.length > 10 ? item.label.slice(0,9)+"…" : item.label;
-      ctx.fillText(lbl, tr, 10);
+      const tr = radius*0.58;
+      ctx.fillText(item.emoji, tr, -12);
+      ctx.font = `bold ${Math.max(11, fs-4)}px 'Outfit', sans-serif`;
+      const lbl = item.label.length > 12 ? item.label.slice(0,11)+"…" : item.label;
+      ctx.fillText(lbl, tr, 12);
       ctx.restore();
     });
 
-    ctx.beginPath(); ctx.arc(center,center,32,0,2*Math.PI);
+    ctx.beginPath(); ctx.arc(center,center,40,0,2*Math.PI);
     ctx.fillStyle = "#0A0A0A"; ctx.fill();
-    ctx.strokeStyle = "#35D07F"; ctx.lineWidth = 3; ctx.stroke();
-    ctx.fillStyle = "#35D07F"; ctx.font = "bold 14px 'Outfit', sans-serif";
+    ctx.strokeStyle = "#35D07F"; ctx.lineWidth = 4; ctx.stroke();
+    ctx.fillStyle = "#35D07F"; ctx.font = "bold 20px 'Outfit', sans-serif";
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText("SPIN", center, center);
   }, [items]);
@@ -332,7 +332,7 @@ export default function SpinWheelPage() {
                 <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FCFF52] drop-shadow-[0_0_12px_rgba(252,255,82,0.6)]"/>
               </div>
               <div style={{transform:`rotate(${rotation}deg)`,transition:transStyle}}>
-                <canvas ref={canvasRef} width={460} height={460} className="w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] md:w-[460px] md:h-[460px]"/>
+                <canvas ref={canvasRef} width={560} height={560} className="w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] md:w-[560px] md:h-[560px]"/>
               </div>
               <div className={`absolute inset-0 rounded-full border-4 pointer-events-none transition-all duration-500 ${isSpinning?"border-[#FCFF52]/60 shadow-[0_0_50px_rgba(252,255,82,0.4)]":"border-[#35D07F]/20"}`}/>
             </div>

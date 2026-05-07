@@ -2,16 +2,26 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift, LogOut, ExternalLink, Loader2
+  ArrowLeft, Wallet2, QrCode, Keyboard, ArrowRight, Users, Trophy, Clock, CheckCircle2, XCircle, Gift, LogOut, ExternalLink, Loader2, Volume2, VolumeX
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import WalletDropdown from "@/components/WalletDropdown";
 import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+
+const BGM_URLS = [
+  "https://cdn.pixabay.com/audio/2024/11/28/audio_3fac7f0464.mp3",
+  "https://cdn.pixabay.com/audio/2022/10/25/audio_32ff41a00f.mp3",
+  "https://cdn.pixabay.com/audio/2023/09/06/audio_13fae43d92.mp3",
+];
+
+const FLOATING_EMOJIS = ["🎯","⚡","🔥","💎","🏆","🎮","✨","🚀","💰","🎉","⭐","🎪"];
+const CORRECT_SFX_URL = "https://cdn.pixabay.com/audio/2022/03/10/audio_5e5a3779f3.mp3";
+const WRONG_SFX_URL = "https://cdn.pixabay.com/audio/2022/03/10/audio_b4c5a4cd9e.mp3";
 
 export default function PlayPage() {
   const { lang } = useLanguage();
@@ -57,6 +67,47 @@ export default function PlayPage() {
   const [revealCountdown, setRevealCountdown] = useState(3);
   const [selectedAvatar, setSelectedAvatar] = useState(0);
 
+  // Music & SFX
+  const audioRef = useRef<HTMLAudioElement|null>(null);
+  const [musicOn, setMusicOn] = useState(false);
+  const [currentBgm, setCurrentBgm] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [floatingEmojis, setFloatingEmojis] = useState<{id:number;emoji:string;x:number;delay:number}[]>([]);
+
+  // Initialize floating emojis
+  useEffect(() => {
+    if (!isJoined) return;
+    const emojis = Array.from({length: 12}, (_, i) => ({
+      id: i, emoji: FLOATING_EMOJIS[i % FLOATING_EMOJIS.length],
+      x: Math.random() * 100, delay: Math.random() * 5,
+    }));
+    setFloatingEmojis(emojis);
+  }, [isJoined]);
+
+  // Music toggle
+  const toggleMusic = () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(BGM_URLS[currentBgm]);
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.3;
+    }
+    if (musicOn) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(() => {});
+    }
+    setMusicOn(!musicOn);
+  };
+
+  const nextTrack = () => {
+    const next = (currentBgm + 1) % BGM_URLS.length;
+    setCurrentBgm(next);
+    if (audioRef.current) {
+      audioRef.current.src = BGM_URLS[next];
+      if (musicOn) audioRef.current.play().catch(() => {});
+    }
+  };
+
   const AVATARS = [
     { emoji: "🐶", name: "Doggo", color: "#F59E0B" },
     { emoji: "🐱", name: "Kitty", color: "#EC4899" },
@@ -96,7 +147,13 @@ export default function PlayPage() {
     if (correct) {
       // Base score + time bonus
       newScore = score + 100 + (timeLeft * 10);
-      setScore(newScore); 
+      setScore(newScore);
+      setStreak(s => s + 1);
+      // Correct SFX
+      try { new Audio(CORRECT_SFX_URL).play(); } catch(_) {}
+    } else {
+      setStreak(0);
+      try { new Audio(WRONG_SFX_URL).play(); } catch(_) {}
     }
     
     // Attempt to update score live on Supabase
@@ -385,22 +442,62 @@ export default function PlayPage() {
 
   if (isJoined) {
     return (
-      <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
+      <main className="min-h-screen w-full text-black dark:text-white flex flex-col relative overflow-hidden">
         <div className="fixed inset-0 z-[-1] pointer-events-none">
           <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+          <div className="absolute bottom-[15%] right-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[120px] rounded-full" />
         </div>
 
-        <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
-          <button onClick={() => setIsJoined(false)} className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
+        {/* Floating Emojis */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          {floatingEmojis.map(fe => (
+            <motion.div
+              key={fe.id}
+              initial={{ y: "110vh", x: `${fe.x}vw`, opacity: 0.6, scale: 0.8 }}
+              animate={{ y: "-10vh", opacity: [0.6, 0.9, 0.3], scale: [0.8, 1.2, 0.6], rotate: [0, 180, 360] }}
+              transition={{ duration: 8 + Math.random() * 6, delay: fe.delay, repeat: Infinity, ease: "linear" }}
+              className="absolute text-2xl sm:text-3xl select-none"
+            >
+              {fe.emoji}
+            </motion.div>
+          ))}
+        </div>
+
+        <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between z-10">
+          <button onClick={() => { setIsJoined(false); if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } }} className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium">{lang === "ENG" ? "Leave Room" : "Keluar Ruangan"}</span>
           </button>
-          {publicKey && (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#FCFF52]/30">
-              <Wallet2 className="w-4 h-4 text-[#FCFF52]" />
-              <span className="text-sm font-mono font-semibold">{walletShort}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Music Controls */}
+            <button onClick={toggleMusic}
+              className={`p-2.5 rounded-xl border transition-all ${musicOn ? "bg-[#FCFF52]/20 border-[#FCFF52]/40 text-[#FCFF52]" : "bg-white/5 border-white/10 text-gray-500 hover:text-[#FCFF52]"}`}
+              title={musicOn ? "Mute" : "Play Music"}
+            >
+              {musicOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            </button>
+            {musicOn && (
+              <button onClick={nextTrack} className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-gray-400 hover:text-[#FCFF52] transition-all" title="Next Track">
+                ⏭️
+              </button>
+            )}
+            {/* Streak Badge */}
+            <AnimatePresence>
+              {streak > 1 && (
+                <motion.div initial={{scale:0}} animate={{scale:1}} exit={{scale:0}}
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B]/20 to-[#EF4444]/20 border border-[#F59E0B]/30 text-[#F59E0B] font-black text-sm"
+                >
+                  🔥 {streak}x
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {publicKey && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full glass border border-[#FCFF52]/30">
+                <Wallet2 className="w-4 h-4 text-[#FCFF52]" />
+                <span className="text-sm font-mono font-semibold">{walletShort}</span>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* 1. Waiting Area */}

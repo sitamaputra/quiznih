@@ -111,15 +111,16 @@ export default function HeroSection() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
         >
           <Link href="/dashboard"
-            className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#FCFF52] text-black px-10 py-4 rounded-lg font-extrabold text-lg hover:shadow-[0_0_40px_rgba(252,255,82,0.4)] hover:scale-105 transition-all duration-300 group uppercase tracking-wider"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#FCFF52] text-black px-14 py-5 rounded-lg font-extrabold text-xl hover:shadow-[0_0_40px_rgba(252,255,82,0.4)] hover:scale-105 transition-all duration-300 group uppercase tracking-wider"
           >
-            <PlayCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <PlayCircle className="w-7 h-7 group-hover:scale-110 transition-transform" />
             {lang === "ENG" ? "PLAY NOW" : "MAIN SEKARANG"}
           </Link>
-          <Link href="/spin"
-            className="w-full sm:w-auto flex items-center justify-center gap-3 border border-[#FCFF52]/30 text-[#FCFF52] px-10 py-4 rounded-lg font-bold text-lg hover:bg-[#FCFF52]/10 hover:border-[#FCFF52]/60 transition-all duration-300 group uppercase tracking-wider"
+          <Link href="/live"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 border border-[#FCFF52]/30 text-[#FCFF52] px-10 py-5 rounded-lg font-bold text-lg hover:bg-[#FCFF52]/10 hover:border-[#FCFF52]/60 transition-all duration-300 group uppercase tracking-wider"
           >
-            🎡 {lang === "ENG" ? "SPIN WHEEL" : "RODA PUTAR"}
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            {lang === "ENG" ? "WATCH LIVE" : "TONTON LIVE"}
             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
