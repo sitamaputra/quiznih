@@ -31,7 +31,7 @@ export default function DashboardPage() {
     ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
     : "";
 
-  const handleConnectAndNavigate = (path: string) => {
+  const handleNavigate = (path: string) => {
     router.push(path);
   };
 
@@ -53,12 +53,12 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 w-full max-w-5xl -mt-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 w-full max-w-5xl -mt-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 space-y-4"
+          className="text-center mb-12 space-y-4"
         >
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
             {lang === "ENG" ? "Choose Your " : "Pilih "}
@@ -71,14 +71,15 @@ export default function DashboardPage() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
+        {/* Main 2-col: Creator + Player */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl mb-8">
           {/* Creator Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleConnectAndNavigate("/create")}
+            onClick={() => handleNavigate("/create")}
             className="cursor-pointer group relative glass rounded-[2.5rem] p-10 border border-[#35D07F]/30 hover:border-[#35D07F]/60 transition-all duration-500 overflow-hidden"
           >
             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#35D07F]/10 blur-[60px] rounded-full group-hover:bg-[#35D07F]/25 transition-all duration-500" />
@@ -122,7 +123,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleConnectAndNavigate("/play")}
+            onClick={() => handleNavigate("/play")}
             className="cursor-pointer group relative glass rounded-[2.5rem] p-10 border border-[#FCFF52]/30 hover:border-[#FCFF52]/60 transition-all duration-500 overflow-hidden"
           >
             <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#FCFF52]/10 blur-[60px] rounded-full group-hover:bg-[#FCFF52]/25 transition-all duration-500" />
@@ -146,6 +147,77 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2 text-[#FCFF52] font-bold group-hover:gap-3 transition-all">
                 <Gamepad2 className="w-5 h-5" />
                 <span>{lang === "ENG" ? "Join Quiz" : "Gabung Kuis"}</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* NEW: Bottom 2-col: Spin Wheel + Live Report */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
+          {/* Spin Wheel Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            whileHover={{ scale: 1.03, y: -5 }}
+            onClick={() => handleNavigate("/spin")}
+            className="cursor-pointer group relative glass rounded-[2.5rem] p-8 border border-[#A78BFA]/30 hover:border-[#A78BFA]/60 transition-all duration-500 overflow-hidden"
+          >
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#A78BFA]/10 blur-[60px] rounded-full group-hover:bg-[#A78BFA]/25 transition-all duration-500" />
+
+            <div className="relative z-10 space-y-5">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#A78BFA] to-[#7C3AED] flex items-center justify-center shadow-[0_0_25px_rgba(167,139,250,0.3)] group-hover:shadow-[0_0_40px_rgba(167,139,250,0.5)] transition-shadow">
+                <span className="text-3xl">🎡</span>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-extrabold mb-1">
+                  {lang === "ENG" ? "Spin Wheel" : "Roda Putar"}
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                  {lang === "ENG"
+                    ? "Random prize picker with customizable prizes. Spin the wheel to pick a winner!"
+                    : "Pemilih hadiah acak yang bisa disesuaikan. Putar roda untuk pilih pemenang!"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-[#A78BFA] font-bold group-hover:gap-3 transition-all text-sm">
+                <span>🎰</span>
+                <span>{lang === "ENG" ? "Spin & Win" : "Putar & Menang"}</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Live Report Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            whileHover={{ scale: 1.03, y: -5 }}
+            onClick={() => handleNavigate("/live")}
+            className="cursor-pointer group relative glass rounded-[2.5rem] p-8 border border-[#F472B6]/30 hover:border-[#F472B6]/60 transition-all duration-500 overflow-hidden"
+          >
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#F472B6]/10 blur-[60px] rounded-full group-hover:bg-[#F472B6]/25 transition-all duration-500" />
+
+            <div className="relative z-10 space-y-5">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F472B6] to-[#EC4899] flex items-center justify-center shadow-[0_0_25px_rgba(244,114,182,0.3)] group-hover:shadow-[0_0_40px_rgba(244,114,182,0.5)] transition-shadow">
+                <span className="text-3xl">📺</span>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-extrabold mb-1">
+                  {lang === "ENG" ? "Live Report" : "Laporan Live"}
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                  {lang === "ENG"
+                    ? "Watch players in real-time, place bets on winners, and set prize variations!"
+                    : "Tonton pemain real-time, pasang taruhan pemenang, dan atur variasi hadiah!"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-[#F472B6] font-bold group-hover:gap-3 transition-all text-sm">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                <span>{lang === "ENG" ? "Watch & Bet" : "Tonton & Taruhan"}</span>
               </div>
             </div>
           </motion.div>
