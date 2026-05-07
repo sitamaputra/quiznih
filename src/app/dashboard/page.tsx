@@ -105,15 +105,15 @@ export default function DashboardPage() {
                 </h2>
                 <p className="text-gray-400 leading-relaxed text-sm">
                   {lang === "ENG"
-                    ? "Initialize smart-contract assessments and distribute CELO tokens to participants."
-                    : "Inisialisasi asesmen smart-contract dan distribusikan token CELO ke peserta."}
+                    ? "Build an interactive quiz room, set CELO rewards, and challenge your friends!"
+                    : "Bikin ruang kuis interaktif, atur hadiah CELO, dan tantang teman-temanmu!"}
                 </p>
               </div>
 
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2 text-[#35D07F] font-bold group-hover:gap-3 transition-all">
                   <PlusCircle className="w-5 h-5" />
-                  <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Init Sequence" : "Mulai Sekuens"}</span>
+                  <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Start Creating" : "Mulai Buat"}</span>
                 </div>
                 <Link 
                   href="/manage"
@@ -121,7 +121,7 @@ export default function DashboardPage() {
                   className="flex items-center gap-2 text-gray-500 hover:text-[#35D07F] text-xs font-mono uppercase transition-all"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  <span>{lang === "ENG" ? "Access Database" : "Akses Database"}</span>
+                  <span>{lang === "ENG" ? "Manage Quizzes" : "Kelola Kuis"}</span>
                 </Link>
               </div>
             </div>
@@ -146,18 +146,18 @@ export default function DashboardPage() {
 
               <div>
                 <h2 className="text-3xl font-extrabold mb-2 font-mono text-white tracking-tight">
-                  {lang === "ENG" ? "Play Quiz" : "Main Kuis"} <span className="text-[#FCFF52] text-sm align-top">[CLIENT]</span>
+                  {lang === "ENG" ? "Join Game" : "Main Kuis"} <span className="text-[#FCFF52] text-sm align-top">[CLIENT]</span>
                 </h2>
                 <p className="text-gray-400 leading-relaxed text-sm">
                   {lang === "ENG"
-                    ? "Connect to an active host node, compete in real-time, and extract rewards."
-                    : "Koneksi ke host aktif, bersaing secara real-time, dan ekstrak hadiah CELO."}
+                    ? "Enter a room code to join the action. Answer fast and win real CELO prizes!"
+                    : "Masukkan kode ruangan untuk beraksi. Jawab cepat dan menangkan hadiah CELO!"}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-[#FCFF52] font-bold group-hover:gap-3 transition-all">
                 <Gamepad2 className="w-5 h-5" />
-                <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Establish Uplink" : "Buat Uplink"}</span>
+                <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Enter Arena" : "Masuk Arena"}</span>
               </div>
             </div>
           </motion.div>
@@ -187,14 +187,14 @@ export default function DashboardPage() {
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Cryptographic random selection protocol for fair prize distribution."
-                    : "Protokol seleksi acak kriptografik untuk distribusi hadiah yang adil."}
+                    ? "Can't decide a winner? Spin the wheel and let fate decide the prize!"
+                    : "Bingung pilih pemenang? Putar roda dan biarkan takdir yang memilih!"}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-[#06B6D4] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
                 <span>⚡</span>
-                <span>{lang === "ENG" ? "Execute" : "Eksekusi"}</span>
+                <span>{lang === "ENG" ? "Spin Now" : "Putar Sekarang"}</span>
               </div>
             </div>
           </motion.div>
@@ -221,14 +221,14 @@ export default function DashboardPage() {
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Monitor quiz activity in real-time and place spectator predictions."
-                    : "Pantau aktivitas kuis real-time dan pasang prediksi penonton."}
+                    ? "Watch the leaderboard update in real-time and feel the match intensity."
+                    : "Tonton skor secara real-time dan rasakan ketegangan pertandingannya."}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-[#35D07F] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
                 <span className="w-2 h-2 rounded-full bg-[#35D07F] animate-pulse inline-block" />
-                <span>{lang === "ENG" ? "Monitor" : "Monitor"}</span>
+                <span>{lang === "ENG" ? "Watch Match" : "Tonton Match"}</span>
               </div>
             </div>
           </motion.div>
@@ -255,14 +255,14 @@ export default function DashboardPage() {
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Create interactive Q&A rooms or join existing ones for secure peer consensus."
-                    : "Buat ruang tanya jawab interaktif atau gabung untuk konsensus peserta."}
+                    ? "Create an interactive Q&A space. Ask, vote, and chat anonymously!"
+                    : "Buat ruang Q&A interaktif. Ajukan pertanyaan, voting, dan diskusi!"}
                 </p>
               </div>
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-[#FCFF52] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
-                  <span>🚀</span>
+                  <span>💬</span>
                   <span>{lang === "ENG" ? "Create / Join Q&A" : "Buat / Gabung Q&A"}</span>
                 </div>
               </div>

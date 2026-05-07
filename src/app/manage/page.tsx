@@ -105,8 +105,8 @@ export default function ManageQuizzesPage() {
             </h1>
             <p className="text-gray-400 max-w-lg font-mono text-sm">
               {lang === "ENG" 
-                ? "Manage your active sessions and view past results." 
-                : "Kelola sesi kuis Anda dan lihat hasil sebelumnya."}
+                ? "Track your active games, review player results, and manage your live rooms." 
+                : "Pantau kuis aktifmu, periksa hasil pemain, dan kelola ruangan live-mu."}
             </p>
           </motion.div>
 
@@ -134,7 +134,7 @@ export default function ManageQuizzesPage() {
               {lang === "ENG" ? "NO QUIZZES FOUND" : "TIDAK ADA KUIS"}
             </h3>
             <p className="text-gray-400 mb-8 font-mono text-sm">
-              {lang === "ENG" ? "You haven't initialized any quiz sessions yet." : "Anda belum menginisialisasi sesi kuis apapun."}
+              {lang === "ENG" ? "You haven't hosted any interactive games yet. Ready to start?" : "Kamu belum membuat permainan interaktif apapun. Siap untuk mulai?"}
             </p>
             <Link href="/create" className="text-[#35D07F] font-bold hover:underline font-mono uppercase tracking-widest text-sm">
               {lang === "ENG" ? "Create Your First Quiz" : "Buat Kuis Pertama Anda"} →
