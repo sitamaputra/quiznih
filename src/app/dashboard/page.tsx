@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import WalletDropdown from "@/components/WalletDropdown";
 import { isMiniPayEnvironment } from "@/lib/celo";
+import TopBar from "@/components/TopBar";
 
 export default function DashboardPage() {
   const { lang } = useLanguage();
@@ -43,14 +44,14 @@ export default function DashboardPage() {
         <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
       </div>
 
-      {/* Header */}
-      <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
-        <Link href="/" className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
-        </Link>
-        {isConnected && <WalletDropdown />}
-      </header>
+      <TopBar backHref="/" />
+
+      {/* Wallet Row */}
+      {isConnected && (
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-2 flex justify-end relative z-40">
+          <WalletDropdown />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 w-full max-w-5xl -mt-6">

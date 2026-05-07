@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { useCapture } from "@/hooks/useCapture";
+import TopBar from "@/components/TopBar";
 
 const WHEEL_COLORS = ["#35D07F","#FCFF52","#60A5FA","#F472B6","#A78BFA","#F59E0B","#EF4444","#10B981","#8B5CF6","#EC4899","#06B6D4","#F97316"];
 const DURATIONS = [{ label: "5s", val: 5 },{ label: "10s", val: 10 },{ label: "15s", val: 15 }];
@@ -179,12 +180,9 @@ export default function SpinWheelPage() {
         <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full"/>
       </div>
 
-      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform"/>
-          <span className="text-sm font-medium">{lang==="ENG"?"Back":"Kembali"}</span>
-        </Link>
-        <div className="flex items-center gap-2">
+      <TopBar backHref="/dashboard" />
+
+      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-end gap-2 flex-wrap">
           {/* Capture Controls */}
           <button onClick={() => captureRef.current && takeScreenshot(captureRef.current, "spin_wheel")}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 dark:bg-white/5 border border-white/10 text-gray-400 hover:text-[#FCFF52] hover:border-[#FCFF52]/40 transition-all text-xs font-bold"
@@ -221,7 +219,6 @@ export default function SpinWheelPage() {
               <Users className="w-4 h-4"/> {lang==="ENG"?"Names":"Nama"}
             </button>
           </div>
-        </div>
       </header>
 
       <div ref={captureRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">

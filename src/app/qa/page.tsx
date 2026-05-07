@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import TopBar from "@/components/TopBar";
 
 interface Question {
   id: string;
@@ -157,14 +158,9 @@ export default function QAPage() {
           <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
         </div>
 
-        <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4">
-          <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
-          </Link>
-        </header>
+        <TopBar backHref="/dashboard" />
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-12">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 space-y-3">
             <h1 className="text-4xl md:text-5xl font-extrabold">
               💬 <span className="text-gradient">{lang === "ENG" ? "Live Q&A" : "Tanya Jawab Live"}</span>
@@ -227,13 +223,15 @@ export default function QAPage() {
         <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Header */}
-      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between flex-wrap gap-4">
+      <TopBar />
+
+      {/* Sub-header */}
+      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-between flex-wrap gap-4">
         <button onClick={() => setIsJoined(false)}
-          className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group"
+          className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group text-sm font-medium"
         >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Leave" : "Keluar"}</span>
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          {lang === "ENG" ? "Leave" : "Keluar"}
         </button>
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#06B6D4]/10 border border-[#06B6D4]/30 text-[#06B6D4] text-xs font-extrabold uppercase tracking-widest">

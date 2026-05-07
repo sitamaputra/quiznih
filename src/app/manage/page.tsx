@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import WalletDropdown from "@/components/WalletDropdown";
+import TopBar from "@/components/TopBar";
 
 export default function ManageQuizzesPage() {
   const { lang } = useLanguage();
@@ -74,15 +75,15 @@ export default function ManageQuizzesPage() {
         <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
       </div>
 
-      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Dashboard" : "Dasbor"}</span>
-        </Link>
-        {isConnected && <WalletDropdown />}
-      </header>
+      <TopBar backHref="/dashboard" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+      {isConnected && (
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-2 flex justify-end relative z-40">
+          <WalletDropdown />
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

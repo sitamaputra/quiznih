@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import WalletDropdown from "@/components/WalletDropdown";
 import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+import TopBar from "@/components/TopBar";
 
 
 
@@ -372,12 +373,9 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
         <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Header */}
-      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
-        </Link>
+      <TopBar backHref="/dashboard" />
+
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-2 flex justify-end relative z-50">
         {publicKey ? (
           <WalletDropdown />
         ) : (
@@ -397,7 +395,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
             {lang === "ENG" ? "Connect Wallet" : "Hubungkan Wallet"}
           </button>
         )}
-      </header>
+      </div>
 
       {/* Supabase Connection Diagnostic */}
       {!isSupabaseConfigured && (

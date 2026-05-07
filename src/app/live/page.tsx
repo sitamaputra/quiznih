@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import confetti from "canvas-confetti";
 import { useCapture } from "@/hooks/useCapture";
+import TopBar from "@/components/TopBar";
 
 interface Player {
   user_wallet: string;
@@ -195,14 +196,9 @@ export default function LiveReportPage() {
           <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
         </div>
 
-        <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-4">
-          <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
-          </Link>
-        </header>
+        <TopBar backHref="/dashboard" />
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-12">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 space-y-3">
             <h1 className="text-4xl md:text-5xl font-extrabold">
               📺 <span className="text-gradient">{lang === "ENG" ? "Live Report" : "Laporan Live"}</span>
@@ -298,46 +294,46 @@ export default function LiveReportPage() {
         <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Header */}
-      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between flex-wrap gap-4">
+      <TopBar />
+
+      {/* Sub-header with live info */}
+      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-between flex-wrap gap-3">
         <button onClick={() => { setIsWatching(false); setLiveTime(0); }}
-          className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors group"
+          className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group text-sm font-medium"
         >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Leave" : "Keluar"}</span>
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          {lang === "ENG" ? "Leave" : "Keluar"}
         </button>
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500 text-white text-xs font-extrabold uppercase tracking-widest">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white text-xs font-extrabold uppercase tracking-widest">
             <span className="w-2 h-2 rounded-full bg-white animate-ping inline-block" /> LIVE
           </span>
-          <span className="px-4 py-2 rounded-full glass border border-white/10 text-sm font-mono font-bold">
-            <Timer className="w-4 h-4 inline mr-1" />{formatTime(liveTime)}
+          <span className="px-3 py-1.5 rounded-full glass border border-white/10 text-xs font-mono font-bold">
+            <Timer className="w-3.5 h-3.5 inline mr-1" />{formatTime(liveTime)}
           </span>
-          <span className="px-4 py-2 rounded-full glass border border-white/10 text-sm font-bold">
-            {players.length} <Users className="w-4 h-4 inline ml-1" />
+          <span className="px-3 py-1.5 rounded-full glass border border-white/10 text-xs font-bold">
+            {players.length} <Users className="w-3.5 h-3.5 inline ml-1" />
           </span>
           {/* Capture Controls */}
           <button onClick={() => captureRef.current && takeScreenshot(captureRef.current, "live_report")}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-[#FCFF52] hover:border-[#FCFF52]/40 transition-all text-xs font-bold"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-[#FCFF52] hover:border-[#FCFF52]/40 transition-all text-xs font-bold"
             title={lang==="ENG"?"Screenshot":"Tangkapan Layar"}
           >
-            <Camera className="w-4 h-4" />
-            <span className="hidden sm:inline">{lang==="ENG"?"Screenshot":"Screenshot"}</span>
+            <Camera className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Screenshot</span>
           </button>
           {isRecording ? (
             <button onClick={stopRecording}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-all text-xs font-bold animate-pulse"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-all text-xs font-bold animate-pulse"
             >
-              <VideoOff className="w-4 h-4" />
+              <VideoOff className="w-3.5 h-3.5" />
               <span className="font-mono">{formatRecTime(recordingTime)}</span>
-              <span className="hidden sm:inline">Stop</span>
             </button>
           ) : (
             <button onClick={startRecording}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-red-400 hover:border-red-400/40 transition-all text-xs font-bold"
-              title={lang==="ENG"?"Record Screen":"Rekam Layar"}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-red-400 hover:border-red-400/40 transition-all text-xs font-bold"
             >
-              <Video className="w-4 h-4" />
+              <Video className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{lang==="ENG"?"Record":"Rekam"}</span>
             </button>
           )}

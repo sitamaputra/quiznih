@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import WalletDropdown from "@/components/WalletDropdown";
 import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+import TopBar from "@/components/TopBar";
 
 const BGM_URLS = [
   "https://cdn.pixabay.com/audio/2024/11/28/audio_3fac7f0464.mp3",
@@ -463,10 +464,12 @@ export default function PlayPage() {
           ))}
         </div>
 
-        <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between z-10">
-          <button onClick={() => { setIsJoined(false); if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } }} className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group">
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">{lang === "ENG" ? "Leave Room" : "Keluar Ruangan"}</span>
+        <TopBar />
+
+        <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-between z-10">
+          <button onClick={() => { setIsJoined(false); if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } }} className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group text-sm font-medium">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            {lang === "ENG" ? "Leave Room" : "Keluar Ruangan"}
           </button>
           <div className="flex items-center gap-2">
             {/* Music Controls */}
@@ -782,16 +785,15 @@ export default function PlayPage() {
         <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Header */}
-      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
-        </Link>
-        {publicKey && <WalletDropdown />}
-      </header>
+      <TopBar backHref="/dashboard" />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-12">
+      {publicKey && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-2 flex justify-end relative z-40">
+          <WalletDropdown />
+        </div>
+      )}
+
+      <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
