@@ -45,31 +45,31 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-[#FCFF52]/10 text-white">
+    <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-black/5 dark:border-[#FCFF52]/10 bg-white/80 dark:bg-[#050508]/80 text-black dark:text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-[#FCFF52] flex items-center justify-center font-black text-black text-sm">Q</div>
               <span className="font-extrabold text-lg tracking-widest font-mono">
-                QUIZ<span className="text-[#FCFF52]">NIH</span>
+                QUIZ<span className="text-[#c4a700] dark:text-[#FCFF52]">NIH</span>
               </span>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#how-it-works" className="text-gray-500 hover:text-[#FCFF52] transition-colors text-sm font-mono tracking-wider uppercase">
+            <a href="#how-it-works" className="text-gray-600 dark:text-gray-500 hover:text-black dark:hover:text-[#FCFF52] transition-colors text-sm font-mono tracking-wider uppercase">
               {lang === "ENG" ? "Protocol" : "Protokol"}
             </a>
-            <a href="#leaderboard" className="text-gray-500 hover:text-[#FCFF52] transition-colors text-sm font-mono tracking-wider uppercase">
+            <a href="#leaderboard" className="text-gray-600 dark:text-gray-500 hover:text-black dark:hover:text-[#FCFF52] transition-colors text-sm font-mono tracking-wider uppercase">
               {lang === "ENG" ? "Ranks" : "Peringkat"}
             </a>
             
-            <div className="flex items-center gap-2 border-l border-[#FCFF52]/10 pl-6">
+            <div className="flex items-center gap-2 border-l border-black/10 dark:border-[#FCFF52]/10 pl-6">
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 rounded-lg hover:bg-[#FCFF52]/10 transition-colors text-gray-500 hover:text-[#FCFF52]"
+                  className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-[#FCFF52]/10 transition-colors text-gray-600 dark:text-gray-500 hover:text-black dark:hover:text-[#FCFF52]"
                 >
                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
@@ -77,7 +77,7 @@ export default function Navbar() {
 
               <button 
                 onClick={toggleLang}
-                className="flex items-center gap-1.5 border border-[#FCFF52]/20 bg-[#FCFF52]/5 hover:bg-[#FCFF52]/10 px-3 py-1.5 rounded-lg transition-colors text-xs font-mono font-bold text-[#FCFF52]/70 hover:text-[#FCFF52]"
+                className="flex items-center gap-1.5 border border-black/10 dark:border-[#FCFF52]/20 bg-black/5 dark:bg-[#FCFF52]/5 hover:bg-black/10 dark:hover:bg-[#FCFF52]/10 px-3 py-1.5 rounded-lg transition-colors text-xs font-mono font-bold text-gray-600 dark:text-[#FCFF52]/70 hover:text-black dark:hover:text-[#FCFF52]"
               >
                 <Globe2 className="w-3 h-3" />
                 {lang}

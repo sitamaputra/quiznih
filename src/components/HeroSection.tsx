@@ -38,9 +38,9 @@ export default function HeroSection() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#FCFF52]/30 bg-[#FCFF52]/5 text-[#FCFF52] text-sm font-mono font-bold tracking-wider"
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#35D07F]/30 dark:border-[#FCFF52]/30 bg-[#35D07F]/5 dark:bg-[#FCFF52]/5 text-[#1a8a4e] dark:text-[#FCFF52] text-sm font-mono font-bold tracking-wider"
         >
-          <span className="w-2 h-2 rounded-full bg-[#FCFF52] neon-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#35D07F] dark:bg-[#FCFF52] neon-pulse" />
           <span className="uppercase text-xs">{`[ ${IS_TESTNET ? "TESTNET::ALFAJORES" : "MAINNET::CELO"} ]`}</span>
         </motion.div>
 
@@ -49,7 +49,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-5xl md:text-8xl font-extrabold tracking-tight leading-[0.95] text-white cyber-glitch"
+          className="text-5xl md:text-8xl font-extrabold tracking-tight leading-[0.95] text-gray-900 dark:text-white cyber-glitch"
         >
           {lang === "ENG" ? (
             <>
@@ -71,16 +71,16 @@ export default function HeroSection() {
           transition={{ delay: 0.6, duration: 0.6 }}
           className="max-w-2xl mx-auto"
         >
-          <p className="text-lg md:text-xl text-gray-400 leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
             {lang === "ENG"
               ? "Host quizzes on Celo blockchain. Auto-distribute crypto rewards. Zero friction. Maximum fun."
               : "Host kuis di blockchain Celo. Distribusi hadiah kripto otomatis. Tanpa hambatan. Maksimal seru."}
           </p>
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-6">
-            <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-[#FCFF52]/40" />
-            <Zap className="w-4 h-4 text-[#FCFF52]/60" />
-            <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#FCFF52]/40" />
+            <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-[#35D07F]/40 dark:to-[#FCFF52]/40" />
+            <Zap className="w-4 h-4 text-[#35D07F]/60 dark:text-[#FCFF52]/60" />
+            <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#35D07F]/40 dark:to-[#FCFF52]/40" />
           </div>
         </motion.div>
 
@@ -97,8 +97,8 @@ export default function HeroSection() {
             { label: "REWARDS", value: "500+ CELO" },
           ].map((s, i) => (
             <div key={i} className="text-center">
-              <div className="text-[#FCFF52] font-black text-xl md:text-2xl">{s.value}</div>
-              <div className="text-gray-600 text-[10px] tracking-[0.2em] uppercase">{s.label}</div>
+              <div className="text-[#c4a700] dark:text-[#FCFF52] font-black text-xl md:text-2xl">{s.value}</div>
+              <div className="text-gray-500 dark:text-gray-600 text-[10px] tracking-[0.2em] uppercase">{s.label}</div>
             </div>
           ))}
         </motion.div>

@@ -45,10 +45,10 @@ export default function HowItWorks() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16 space-y-4"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded border border-[#FCFF52]/20 bg-[#FCFF52]/5 text-[#FCFF52] text-xs font-mono tracking-widest uppercase mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded border border-[#35D07F]/20 dark:border-[#FCFF52]/20 bg-[#35D07F]/5 dark:bg-[#FCFF52]/5 text-[#1a8a4e] dark:text-[#FCFF52] text-xs font-mono tracking-widest uppercase mb-4">
             // {lang === "ENG" ? "PROTOCOL" : "PROTOKOL"}
           </div>
-          <h2 className="text-4xl md:text-6xl font-extrabold text-white cyber-glitch">
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white cyber-glitch">
             {lang === "ENG" ? "HOW IT " : "CARA "}
             <span className="text-gradient">{lang === "ENG" ? "WORKS_" : "KERJA_"}</span>
           </h2>
@@ -68,7 +68,7 @@ export default function HowItWorks() {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.15, duration: 0.6 }}
               whileHover={{ y: -8 }}
-              className="relative group rounded-2xl p-8 bg-[#0a0a10] border border-white/5 hover:border-[#FCFF52]/30 transition-all duration-500 overflow-hidden"
+              className="relative group rounded-2xl p-8 bg-white dark:bg-[#0a0a10] border border-black/5 dark:border-white/5 hover:border-[#35D07F]/30 dark:hover:border-[#FCFF52]/30 transition-all duration-500 overflow-hidden shadow-sm dark:shadow-none"
             >
               {/* Top line accent */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-current to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ color: step.accent }} />
@@ -83,7 +83,7 @@ export default function HowItWorks() {
                 </div>
               </div>
 
-              <h3 className="text-xl font-extrabold mb-3 text-white group-hover:text-[#FCFF52] transition-colors">{step.title}</h3>
+              <h3 className="text-xl font-extrabold mb-3 text-black dark:text-white group-hover:text-[#35D07F] dark:group-hover:text-[#FCFF52] transition-colors">{step.title}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
 
               {/* Bottom decoration */}

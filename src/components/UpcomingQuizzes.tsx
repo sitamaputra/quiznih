@@ -50,7 +50,7 @@ export default function UpcomingQuizzes() {
             className="space-y-4"
           >
             <h2 className="text-4xl md:text-5xl font-bold flex items-center gap-4 text-black dark:text-white">
-              <Clock className="w-10 h-10 text-celo-green" />
+              <Clock className="w-10 h-10 text-[#35D07F]" />
               {lang === "ENG" ? "Upcoming " : "Kuis "}
               <span className="text-gradient">
                 {lang === "ENG" ? "Quizzes" : "Mendatang"}
@@ -73,12 +73,12 @@ export default function UpcomingQuizzes() {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
               whileHover={{ scale: 1.02 }}
-              className="glass rounded-3xl p-8 relative overflow-hidden group border border-black/10 dark:border-white/10"
+              className="rounded-2xl p-8 relative overflow-hidden group border border-black/5 dark:border-white/10 bg-white dark:bg-[#0a0a10] shadow-sm dark:shadow-none transition-all"
             >
-              <div className="absolute -top-12 -right-12 w-40 h-40 bg-celo-green/10 blur-[60px] rounded-full group-hover:bg-celo-green/20 transition-all duration-500"></div>
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#35D07F]/5 dark:bg-[#35D07F]/10 blur-[60px] rounded-full group-hover:bg-[#35D07F]/15 dark:group-hover:bg-[#35D07F]/20 transition-all duration-500"></div>
               
               <div className="flex justify-between items-start mb-6">
-                <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full bg-[#35D07F]/10 text-[#1a8a4e] dark:text-[#35D07F] text-xs font-bold uppercase tracking-wider">
                   {lang === "ENG" ? quiz.difficulty : quiz.difficulty_id}
                 </span>
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
@@ -93,13 +93,13 @@ export default function UpcomingQuizzes() {
               
               <div className="space-y-3 mb-8">
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-                  <ShieldCheck className="w-5 h-5 text-celo-green" />
+                  <ShieldCheck className="w-5 h-5 text-[#35D07F]" />
                   <span className="font-semibold">{quiz.reward}</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
                   <Clock className="w-5 h-5" />
                   <span>{lang === "ENG" ? "Starts in " : "Mulai dalam "} 
-                    <span className="text-celo-green font-bold">
+                    <span className="text-[#35D07F] font-bold">
                       {lang === "ID" && quiz.startsIn === "Next Room" ? "Sesi Berikutnya" : 
                        lang === "ID" && quiz.startsIn === "Scheduled" ? "Terjadwal" : 
                        quiz.startsIn}
@@ -108,7 +108,7 @@ export default function UpcomingQuizzes() {
                 </div>
               </div>
 
-              <button className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold group-hover:shadow-[0_0_20px_rgba(53,208,127,0.4)] transition-all duration-300">
+              <button className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-black dark:bg-white text-white dark:text-black font-bold group-hover:shadow-[0_0_20px_rgba(53,208,127,0.3)] transition-all duration-300">
                 <Play className="w-4 h-4 fill-current" />
                 {lang === "ENG" ? "Join Waitlist" : "Gabung Antrean"}
               </button>

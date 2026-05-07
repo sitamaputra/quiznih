@@ -48,7 +48,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
     return (
       <button
         onClick={handleConnect}
-        className="flex items-center gap-2 bg-[#35D07F]/10 dark:bg-[#35D07F]/20 hover:bg-[#35D07F]/30 dark:hover:bg-[#35D07F]/40 border border-[#35D07F] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(53,208,127,0.2)] hover:shadow-[0_0_25px_rgba(53,208,127,0.4)] text-[#35D07F]"
+        className="flex items-center gap-2 bg-[#35D07F]/10 hover:bg-[#35D07F]/20 border border-[#35D07F]/30 dark:border-[#35D07F] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(53,208,127,0.15)] hover:shadow-[0_0_25px_rgba(53,208,127,0.3)] text-[#1a8a4e] dark:text-[#35D07F]"
       >
         <Wallet2 className="w-4 h-4" />
         <span className="font-semibold text-sm">
@@ -65,7 +65,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-[#35D07F]/10 dark:bg-[#35D07F]/20 border border-[#35D07F] px-4 py-2 rounded-full shadow-[0_0_15px_rgba(53,208,127,0.2)] hover:bg-[#35D07F]/20 transition-all font-semibold text-sm text-[#35D07F] dark:text-[#7DFCB4]"
+        className="flex items-center gap-2 bg-[#35D07F]/10 border border-[#35D07F]/30 dark:border-[#35D07F] px-4 py-2 rounded-full shadow-[0_0_15px_rgba(53,208,127,0.1)] hover:bg-[#35D07F]/20 transition-all font-semibold text-sm text-[#1a8a4e] dark:text-[#7DFCB4]"
       >
         <Wallet2 className="w-4 h-4" />
         <span>{shortAddr}</span>
@@ -79,7 +79,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-3 w-64 bg-white/90 dark:bg-black/90 backdrop-blur-xl border border-black/10 dark:border-white/10 p-4 rounded-3xl shadow-2xl z-50 flex flex-col gap-4 text-black dark:text-white"
+            className="absolute right-0 mt-3 w-64 bg-white dark:bg-[#0a0a12] backdrop-blur-xl border border-black/10 dark:border-[#FCFF52]/10 p-4 rounded-3xl shadow-2xl z-50 flex flex-col gap-4 text-black dark:text-white"
           >
             {/* Header / Account info */}
             <div className="flex flex-col gap-1 items-center pb-4 border-b border-black/5 dark:border-white/5">

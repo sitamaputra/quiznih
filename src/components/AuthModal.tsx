@@ -124,21 +124,24 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[101] p-4 max-h-[90vh] overflow-y-auto"
           >
-            <div className="glass rounded-[2rem] border border-white/20 p-8 shadow-2xl relative overflow-hidden bg-black/80 dark:bg-black/90">
+            <div className="rounded-[2rem] border border-black/10 dark:border-[#FCFF52]/15 p-8 shadow-2xl relative overflow-hidden bg-white dark:bg-[#0a0a12]">
+              {/* Decorative glow */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#FCFF52]/5 dark:bg-[#FCFF52]/10 blur-[80px] rounded-full pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#35D07F]/5 dark:bg-[#35D07F]/10 blur-[80px] rounded-full pointer-events-none" />
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+                className="absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray-400 hover:text-black dark:hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-extrabold text-white">
+                <h2 className="text-3xl font-extrabold text-black dark:text-white">
                   {isLogin 
                     ? (lang === "ENG" ? "Welcome Back" : "Selamat Datang") 
                     : (lang === "ENG" ? "Create Account" : "Daftar Akun")}
                 </h2>
-                <p className="text-gray-400 text-sm mt-2">
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
                   {lang === "ENG" ? "Log in to save your progress and quizzes." : "Masuk untuk menyimpan progres kuis Anda."}
                 </p>
               </div>
@@ -147,35 +150,35 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">Username <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 ml-1">Username <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
                         type="text" value={username} onChange={(e) => setUsername(e.target.value)} required
-                        className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
+                        className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-black/[0.03] dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
                         placeholder="cool_player_99"
                       />
                     </div>
                   </div>
                 )}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-300 ml-1">Email <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 ml-1">Email <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-black/[0.03] dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
                       placeholder="you@example.com"
                     />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-300 ml-1">Password <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 ml-1">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-black/[0.03] dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
                       placeholder="••••••••"
                     />
                   </div>
@@ -194,14 +197,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-black text-gray-400">{lang === "ENG" ? "or continue with" : "atau masuk dengan"}</span>
+                  <span className="px-4 bg-white dark:bg-[#0a0a12] text-gray-400">{lang === "ENG" ? "or continue with" : "atau masuk dengan"}</span>
                 </div>
               </div>
 
               {/* Google */}
               <button
                 type="button" onClick={handleGoogleLogin}
-                className="w-full py-3.5 rounded-xl bg-white text-black font-extrabold text-base flex items-center justify-center gap-3 hover:bg-gray-100 active:scale-95 transition-all"
+                className="w-full py-3.5 rounded-xl bg-black dark:bg-white text-white dark:text-black font-extrabold text-base flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all border border-black/10 dark:border-white/10"
               >
                 <Chrome className="w-5 h-5 text-blue-500" />
                 Google
@@ -211,7 +214,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Wallet2 className="w-4 h-4 text-[#35D07F]" />
-                  <span className="text-sm font-bold text-gray-300">
+                  <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
                     {lang === "ENG" ? "Web3 Wallets" : "Dompet Web3"}
                   </span>
                 </div>
@@ -234,7 +237,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                             setError(null);
                             connect({ connector });
                           }}
-                          className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-[#35D07F]/40 transition-all duration-200 group disabled:opacity-60"
+                          className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border border-black/5 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.03] hover:bg-black/[0.05] dark:hover:bg-white/[0.08] hover:border-[#35D07F]/40 transition-all duration-200 group disabled:opacity-60"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/5 flex items-center justify-center flex-shrink-0">
@@ -245,7 +248,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                               )}
                             </div>
                             <div className="text-left">
-                              <span className="font-bold text-sm text-white group-hover:text-[#35D07F] transition-colors block">
+                              <span className="font-bold text-sm text-black dark:text-white group-hover:text-[#35D07F] transition-colors block">
                                 {connector.name}
                               </span>
                               <span className="text-[11px] text-gray-500">
@@ -312,7 +315,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               </div>
 
               {/* Toggle Login/Register */}
-              <div className="mt-6 text-center text-sm text-gray-400">
+              <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
                 {isLogin ? (lang === "ENG" ? "Don't have an account? " : "Belum punya akun? ") : (lang === "ENG" ? "Already have an account? " : "Sudah punya akun? ")}
                 <button onClick={() => { setIsLogin(!isLogin); setError(null); }} className="text-[#35D07F] font-bold hover:underline">
                   {isLogin ? (lang === "ENG" ? "Sign Up" : "Daftar Sekarang") : (lang === "ENG" ? "Sign In" : "Masuk")}
