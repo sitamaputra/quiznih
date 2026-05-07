@@ -1,10 +1,11 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, Trash2, Gift, RotateCcw, Sparkles, Trophy, Users, UserPlus, Clock } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Gift, RotateCcw, Sparkles, Trophy, Users, UserPlus, Clock, Camera, Video, VideoOff, Download } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import confetti from "canvas-confetti";
+import { useCapture } from "@/hooks/useCapture";
 
 const WHEEL_COLORS = ["#35D07F","#FCFF52","#60A5FA","#F472B6","#A78BFA","#F59E0B","#EF4444","#10B981","#8B5CF6","#EC4899","#06B6D4","#F97316"];
 const DURATIONS = [{ label: "5s", val: 5 },{ label: "10s", val: 10 },{ label: "15s", val: 15 }];
@@ -28,6 +29,8 @@ export default function SpinWheelPage() {
   const { lang } = useLanguage();
   // Mode: "prize" = spin prizes, "name" = spin names
   const [mode, setMode] = useState<"prize"|"name">("prize");
+  const { takeScreenshot, startRecording, stopRecording, isRecording, recordingTime, formatRecTime } = useCapture();
+  const captureRef = useRef<HTMLDivElement>(null);
 
   // Shared
   const [items, setItems] = useState<Item[]>(DEFAULT_PRIZES);
@@ -181,20 +184,47 @@ export default function SpinWheelPage() {
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform"/>
           <span className="text-sm font-medium">{lang==="ENG"?"Back":"Kembali"}</span>
         </Link>
-        {/* Mode Toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 dark:bg-white/5 border border-white/10">
-          <button onClick={()=>switchMode("prize")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="prize"?"bg-[#35D07F] text-white shadow-md":"text-gray-400 hover:text-white"}`}>
-            <Gift className="w-4 h-4"/> {lang==="ENG"?"Prizes":"Hadiah"}
+        <div className="flex items-center gap-2">
+          {/* Capture Controls */}
+          <button onClick={() => captureRef.current && takeScreenshot(captureRef.current, "spin_wheel")}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 dark:bg-white/5 border border-white/10 text-gray-400 hover:text-[#FCFF52] hover:border-[#FCFF52]/40 transition-all text-xs font-bold"
+            title={lang==="ENG"?"Screenshot":"Tangkapan Layar"}
+          >
+            <Camera className="w-4 h-4" />
+            <span className="hidden sm:inline">{lang==="ENG"?"Screenshot":"Screenshot"}</span>
           </button>
-          <button onClick={()=>switchMode("name")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="name"?"bg-[#FCFF52] text-black shadow-md":"text-gray-400 hover:text-white"}`}>
-            <Users className="w-4 h-4"/> {lang==="ENG"?"Names":"Nama"}
-          </button>
+          {isRecording ? (
+            <button onClick={stopRecording}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-all text-xs font-bold animate-pulse"
+            >
+              <VideoOff className="w-4 h-4" />
+              <span className="font-mono">{formatRecTime(recordingTime)}</span>
+              <span className="hidden sm:inline">Stop</span>
+            </button>
+          ) : (
+            <button onClick={startRecording}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 dark:bg-white/5 border border-white/10 text-gray-400 hover:text-red-400 hover:border-red-400/40 transition-all text-xs font-bold"
+              title={lang==="ENG"?"Record Screen":"Rekam Layar"}
+            >
+              <Video className="w-4 h-4" />
+              <span className="hidden sm:inline">{lang==="ENG"?"Record":"Rekam"}</span>
+            </button>
+          )}
+          {/* Mode Toggle */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 dark:bg-white/5 border border-white/10">
+            <button onClick={()=>switchMode("prize")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="prize"?"bg-[#35D07F] text-white shadow-md":"text-gray-400 hover:text-white"}`}>
+              <Gift className="w-4 h-4"/> {lang==="ENG"?"Prizes":"Hadiah"}
+            </button>
+            <button onClick={()=>switchMode("name")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="name"?"bg-[#FCFF52] text-black shadow-md":"text-gray-400 hover:text-white"}`}>
+              <Users className="w-4 h-4"/> {lang==="ENG"?"Names":"Nama"}
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+      <div ref={captureRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
         <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
             🎡 <span className="text-gradient">{mode==="prize"?(lang==="ENG"?"Spin & Win":"Putar & Menang"):(lang==="ENG"?"Random Picker":"Pilih Acak")}</span>

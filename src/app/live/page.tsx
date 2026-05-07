@@ -4,12 +4,13 @@ import { useAccount } from "wagmi";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Users, Trophy, TrendingUp, Eye, Zap, Gift, Star,
-  Timer, BarChart3, Crown, Target, Loader2, ChevronDown
+  Timer, BarChart3, Crown, Target, Loader2, ChevronDown, Camera, Video, VideoOff
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import confetti from "canvas-confetti";
+import { useCapture } from "@/hooks/useCapture";
 
 interface Player {
   user_wallet: string;
@@ -59,6 +60,8 @@ export default function LiveReportPage() {
   const [showBetPanel, setShowBetPanel] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
   const [liveTime, setLiveTime] = useState(0);
+  const { takeScreenshot, startRecording, stopRecording, isRecording, recordingTime, formatRecTime } = useCapture();
+  const captureRef = useRef<HTMLDivElement>(null);
 
   // Live timer
   useEffect(() => {
@@ -292,10 +295,35 @@ export default function LiveReportPage() {
           <span className="px-4 py-2 rounded-full glass border border-white/10 text-sm font-bold">
             {players.length} <Users className="w-4 h-4 inline ml-1" />
           </span>
+          {/* Capture Controls */}
+          <button onClick={() => captureRef.current && takeScreenshot(captureRef.current, "live_report")}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-[#FCFF52] hover:border-[#FCFF52]/40 transition-all text-xs font-bold"
+            title={lang==="ENG"?"Screenshot":"Tangkapan Layar"}
+          >
+            <Camera className="w-4 h-4" />
+            <span className="hidden sm:inline">{lang==="ENG"?"Screenshot":"Screenshot"}</span>
+          </button>
+          {isRecording ? (
+            <button onClick={stopRecording}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-all text-xs font-bold animate-pulse"
+            >
+              <VideoOff className="w-4 h-4" />
+              <span className="font-mono">{formatRecTime(recordingTime)}</span>
+              <span className="hidden sm:inline">Stop</span>
+            </button>
+          ) : (
+            <button onClick={startRecording}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-red-400 hover:border-red-400/40 transition-all text-xs font-bold"
+              title={lang==="ENG"?"Record Screen":"Rekam Layar"}
+            >
+              <Video className="w-4 h-4" />
+              <span className="hidden sm:inline">{lang==="ENG"?"Record":"Rekam"}</span>
+            </button>
+          )}
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+      <div ref={captureRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
         {/* Quiz Title Bar */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           className="glass rounded-[2rem] border border-[#FCFF52]/30 p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4"
