@@ -20,12 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${outfit.variable} antialiased`}>
-      <body className="min-h-screen selection:bg-[#35D07F] selection:text-black flex flex-col items-center transition-colors">
+      <body className="min-h-screen selection:bg-[#FCFF52] selection:text-black flex flex-col items-center transition-colors bg-[#050508]">
         <Providers>
-          {/* Futuristic Background Elements */}
+          {/* Cyberpunk Background */}
           <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#35D07F] mix-blend-screen opacity-20 blur-[120px] rounded-full dark:opacity-20 opacity-10"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#FCFF52] mix-blend-screen opacity-20 blur-[120px] rounded-full dark:opacity-20 opacity-10"></div>
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#FCFF52] opacity-[0.03] blur-[150px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#35D07F] opacity-[0.04] blur-[150px] rounded-full" />
           </div>
           
           {children}

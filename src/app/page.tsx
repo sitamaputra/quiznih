@@ -9,25 +9,39 @@ import BlinkShare from "@/components/BlinkShare";
 
 export default function Home() {
   return (
-    <main className="w-full relative flex flex-col min-h-screen transition-colors duration-300">
+    <main className="w-full relative flex flex-col min-h-screen transition-colors duration-300 bg-[#050508]">
       <Navbar />
 
       <div className="flex-grow">
         <HeroSection />
+
+        {/* Cyberpunk Divider */}
+        <div className="w-full flex items-center justify-center py-8">
+          <div className="h-[1px] flex-1 max-w-xs bg-gradient-to-r from-transparent to-[#FCFF52]/20" />
+          <div className="w-2 h-2 rotate-45 border border-[#FCFF52]/30 mx-4" />
+          <div className="h-[1px] flex-1 max-w-xs bg-gradient-to-l from-transparent to-[#FCFF52]/20" />
+        </div>
+
         <HowItWorks />
 
-        {/* Decorative Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent my-16"></div>
+        <div className="w-full flex items-center justify-center py-8">
+          <div className="h-[1px] flex-1 max-w-xs bg-gradient-to-r from-transparent to-[#35D07F]/20" />
+          <div className="w-2 h-2 rotate-45 border border-[#35D07F]/30 mx-4" />
+          <div className="h-[1px] flex-1 max-w-xs bg-gradient-to-l from-transparent to-[#35D07F]/20" />
+        </div>
 
         <UpcomingQuizzes />
         
         {/* Blink Section */}
-        <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-black dark:text-white">
+        <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
            <BlinkShare />
         </section>
 
-        {/* Decorative Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent my-16"></div>
+        <div className="w-full flex items-center justify-center py-8">
+          <div className="h-[1px] flex-1 max-w-xs bg-gradient-to-r from-transparent to-[#FCFF52]/20" />
+          <div className="w-2 h-2 rotate-45 border border-[#FCFF52]/30 mx-4" />
+          <div className="h-[1px] flex-1 max-w-xs bg-gradient-to-l from-transparent to-[#FCFF52]/20" />
+        </div>
         
         <Leaderboard />
       </div>

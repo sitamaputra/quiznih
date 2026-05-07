@@ -6,6 +6,8 @@
   --color-celo-green: #35D07F;
   --color-celo-gold: #FCFF52;
   --color-celo-dark: #1A1A2E;
+  --color-cyber-pink: #FF2D95;
+  --color-cyber-blue: #00F0FF;
 }
 
 :root {
@@ -18,12 +20,12 @@
 }
 
 .dark {
-  --background: #0A0A0A;
-  --foreground: #ffffff;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.05);
+  --background: #050508;
+  --foreground: #f0f0f0;
+  --glass-bg: rgba(252, 255, 82, 0.02);
+  --glass-border: rgba(252, 255, 82, 0.08);
   --glass-text-muted: #9ca3af;
-  --card-bg: #111111;
+  --card-bg: #0a0a10;
 }
 
 body {
@@ -41,8 +43,61 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(90deg, #35D07F 0%, #FCFF52 100%);
+  background: linear-gradient(90deg, #FCFF52 0%, #35D07F 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Cyberpunk scanline overlay */
+.cyber-scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(252,255,82,0.015) 2px,
+    rgba(252,255,82,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glitch text */
+.cyber-glitch {
+  text-shadow:
+    0 0 10px rgba(252,255,82,0.5),
+    0 0 20px rgba(252,255,82,0.3),
+    0 0 40px rgba(53,208,127,0.2);
+}
+
+/* Neon border glow */
+.cyber-border {
+  border: 1px solid rgba(252,255,82,0.15);
+  box-shadow:
+    0 0 15px rgba(252,255,82,0.05),
+    inset 0 0 15px rgba(252,255,82,0.02);
+}
+
+/* Grid bg */
+.cyber-grid {
+  background-image:
+    linear-gradient(rgba(252,255,82,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(252,255,82,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Animated glow pulse */
+@keyframes neon-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.neon-pulse { animation: neon-pulse 2s ease-in-out infinite; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float-anim { animation: float 4s ease-in-out infinite; }

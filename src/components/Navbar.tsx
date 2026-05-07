@@ -45,31 +45,31 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass border-b border-black/10 dark:border-white/10 text-black dark:text-white">
+    <nav className="fixed top-0 w-full z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-[#FCFF52]/10 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2.5">
-              <img src="/logo.svg" alt="Quiznih" className="w-9 h-9 rounded-xl" />
-              <span className="font-extrabold text-xl tracking-wider">
-                Quiz<span className="text-gradient">nih</span>
+              <div className="w-8 h-8 rounded-lg bg-[#FCFF52] flex items-center justify-center font-black text-black text-sm">Q</div>
+              <span className="font-extrabold text-lg tracking-widest font-mono">
+                QUIZ<span className="text-[#FCFF52]">NIH</span>
               </span>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#how-it-works" className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-              {lang === "ENG" ? "How it Works" : "Cara Kerja"}
+            <a href="#how-it-works" className="text-gray-500 hover:text-[#FCFF52] transition-colors text-sm font-mono tracking-wider uppercase">
+              {lang === "ENG" ? "Protocol" : "Protokol"}
             </a>
-            <a href="#leaderboard" className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
-              {lang === "ENG" ? "Leaderboard" : "Papan Peringkat"}
+            <a href="#leaderboard" className="text-gray-500 hover:text-[#FCFF52] transition-colors text-sm font-mono tracking-wider uppercase">
+              {lang === "ENG" ? "Ranks" : "Peringkat"}
             </a>
             
-            <div className="flex items-center gap-2 border-l border-black/10 dark:border-white/10 pl-6">
+            <div className="flex items-center gap-2 border-l border-[#FCFF52]/10 pl-6">
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                  className="p-2 rounded-lg hover:bg-[#FCFF52]/10 transition-colors text-gray-500 hover:text-[#FCFF52]"
                 >
                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
@@ -77,7 +77,7 @@ export default function Navbar() {
 
               <button 
                 onClick={toggleLang}
-                className="flex items-center gap-2 bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 border border-black/10 dark:border-white/20 px-3 py-1.5 rounded-full transition-colors text-xs font-bold"
+                className="flex items-center gap-1.5 border border-[#FCFF52]/20 bg-[#FCFF52]/5 hover:bg-[#FCFF52]/10 px-3 py-1.5 rounded-lg transition-colors text-xs font-mono font-bold text-[#FCFF52]/70 hover:text-[#FCFF52]"
               >
                 <Globe2 className="w-3 h-3" />
                 {lang}
@@ -91,10 +91,10 @@ export default function Navbar() {
                 {!user && !isConnected && (
                   <button
                     onClick={() => setIsAuthOpen(true)}
-                    className="flex items-center gap-2 bg-[#35D07F] hover:bg-[#2bb86e] text-black px-5 py-2.5 rounded-full transition-all font-semibold text-sm shadow-[0_0_15px_rgba(53,208,127,0.4)]"
+                    className="flex items-center gap-2 bg-[#FCFF52] hover:bg-[#e6e84a] text-black px-5 py-2 rounded-lg transition-all font-extrabold text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(252,255,82,0.3)] hover:shadow-[0_0_30px_rgba(252,255,82,0.5)]"
                   >
                     <LogIn className="w-4 h-4" />
-                    <span>{lang === "ENG" ? "Sign In / Connect" : "Masuk / Hubung"}</span>
+                    <span>{lang === "ENG" ? "CONNECT" : "MASUK"}</span>
                   </button>
                 )}
 
@@ -103,7 +103,7 @@ export default function Navbar() {
                   <div className="relative">
                     <button
                       onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                      className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all font-semibold text-sm"
+                      className="flex items-center gap-2 border border-[#FCFF52]/20 bg-[#FCFF52]/5 px-4 py-2 rounded-lg hover:bg-[#FCFF52]/10 transition-all font-mono text-sm text-[#FCFF52]"
                     >
                       <User className="w-4 h-4" />
                       <span className="max-w-[100px] truncate">
@@ -111,17 +111,17 @@ export default function Navbar() {
                       </span>
                     </button>
                     {isUserDropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-2xl shadow-xl p-2 z-50">
-                        <div className="px-3 py-2 border-b border-black/10 dark:border-white/10 mb-2">
-                          <p className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Signed in as" : "Masuk sebagai"}</p>
-                          <p className="text-sm font-bold truncate">{user.email}</p>
+                      <div className="absolute right-0 mt-2 w-48 bg-[#0a0a10] border border-[#FCFF52]/10 rounded-xl shadow-xl p-2 z-50">
+                        <div className="px-3 py-2 border-b border-[#FCFF52]/10 mb-2">
+                          <p className="text-xs text-gray-600 font-mono">{lang === "ENG" ? "SIGNED_IN" : "MASUK_SEBAGAI"}</p>
+                          <p className="text-sm font-bold text-white truncate">{user.email}</p>
                         </div>
                         <button
                           onClick={handleLogout}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-semibold"
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-lg transition-colors font-semibold"
                         >
                           <LogOut className="w-4 h-4" />
-                          {lang === "ENG" ? "Sign Out" : "Keluar"}
+                          {lang === "ENG" ? "Disconnect" : "Keluar"}
                         </button>
                       </div>
                     )}
@@ -134,23 +134,23 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-3">
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
+                className="p-1.5 rounded-lg hover:bg-[#FCFF52]/10 transition-colors text-gray-400"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
             )}
             <button 
               onClick={toggleLang}
-              className="flex items-center gap-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/20 text-black dark:text-white px-2 py-1 rounded text-xs"
+              className="flex items-center gap-1 border border-[#FCFF52]/20 text-[#FCFF52]/70 px-2 py-1 rounded text-xs font-mono"
             >
               <Globe2 className="w-3 h-3" />
               {lang}
             </button>
-            <button className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white">
+            <button className="text-gray-400 hover:text-[#FCFF52]">
               <Menu className="w-6 h-6" />
             </button>
           </div>
