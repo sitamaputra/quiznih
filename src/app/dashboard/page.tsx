@@ -2,11 +2,12 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 import { motion } from "framer-motion";
-import { PlusCircle, Gamepad2, Wallet2, ArrowLeft, Crown, Users, LayoutDashboard, LogOut } from "lucide-react";
+import { PlusCircle, Gamepad2, ArrowLeft, Crown, Users, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import WalletDropdown from "@/components/WalletDropdown";
+import WalletModal from "@/components/WalletModal";
 import { isMiniPayEnvironment } from "@/lib/celo";
 
 export default function DashboardPage() {
@@ -16,26 +17,29 @@ export default function DashboardPage() {
   const connectors = useConnectors();
   const router = useRouter();
   const isMiniPay = isMiniPayEnvironment();
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   useEffect(() => {
-    // Auto-connect in MiniPay, or prompt connect on desktop
-    if (!isConnected && connectors.length > 0) {
-      if (isMiniPay) {
-        connect({ connector: connectors[0] });
-      }
+    if (!isConnected && connectors.length > 0 && isMiniPay) {
+      connect({ connector: connectors[0] });
     }
   }, [isConnected, connectors, connect, isMiniPay]);
 
-  const walletAddress = address || "";
-  const shortAddress = walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-    : "";
+  // Navigate to pending path once wallet connects
+  useEffect(() => {
+    if (isConnected && pendingPath) {
+      router.push(pendingPath);
+      setPendingPath(null);
+    }
+  }, [isConnected, pendingPath, router]);
 
   const handleConnectAndNavigate = (path: string) => {
     if (isConnected) {
       router.push(path);
-    } else if (connectors.length > 0) {
-      connect({ connector: connectors[0] });
+    } else {
+      setPendingPath(path);
+      setIsWalletModalOpen(true);
     }
   };
 
@@ -155,6 +159,8 @@ export default function DashboardPage() {
           </motion.div>
         </div>
       </div>
+
+      <WalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
     </main>
   );
 }

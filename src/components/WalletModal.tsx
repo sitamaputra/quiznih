@@ -27,47 +27,51 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
     }
   }, [isConnected, connectingId, onClose]);
 
+  const installUrls: Record<string, string> = {
+    metamask: "https://metamask.io/download/",
+    rabby: "https://rabby.io/",
+    okx: "https://www.okx.com/web3",
+    bitget: "https://web3.bitget.com/",
+    trust: "https://trustwallet.com/",
+  };
+
+  const connectorIdMap: Record<string, string> = {
+    metamask: "metaMask",
+    rabby: "rabby",
+    okx: "okxwallet",
+    bitget: "bitkeep",
+    trust: "trustwallet",
+  };
+
   const handleConnect = (walletId: string) => {
     setConnectingId(walletId);
     setError(null);
 
-    const connectorMap: Record<string, number> = {
-      metamask: 1,
-      rabby: 2,
-      okx: 3,
-      bitget: 4,
-      trust: 5,
-    };
+    const targetId = connectorIdMap[walletId];
+    const connector =
+      connectors.find((c) => c.id === targetId) ??
+      connectors.find((c) => c.id === "injected") ??
+      connectors[0];
 
-    const idx = connectorMap[walletId] ?? 0;
-
-    if (connectors.length > idx) {
-      connect(
-        { connector: connectors[idx] },
-        {
-          onError: (err) => {
-            setConnectingId(null);
-            const installUrls: Record<string, string> = {
-              metamask: "https://metamask.io/download/",
-              rabby: "https://rabby.io/",
-              okx: "https://www.okx.com/web3",
-              bitget: "https://web3.bitget.com/",
-              trust: "https://trustwallet.com/",
-            };
-            if (err.message?.includes("provider") || err.message?.includes("not found")) {
-              window.open(installUrls[walletId] || "#", "_blank");
-            } else {
-              setError(err.message || "Connection failed");
-            }
-          },
-        }
-      );
-    } else if (connectors.length > 0) {
-      connect(
-        { connector: connectors[0] },
-        { onError: () => { setConnectingId(null); setError("Wallet not detected"); } }
-      );
+    if (!connector) {
+      setConnectingId(null);
+      setError("No wallet detected");
+      return;
     }
+
+    connect(
+      { connector },
+      {
+        onError: (err) => {
+          setConnectingId(null);
+          if (err.message?.includes("provider") || err.message?.includes("not found") || err.message?.includes("No injected")) {
+            window.open(installUrls[walletId] || "#", "_blank");
+          } else {
+            setError(err.message || "Connection failed");
+          }
+        },
+      }
+    );
   };
 
   return (

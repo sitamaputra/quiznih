@@ -1,20 +1,20 @@
 "use client";
-import { useAccount, useBalance, useConnect, useDisconnect, useConnectors } from "wagmi";
+import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { useState, useEffect, useRef } from "react";
 import { Wallet2, LogOut, Copy, CheckCircle2, ChevronDown, Coins, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { shortenAddress, getExplorerAddressUrl, IS_TESTNET, isMiniPayEnvironment } from "@/lib/celo";
+import { shortenAddress, getExplorerAddressUrl, IS_TESTNET, isMiniPayEnvironment, formatEther } from "@/lib/celo";
+import WalletModal from "@/components/WalletModal";
 
 export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfDisconnected?: boolean }) {
   const { lang } = useLanguage();
   const { address, isConnected } = useAccount();
   const { data: balanceData } = useBalance({ address });
-  const { connect } = useConnect();
   const { disconnect } = useDisconnect();
-  const connectors = useConnectors();
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isMiniPay = isMiniPayEnvironment();
 
@@ -35,31 +35,27 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleConnect = () => {
-    if (connectors.length > 0) {
-      connect({ connector: connectors[0] });
-    }
-  };
-
   if (!isConnected || !address) {
     if (hideIfDisconnected) return null;
-    // In MiniPay, don't show connect button (auto-connect handles it)
     if (isMiniPay) return null;
     return (
-      <button
-        onClick={handleConnect}
-        className="flex items-center gap-2 bg-[#35D07F]/10 dark:bg-[#35D07F]/20 hover:bg-[#35D07F]/30 dark:hover:bg-[#35D07F]/40 border border-[#35D07F] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(53,208,127,0.2)] hover:shadow-[0_0_25px_rgba(53,208,127,0.4)] text-[#35D07F]"
-      >
-        <Wallet2 className="w-4 h-4" />
-        <span className="font-semibold text-sm">
-          {lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
-        </span>
-      </button>
+      <>
+        <button
+          onClick={() => setIsWalletModalOpen(true)}
+          className="flex items-center gap-2 bg-[#35D07F]/10 dark:bg-[#35D07F]/20 hover:bg-[#35D07F]/30 dark:hover:bg-[#35D07F]/40 border border-[#35D07F] px-5 py-2.5 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(53,208,127,0.2)] hover:shadow-[0_0_25px_rgba(53,208,127,0.4)] text-[#35D07F]"
+        >
+          <Wallet2 className="w-4 h-4" />
+          <span className="font-semibold text-sm">
+            {lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
+          </span>
+        </button>
+        <WalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
+      </>
     );
   }
 
   const shortAddr = shortenAddress(address);
-  const balance = balanceData ? parseFloat(balanceData.formatted).toFixed(4) : "...";
+  const balance = balanceData ? parseFloat(formatEther(balanceData.value)).toFixed(4) : "...";
 
   return (
     <div className="relative" ref={dropdownRef}>

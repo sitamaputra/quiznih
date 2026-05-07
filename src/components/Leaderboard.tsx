@@ -17,8 +17,8 @@ export default function Leaderboard() {
   return (
     <section id="leaderboard" className="py-24 relative w-full px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-black/5 dark:to-[#0A0A0A]/50">
       <div className="max-w-4xl mx-auto">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
+        <motion.div
+          initial={{ opacity: 1, x: 0 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6"
@@ -39,8 +39,8 @@ export default function Leaderboard() {
           </button>
         </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+        <motion.div
+          initial={{ opacity: 1, y: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="glass rounded-3xl border border-black/10 dark:border-white/10 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(53,208,127,0.1)]"
@@ -54,9 +54,9 @@ export default function Leaderboard() {
 
           <div className="divide-y divide-black/5 dark:divide-white/5">
             {players.map((player, idx) => (
-              <motion.div 
-                key={player.rank} 
-                initial={{ opacity: 0, x: -10 }}
+              <motion.div
+                key={player.rank}
+                initial={{ opacity: 1, x: 0 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}

@@ -146,6 +146,22 @@ export default function PlayPage() {
     }
   };
 
+  const claimReward = async (quizId: string) => {
+    const res = await fetch("/api/quiz/claim-reward", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quizId, userWallet: publicKey }),
+    });
+    const data = await res.json();
+    return {
+      success: res.ok,
+      txSignature: null as string | null,
+      rewardAmount: data.rewardAmount as number | undefined,
+      rank: data.rank as number | undefined,
+      error: data.error as string | undefined,
+    };
+  };
+
   // On-chain claim state
   const [claimTxSignature, setClaimTxSignature] = useState<string | null>(null);
   const [claimRewardAmount, setClaimRewardAmount] = useState<number | null>(null);
@@ -387,7 +403,7 @@ export default function PlayPage() {
     return (
       <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
         <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="abCELOute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+          <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
         </div>
 
         <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between">
@@ -576,7 +592,7 @@ export default function PlayPage() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               className="glass rounded-[3rem] border border-[#FDE047]/40 p-10 max-w-md w-full text-center space-y-8 relative overflow-hidden"
             >
-              <div className="abCELOute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#FDE047]/20 blur-[80px] rounded-full pointer-events-none" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#FDE047]/20 blur-[80px] rounded-full pointer-events-none" />
               
               <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-[#FDE047] to-[#EAB308] flex items-center justify-center shadow-[0_0_40px_rgba(253,224,71,0.4)]">
                 <Trophy className="w-12 h-12 text-black" />
@@ -681,8 +697,8 @@ export default function PlayPage() {
     <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
       {/* Background */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="abCELOute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
-        <div className="abCELOute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
       </div>
 
       {/* Header */}
@@ -775,12 +791,12 @@ export default function PlayPage() {
 
             {/* QR Scanner Placeholder */}
             <div className="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border-2 border-[#FCFF52]/50 bg-black/80 flex items-center justify-center">
-              <div className="abCELOute inset-4 border-2 border-[#FCFF52] rounded-2xl border-dashed animate-pulse" />
+              <div className="absolute inset-4 border-2 border-[#FCFF52] rounded-2xl border-dashed animate-pulse" />
               <QrCode className="w-16 h-16 text-[#FCFF52]/50" />
 
               {/* Scanning line animation */}
               <motion.div
-                className="abCELOute left-4 right-4 h-0.5 bg-[#FCFF52] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
+                className="absolute left-4 right-4 h-0.5 bg-[#FCFF52] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
                 animate={{ top: ["10%", "85%", "10%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -860,7 +876,7 @@ export default function PlayPage() {
                     <span>{AVATARS[selectedAvatar].emoji}</span>
                     {/* Glow */}
                     <div
-                      className="abCELOute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
+                      className="absolute inset-0 rounded-3xl blur-xl opacity-40 -z-10"
                       style={{ backgroundColor: AVATARS[selectedAvatar].color }}
                     />
                   </div>

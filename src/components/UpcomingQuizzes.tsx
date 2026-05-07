@@ -43,8 +43,8 @@ export default function UpcomingQuizzes() {
     <section className="py-24 w-full px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
+          <motion.div
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="space-y-4"
@@ -68,7 +68,7 @@ export default function UpcomingQuizzes() {
           {quizzes.map((quiz, idx) => (
             <motion.div
               key={quiz.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}

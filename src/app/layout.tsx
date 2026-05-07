@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${outfit.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${outfit.variable} antialiased`} style={{ scrollBehavior: "smooth" }}>
       <body className="min-h-screen selection:bg-[#35D07F] selection:text-black flex flex-col items-center transition-colors">
         <Providers>
           {/* Futuristic Background Elements */}

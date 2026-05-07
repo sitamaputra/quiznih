@@ -19,12 +19,16 @@ export default function Navbar() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const isClient = true; // Avoid setState in effect warning
-    if (isClient) {
-      setMounted(true);
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
     
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,23 +49,23 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass border-b border-black/10 dark:border-white/10 text-black dark:text-white">
+    <><nav className="fixed top-0 w-full z-50 text-black dark:text-white" style={{ background: "#ffffff", borderBottom: "1px solid rgba(53,208,127,0.12)", backdropFilter: scrolled ? "blur(16px)" : "none", WebkitBackdropFilter: scrolled ? "blur(16px)" : "none", boxShadow: scrolled ? "0 2px 20px rgba(53,208,127,0.08)" : "none", transition: "box-shadow 0.3s ease, backdrop-filter 0.3s ease" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2.5">
-              <img src="/logo.svg" alt="Quiznih" className="w-9 h-9 rounded-xl" />
-              <span className="font-extrabold text-xl tracking-wider">
-                Quiz<span className="text-gradient">nih</span>
+              <img src="/quiznih-logo.png" alt="Quiznih" className="w-9 h-9 rounded-[10px] object-cover" />
+              <span className="text-xl" style={{ letterSpacing: "-0.02em", fontWeight: 900, background: 'linear-gradient(90deg, #35D07F, #FCFF52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                Quiznih
               </span>
             </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#how-it-works" className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+            <a href="#how-it-works" className="transition-colors font-medium" style={{ color: "#0a1a0f" }} onMouseOver={e => (e.currentTarget.style.color = "#0a1a0f")} onMouseOut={e => (e.currentTarget.style.color = "#4a6357")}>
               {lang === "ENG" ? "How it Works" : "Cara Kerja"}
             </a>
-            <a href="#leaderboard" className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">
+            <a href="#leaderboard" className="transition-colors font-medium" style={{ color: "#0a1a0f" }} onMouseOver={e => (e.currentTarget.style.color = "#0a1a0f")} onMouseOut={e => (e.currentTarget.style.color = "#4a6357")}>
               {lang === "ENG" ? "Leaderboard" : "Papan Peringkat"}
             </a>
             
@@ -156,12 +160,13 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)} 
-      />
     </nav>
+
+    {/* Auth Modal — outside nav to escape backdrop-filter containing block */}
+    <AuthModal
+      isOpen={isAuthOpen}
+      onClose={() => setIsAuthOpen(false)}
+    />
+    </>
   );
 }

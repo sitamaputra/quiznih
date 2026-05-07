@@ -102,57 +102,51 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     }
   };
 
+  const installUrls: Record<string, string> = {
+    metamask: "https://metamask.io/download/",
+    rabby: "https://rabby.io/",
+    okx: "https://www.okx.com/web3",
+    bitget: "https://web3.bitget.com/",
+    trust: "https://trustwallet.com/",
+  };
+
+  const connectorIdMap: Record<string, string> = {
+    metamask: "metaMask",
+    rabby: "rabby",
+    okx: "okxwallet",
+    bitget: "bitkeep",
+    trust: "trustwallet",
+  };
+
   const handleWalletConnect = (walletId: string) => {
     setConnectingWalletId(walletId);
     setError(null);
 
-    // Map wallet ID to the correct connector
-    const connectorMap: Record<string, number> = {
-      metamask: 1,  // index matches wagmiConfig connectors order
-      rabby: 2,
-      okx: 3,
-      bitget: 4,
-      trust: 5,
-    };
+    const targetId = connectorIdMap[walletId];
+    const connector =
+      connectors.find((c) => c.id === targetId) ??
+      connectors.find((c) => c.id === "injected") ??
+      connectors[0];
 
-    const connectorIndex = connectorMap[walletId] ?? 0;
-
-    if (connectors.length > connectorIndex) {
-      connect(
-        { connector: connectors[connectorIndex] },
-        {
-          onError: (err) => {
-            setConnectingWalletId(null);
-            // If wallet extension is not installed, open install page
-            const installUrls: Record<string, string> = {
-              metamask: "https://metamask.io/download/",
-              rabby: "https://rabby.io/",
-              okx: "https://www.okx.com/web3",
-              bitget: "https://web3.bitget.com/",
-              trust: "https://trustwallet.com/",
-            };
-            if (err.message?.includes("provider") || err.message?.includes("not found")) {
-              window.open(installUrls[walletId] || "#", "_blank");
-            } else {
-              setError(err.message || "Connection failed");
-            }
-          },
-        }
-      );
-    } else {
-      // Fallback: try generic injected
-      if (connectors.length > 0) {
-        connect(
-          { connector: connectors[0] },
-          {
-            onError: (err) => {
-              setConnectingWalletId(null);
-              setError(err.message || "No wallet detected");
-            },
-          }
-        );
-      }
+    if (!connector) {
+      setConnectingWalletId(null);
+      setError("No wallet detected");
+      return;
     }
+
+    connect(
+      { connector },
+      {
+        onError: (err) => {
+          setConnectingWalletId(null);
+          if (err.message?.includes("provider") || err.message?.includes("not found") || err.message?.includes("No injected")) {
+            window.open(installUrls[walletId] || "#", "_blank");
+          } else {
+            setError(err.message || "Connection failed");
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -164,29 +158,33 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 z-[100]"
+            style={{ background: "rgba(0,0,0,0.4)" }}
           />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[101] p-4 max-h-[90vh] overflow-y-auto"
+          <div
+            className="fixed w-full max-w-md z-[101] p-4"
+            style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)", maxHeight: "85vh", overflowY: "auto" }}
           >
-            <div className="glass rounded-[2rem] border border-white/20 p-8 shadow-2xl relative overflow-hidden bg-black/80 dark:bg-black/90">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+            <div className="p-8 relative overflow-hidden" style={{ background: "#ffffff", borderRadius: 16, boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+                className="absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 transition-colors text-gray-400 hover:text-gray-700"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-extrabold text-white">
-                  {isLogin 
-                    ? (lang === "ENG" ? "Welcome Back" : "Selamat Datang") 
+                <h2 className="text-3xl font-extrabold text-gray-900">
+                  {isLogin
+                    ? (lang === "ENG" ? "Welcome Back" : "Selamat Datang")
                     : (lang === "ENG" ? "Create Account" : "Daftar Akun")}
                 </h2>
-                <p className="text-gray-400 text-sm mt-2">
+                <p className="text-gray-500 text-sm mt-2">
                   {lang === "ENG" ? "Log in to save your progress and quizzes." : "Masuk untuk menyimpan progres kuis Anda."}
                 </p>
               </div>
@@ -194,7 +192,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">Username <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-gray-700 ml-1">Username <span className="text-red-500">*</span></label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <input
@@ -202,7 +200,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
-                        className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
+                        className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#35D07F] transition-colors"
                         placeholder="cool_player_99"
                       />
                     </div>
@@ -210,7 +208,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 )}
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-300 ml-1">Email <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Email <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -218,14 +216,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#35D07F] transition-colors"
                       placeholder="you@example.com"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-300 ml-1">Password <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -233,21 +231,21 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-[#35D07F] transition-colors"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#35D07F] transition-colors"
                       placeholder="••••••••"
                     />
                   </div>
                 </div>
 
-                {error && <p className="text-red-400 text-sm font-medium pt-1">{error}</p>}
+                {error && <p className="text-red-500 text-sm font-medium pt-1">{error}</p>}
 
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full py-4 rounded-xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-extrabold text-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 mt-4"
                 >
-                  {loading 
-                    ? (lang === "ENG" ? "Processing..." : "Memproses...") 
+                  {loading
+                    ? (lang === "ENG" ? "Processing..." : "Memproses...")
                     : (isLogin ? (lang === "ENG" ? "Sign In" : "Masuk") : (lang === "ENG" ? "Create Account" : "Daftar Akun"))}
                   {!loading && <ChevronRight className="w-5 h-5" />}
                 </button>
@@ -255,10 +253,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
               <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/10"></div>
+                  <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-black text-gray-400">
+                  <span className="px-4 bg-white text-gray-500">
                     {lang === "ENG" ? "or continue with" : "atau masuk dengan"}
                   </span>
                 </div>
@@ -268,7 +266,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full py-3.5 rounded-xl bg-white text-black font-extrabold text-base flex items-center justify-center gap-3 hover:bg-gray-100 active:scale-95 transition-all"
+                className="w-full py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 font-extrabold text-base flex items-center justify-center gap-3 hover:bg-gray-100 active:scale-95 transition-all"
               >
                 <Chrome className="w-5 h-5 text-blue-500" />
                 Google
@@ -278,7 +276,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <div className="mt-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Wallet2 className="w-4 h-4 text-[#35D07F]" />
-                  <span className="text-sm font-bold text-gray-300">
+                  <span className="text-sm font-bold text-gray-700">
                     {lang === "ENG" ? "Web3 Wallets" : "Dompet Web3"}
                   </span>
                 </div>
@@ -293,10 +291,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       type="button"
                       disabled={isConnecting && connectingWalletId === wallet.id}
                       onClick={() => handleWalletConnect(wallet.id)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/25 transition-all duration-200 group disabled:opacity-60"
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 group disabled:opacity-60"
                     >
                       <div className="flex items-center gap-3">
-                        <div 
+                        <div
                           className="w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden"
                           style={{ backgroundColor: `${wallet.color}15` }}
                         >
@@ -306,35 +304,36 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                             className="w-6 h-6"
                           />
                         </div>
-                        <span className="font-bold text-sm text-white group-hover:text-[#35D07F] transition-colors">
+                        <span className="font-bold text-sm text-gray-900 group-hover:text-[#35D07F] transition-colors">
                           {wallet.name}
                         </span>
                       </div>
                       {connectingWalletId === wallet.id ? (
                         <Loader2 className="w-4 h-4 text-[#35D07F] animate-spin" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ChevronRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                       )}
                     </motion.button>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-6 text-center text-sm text-gray-400">
-                {isLogin 
+              <div className="mt-6 text-center text-sm text-gray-500">
+                {isLogin
                   ? (lang === "ENG" ? "Don't have an account? " : "Belum punya akun? ")
                   : (lang === "ENG" ? "Already have an account? " : "Sudah punya akun? ")}
                 <button
                   onClick={() => { setIsLogin(!isLogin); setError(null); }}
                   className="text-[#35D07F] font-bold hover:underline"
                 >
-                  {isLogin 
+                  {isLogin
                     ? (lang === "ENG" ? "Sign Up" : "Daftar Sekarang")
                     : (lang === "ENG" ? "Sign In" : "Masuk")}
                 </button>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

@@ -17,8 +17,8 @@ export default function BlinkShare() {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
+    <motion.div
+      initial={{ opacity: 1, scale: 1 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       className="p-10 rounded-[3rem] glass border border-[#35D07F]/30 bg-gradient-to-br from-[#35D07F]/5 to-transparent text-center space-y-6"

@@ -95,7 +95,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [quizId, publicKey, setVisible, router]);
+  }, [quizId, publicKey, router]);
 
   const handleStartQuiz = async () => {
     setIsStarting(true);
