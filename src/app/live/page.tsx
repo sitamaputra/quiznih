@@ -7,11 +7,12 @@ import {
   Timer, BarChart3, Crown, Target, Loader2, ChevronDown, Camera, Video, VideoOff
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import confetti from "canvas-confetti";
 import { useCapture } from "@/hooks/useCapture";
 import TopBar from "@/components/TopBar";
+import { useSearchParams } from "next/navigation";
 
 interface Player {
   user_wallet: string;
@@ -45,10 +46,13 @@ const DEMO_PLAYERS: Player[] = [
   { user_wallet: "0xU1v2...W3x4", player_name: "TokenFan", final_score: 490, avatar_emoji: "🐼" },
 ];
 
-export default function LiveReportPage() {
+function LiveReportContent() {
   const { lang } = useLanguage();
   const { address } = useAccount();
-  const [roomCode, setRoomCode] = useState("");
+  const searchParams = useSearchParams();
+  const initialCode = searchParams.get("code") || "";
+  
+  const [roomCode, setRoomCode] = useState(initialCode);
   const [isWatching, setIsWatching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -638,5 +642,13 @@ export default function LiveReportPage() {
         )}
       </AnimatePresence>
     </main>
+  );
+}
+
+export default function LiveReportPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">Loading...</div>}>
+      <LiveReportContent />
+    </Suspense>
   );
 }

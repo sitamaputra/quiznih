@@ -6,8 +6,9 @@ import {
   Users, Hash, Plus, ChevronDown, Clock, Sparkles, UserCircle2
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import TopBar from "@/components/TopBar";
+import { useSearchParams } from "next/navigation";
 
 interface Question {
   id: string;
@@ -48,11 +49,15 @@ function timeAgo(ts: number, lang: string): string {
   return `${Math.floor(diff / 86400)}d`;
 }
 
-export default function QAPage() {
+function QAContent() {
   const { lang } = useLanguage();
-  const [roomCode, setRoomCode] = useState("");
+  const searchParams = useSearchParams();
+  const initialCode = searchParams.get("code") || "";
+  const initialUser = searchParams.get("user") || "";
+
+  const [roomCode, setRoomCode] = useState(initialCode);
   const [isJoined, setIsJoined] = useState(false);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(initialUser);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [newQuestion, setNewQuestion] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -88,6 +93,13 @@ export default function QAPage() {
     }, 8000);
     return () => clearInterval(t);
   }, [isJoined]);
+
+  // Auto join if code and user are provided in URL
+  useEffect(() => {
+    if (initialCode && initialUser && !isJoined) {
+      setIsJoined(true);
+    }
+  }, [initialCode, initialUser]);
 
   const handleJoin = () => {
     if (!roomCode.trim() || !username.trim()) return;
@@ -456,5 +468,13 @@ export default function QAPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function QAPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-bold">Loading...</div>}>
+      <QAContent />
+    </Suspense>
   );
 }
