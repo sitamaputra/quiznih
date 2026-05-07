@@ -35,10 +35,8 @@ export default function CreateQuizPage() {
     balance,
     isDepositing,
     isTestnet: isDevnet,
-    
     refetchBalance: fetchBalance,
     createQuizAndDeposit: depositRewardPool,
-    
     getExplorerTxUrl: getExplorer,
   } = useCeloQuiz();
 
@@ -319,14 +317,14 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
       // 4. On-chain CELO deposit (if reward type is CELO and amount > 0)
       const celoAmount = Number(rewardPool);
       if (rewardType === "CELO" && celoAmount > 0) {
-        const depositResult = await depositRewardPool(quizData.id, celoAmount);
+        const depositResult = await depositRewardPool(quizData.id, code, rewardPool);
         if (!depositResult.success) {
           setDepositError(depositResult.error || "Deposit failed");
           // Quiz is still created, just not funded on-chain
           // User can retry deposit later
         } else {
-          setDepositTx(depositResult.txSignature || null);
-          setEscrowAddress(depositResult.escrowAddress || null);
+          setDepositTx(depositResult.txHash || null);
+          setEscrowAddress(depositResult.explorerUrl || null);
         }
       }
 
@@ -608,10 +606,10 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       onClick={async () => {
                         if (!quizId) return;
                         setDepositError(null);
-                        const result = await depositRewardPool(quizId, Number(rewardPool));
+                        const result = await depositRewardPool(quizId, roomCode, rewardPool);
                         if (result.success) {
-                          setDepositTx(result.txSignature || null);
-                          setEscrowAddress(result.escrowAddress || null);
+                          setDepositTx(result.txHash || null);
+                          setEscrowAddress(result.explorerUrl || null);
                         } else {
                           setDepositError(result.error || "Retry failed");
                         }
@@ -783,22 +781,19 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       <div>
                         <p className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Your Balance" : "Saldo Anda"}</p>
                         <p className="text-lg font-black text-[#FCFF52]">
-                          {balance !== null ? `◎ ${balance.toFixed(4)} CELO` : "Loading..."}
+                          {balance !== null ? `◎ ${parseFloat(balance).toFixed(4)} CELO` : "Loading..."}
                         </p>
                       </div>
                     </div>
                     {isDevnet && (
-                      <button
-                        onClick={() => requestDevnetAirdrop(2)}
-                        disabled={isAirdropping}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#35D07F]/20 border border-[#35D07F]/30 text-[#35D07F] text-xs font-bold hover:bg-[#35D07F]/30 transition-all disabled:opacity-50"
+                      <a
+                        href="https://faucet.celo.org/alfajores"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#35D07F]/20 border border-[#35D07F]/30 text-[#35D07F] text-xs font-bold hover:bg-[#35D07F]/30 transition-all"
                       >
-                        {isAirdropping ? (
-                          <><Loader2 className="w-3 h-3 animate-spin" /> Airdrop...</>
-                        ) : (
-                          <><Zap className="w-3 h-3" /> Devnet Airdrop</>
-                        )}
-                      </button>
+                        <Zap className="w-3 h-3" /> Testnet Faucet
+                      </a>
                     )}
                   </div>
                 )}

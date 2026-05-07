@@ -1,0 +1,12 @@
+ M next-env.d.ts
+?? build_test_vercel.txt
+?? clean_lint.txt
+?? eslint_errors.txt
+?? eslint_report.json
+?? git_files.txt
+?? lint_output.txt
+?? remaining_errors.json
+?? src/components/AuthModal.tsx
+?? supabase/auth_migration.sql
+?? true_errors.json
+?? ts_errors.txt
