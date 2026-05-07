@@ -38,10 +38,12 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen w-full flex flex-col items-center text-black dark:text-white relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#35D07F]/15 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[600px] h-[300px] bg-[#06B6D4]/10 blur-[120px] rounded-full mix-blend-screen" />
       </div>
 
       <TopBar backHref="/" />
@@ -59,16 +61,22 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12 space-y-4"
+          className="text-center mb-12 space-y-4 relative"
         >
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-            {lang === "ENG" ? "Choose Your " : "Pilih "}
-            <span className="text-gradient">{lang === "ENG" ? "Role" : "Peranmu"}</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] text-xs font-mono font-bold uppercase tracking-widest mb-4">
+            <span className="w-2 h-2 rounded-full bg-[#FCFF52] animate-pulse" />
+            AI-Powered Nexus
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight uppercase font-mono">
+            {lang === "ENG" ? "System " : "Sistem "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] via-[#FCFF52] to-[#06B6D4] animate-pulse">
+              {lang === "ENG" ? "Initialized" : "Diinisialisasi"}
+            </span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-lg max-w-lg mx-auto">
+          <p className="text-gray-400 text-lg max-w-lg mx-auto font-mono text-sm">
             {lang === "ENG"
-              ? "Create a quiz to challenge others, or join as a player to compete and earn rewards."
-              : "Buat kuis untuk menantang yang lain, atau bergabung sebagai pemain untuk bersaing dan dapatkan hadiah."}
+              ? "Select operational parameter. Host a neural-quiz or interface as a player."
+              : "Pilih parameter operasional. Buat kuis-neural atau masuk sebagai pemain."}
           </p>
         </motion.div>
 
@@ -81,38 +89,39 @@ export default function DashboardPage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
             onClick={() => handleNavigate("/create")}
-            className="cursor-pointer group relative glass rounded-[2.5rem] p-10 border border-[#35D07F]/30 hover:border-[#35D07F]/60 transition-all duration-500 overflow-hidden"
+            className="cursor-pointer group relative bg-black/60 backdrop-blur-xl rounded-[2.5rem] p-10 border-2 border-[#35D07F]/40 hover:border-[#35D07F] hover:shadow-[0_0_40px_rgba(53,208,127,0.3)] transition-all duration-500 overflow-hidden"
           >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#35D07F]/10 blur-[60px] rounded-full group-hover:bg-[#35D07F]/25 transition-all duration-500" />
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#35D07F]/20 blur-[60px] rounded-full group-hover:bg-[#35D07F]/40 transition-all duration-500" />
 
             <div className="relative z-10 space-y-6">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#35D07F] to-[#2bb86e] flex items-center justify-center shadow-[0_0_30px_rgba(53,208,127,0.3)] group-hover:shadow-[0_0_50px_rgba(53,208,127,0.5)] transition-shadow">
-                <Crown className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 rounded-2xl bg-black border border-[#35D07F] flex items-center justify-center shadow-[0_0_30px_rgba(53,208,127,0.3)] group-hover:shadow-[0_0_50px_rgba(53,208,127,0.5)] transition-shadow">
+                <Crown className="w-10 h-10 text-[#35D07F]" />
               </div>
 
               <div>
-                <h2 className="text-3xl font-extrabold mb-2">
-                  {lang === "ENG" ? "Quiz Creator" : "Pembuat Kuis"}
+                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white">
+                  {lang === "ENG" ? "SYS_HOST" : "SYS_HOST"}
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                <p className="text-gray-400 leading-relaxed text-sm">
                   {lang === "ENG"
-                    ? "Design your own quiz, set rewards in CELO, and invite players with a unique code."
-                    : "Rancang kuis sendiri, tentukan hadiah dalam CELO, dan undang pemain dengan kode unik."}
+                    ? "Generate smart-contract powered assessments. Distribute CELO tokens."
+                    : "Buat asesmen berbasis smart-contract. Distribusikan token CELO."}
                 </p>
               </div>
 
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2 text-[#35D07F] font-bold group-hover:gap-3 transition-all">
                   <PlusCircle className="w-5 h-5" />
-                  <span>{lang === "ENG" ? "Create New Quiz" : "Buat Kuis Baru"}</span>
+                  <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Init Sequence" : "Mulai Sekuens"}</span>
                 </div>
                 <Link 
                   href="/manage"
                   onClick={(e) => e.stopPropagation()}
-                  className="flex items-center gap-2 text-gray-500 hover:text-[#35D07F] text-sm font-semibold transition-all"
+                  className="flex items-center gap-2 text-gray-500 hover:text-[#35D07F] text-xs font-mono uppercase transition-all"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  <span>{lang === "ENG" ? "Manage My Quizzes" : "Kelola Kuis Saya"}</span>
+                  <span>{lang === "ENG" ? "Access Database" : "Akses Database"}</span>
                 </Link>
               </div>
             </div>
@@ -125,35 +134,36 @@ export default function DashboardPage() {
             transition={{ delay: 0.3, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
             onClick={() => handleNavigate("/play")}
-            className="cursor-pointer group relative glass rounded-[2.5rem] p-10 border border-[#FCFF52]/30 hover:border-[#FCFF52]/60 transition-all duration-500 overflow-hidden"
+            className="cursor-pointer group relative bg-black/60 backdrop-blur-xl rounded-[2.5rem] p-10 border-2 border-[#FCFF52]/40 hover:border-[#FCFF52] hover:shadow-[0_0_40px_rgba(252,255,82,0.2)] transition-all duration-500 overflow-hidden"
           >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#FCFF52]/10 blur-[60px] rounded-full group-hover:bg-[#FCFF52]/25 transition-all duration-500" />
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(252,255,82,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#FCFF52]/20 blur-[60px] rounded-full group-hover:bg-[#FCFF52]/40 transition-all duration-500" />
 
             <div className="relative z-10 space-y-6">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#FCFF52] to-[#e6e84a] flex items-center justify-center shadow-[0_0_30px_rgba(252,255,82,0.3)] group-hover:shadow-[0_0_50px_rgba(252,255,82,0.5)] transition-shadow">
-                <Users className="w-10 h-10 text-black" />
+              <div className="w-20 h-20 rounded-2xl bg-black border border-[#FCFF52] flex items-center justify-center shadow-[0_0_30px_rgba(252,255,82,0.3)] group-hover:shadow-[0_0_50px_rgba(252,255,82,0.5)] transition-shadow">
+                <Users className="w-10 h-10 text-[#FCFF52]" />
               </div>
 
               <div>
-                <h2 className="text-3xl font-extrabold mb-2">
-                  {lang === "ENG" ? "Join as Player" : "Gabung Sebagai Pemain"}
+                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white">
+                  {lang === "ENG" ? "SYS_CLIENT" : "SYS_CLIENT"}
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                <p className="text-gray-400 leading-relaxed text-sm">
                   {lang === "ENG"
-                    ? "Scan QR code or enter a room code to join a live quiz and compete for CELO prizes."
-                    : "Scan QR code atau masukkan kode ruangan untuk bergabung kuis dan bersaing hadiah CELO."}
+                    ? "Connect to an active node. Compete in real-time. Extract rewards."
+                    : "Koneksi ke node aktif. Bersaing real-time. Ekstrak hadiah."}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-[#FCFF52] font-bold group-hover:gap-3 transition-all">
                 <Gamepad2 className="w-5 h-5" />
-                <span>{lang === "ENG" ? "Join Quiz" : "Gabung Kuis"}</span>
+                <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Establish Uplink" : "Buat Uplink"}</span>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Bottom row: Spin Wheel + Live Report + Q&A */}
+        {/* Bottom row: Tools */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
           {/* Spin Wheel Card */}
           <motion.div
@@ -162,29 +172,29 @@ export default function DashboardPage() {
             transition={{ delay: 0.4, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
             onClick={() => handleNavigate("/spin")}
-            className="cursor-pointer group relative glass rounded-[2rem] p-7 border border-[#A78BFA]/30 hover:border-[#A78BFA]/60 transition-all duration-500 overflow-hidden"
+            className="cursor-pointer group relative bg-black/50 backdrop-blur-md rounded-[2rem] p-7 border border-[#06B6D4]/30 hover:border-[#06B6D4] transition-all duration-500 overflow-hidden"
           >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#A78BFA]/10 blur-[60px] rounded-full group-hover:bg-[#A78BFA]/25 transition-all duration-500" />
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#06B6D4]/10 blur-[60px] rounded-full group-hover:bg-[#06B6D4]/30 transition-all duration-500" />
 
             <div className="relative z-10 space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#A78BFA] to-[#7C3AED] flex items-center justify-center shadow-[0_0_25px_rgba(167,139,250,0.3)] group-hover:shadow-[0_0_40px_rgba(167,139,250,0.5)] transition-shadow">
-                <span className="text-2xl">🎡</span>
+              <div className="w-14 h-14 rounded-2xl bg-black border border-[#06B6D4] flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-shadow">
+                <span className="text-2xl filter hue-rotate-[180deg]">🎡</span>
               </div>
 
               <div>
-                <h2 className="text-xl font-extrabold mb-1">
-                  {lang === "ENG" ? "Spin Wheel" : "Roda Putar"}
+                <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
+                  RND_SEED
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
+                <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Random prize picker. Spin the wheel to pick a winner!"
-                    : "Pemilih hadiah acak. Putar roda untuk pilih pemenang!"}
+                    ? "Cryptographic random selection protocol."
+                    : "Protokol seleksi acak kriptografik."}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-[#A78BFA] font-bold group-hover:gap-3 transition-all text-sm">
-                <span>🎰</span>
-                <span>{lang === "ENG" ? "Spin & Win" : "Putar & Menang"}</span>
+              <div className="flex items-center gap-2 text-[#06B6D4] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
+                <span>⚡</span>
+                <span>{lang === "ENG" ? "Execute" : "Eksekusi"}</span>
               </div>
             </div>
           </motion.div>
@@ -196,29 +206,29 @@ export default function DashboardPage() {
             transition={{ delay: 0.5, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
             onClick={() => handleNavigate("/live")}
-            className="cursor-pointer group relative glass rounded-[2rem] p-7 border border-[#F472B6]/30 hover:border-[#F472B6]/60 transition-all duration-500 overflow-hidden"
+            className="cursor-pointer group relative bg-black/50 backdrop-blur-md rounded-[2rem] p-7 border border-[#35D07F]/30 hover:border-[#35D07F] transition-all duration-500 overflow-hidden"
           >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#F472B6]/10 blur-[60px] rounded-full group-hover:bg-[#F472B6]/25 transition-all duration-500" />
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#35D07F]/10 blur-[60px] rounded-full group-hover:bg-[#35D07F]/30 transition-all duration-500" />
 
             <div className="relative z-10 space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F472B6] to-[#EC4899] flex items-center justify-center shadow-[0_0_25px_rgba(244,114,182,0.3)] group-hover:shadow-[0_0_40px_rgba(244,114,182,0.5)] transition-shadow">
-                <span className="text-2xl">📺</span>
+              <div className="w-14 h-14 rounded-2xl bg-black border border-[#35D07F] flex items-center justify-center shadow-[0_0_25px_rgba(53,208,127,0.3)] group-hover:shadow-[0_0_40px_rgba(53,208,127,0.5)] transition-shadow">
+                <span className="text-2xl filter sepia hue-rotate-[90deg] saturate-200">📺</span>
               </div>
 
               <div>
-                <h2 className="text-xl font-extrabold mb-1">
-                  {lang === "ENG" ? "Live Report" : "Laporan Live"}
+                <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
+                  TELEMETRY
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
+                <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Watch players live, bet on winners, set prizes!"
-                    : "Tonton pemain live, taruhan pemenang, atur hadiah!"}
+                    ? "Real-time market tracking and participant wagers."
+                    : "Pelacakan pasar real-time dan taruhan peserta."}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-[#F472B6] font-bold group-hover:gap-3 transition-all text-sm">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
-                <span>{lang === "ENG" ? "Watch & Bet" : "Tonton & Taruhan"}</span>
+              <div className="flex items-center gap-2 text-[#35D07F] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
+                <span className="w-2 h-2 rounded-full bg-[#35D07F] animate-pulse inline-block" />
+                <span>{lang === "ENG" ? "Monitor" : "Monitor"}</span>
               </div>
             </div>
           </motion.div>
@@ -230,29 +240,29 @@ export default function DashboardPage() {
             transition={{ delay: 0.6, duration: 0.6 }}
             whileHover={{ scale: 1.03, y: -5 }}
             onClick={() => handleNavigate("/qa")}
-            className="cursor-pointer group relative glass rounded-[2rem] p-7 border border-[#06B6D4]/30 hover:border-[#06B6D4]/60 transition-all duration-500 overflow-hidden"
+            className="cursor-pointer group relative bg-black/50 backdrop-blur-md rounded-[2rem] p-7 border border-[#FCFF52]/30 hover:border-[#FCFF52] transition-all duration-500 overflow-hidden"
           >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#06B6D4]/10 blur-[60px] rounded-full group-hover:bg-[#06B6D4]/25 transition-all duration-500" />
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#FCFF52]/10 blur-[60px] rounded-full group-hover:bg-[#FCFF52]/30 transition-all duration-500" />
 
             <div className="relative z-10 space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#06B6D4] to-[#0891B2] flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-shadow">
-                <MessageCircle className="w-7 h-7 text-white" />
+              <div className="w-14 h-14 rounded-2xl bg-black border border-[#FCFF52] flex items-center justify-center shadow-[0_0_25px_rgba(252,255,82,0.3)] group-hover:shadow-[0_0_40px_rgba(252,255,82,0.5)] transition-shadow">
+                <MessageCircle className="w-7 h-7 text-[#FCFF52]" />
               </div>
 
               <div>
-                <h2 className="text-xl font-extrabold mb-1">
-                  {lang === "ENG" ? "Live Q&A" : "Tanya Jawab"}
+                <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
+                  COMMS_LINK
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
+                <p className="text-gray-400 text-xs leading-relaxed">
                   {lang === "ENG"
-                    ? "Ask questions, vote & reply. Anonymous mode available!"
-                    : "Ajukan pertanyaan, vote & balas. Bisa anonim!"}
+                    ? "Encrypted query submission & peer consensus."
+                    : "Pengajuan kueri terenkripsi & konsensus rekan."}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-[#06B6D4] font-bold group-hover:gap-3 transition-all text-sm">
+              <div className="flex items-center gap-2 text-[#FCFF52] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
                 <span>💬</span>
-                <span>{lang === "ENG" ? "Ask & Vote" : "Tanya & Vote"}</span>
+                <span>{lang === "ENG" ? "Connect" : "Koneksi"}</span>
               </div>
             </div>
           </motion.div>

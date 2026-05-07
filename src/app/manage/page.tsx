@@ -70,9 +70,11 @@ export default function ManageQuizzesPage() {
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[10%] right-[10%] w-[400px] h-[400px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[20%] left-[5%] w-[350px] h-[350px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       <TopBar backHref="/dashboard" />
@@ -88,16 +90,21 @@ export default function ManageQuizzesPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            className="relative"
           >
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center gap-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
+              DATABASE_ACCESS
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 flex items-center gap-4 font-mono uppercase">
               <LayoutDashboard className="w-10 h-10 text-[#35D07F]" />
-              {lang === "ENG" ? "My " : "Kuis "}
-              <span className="text-gradient">{lang === "ENG" ? "Quizzes" : "Saya"}</span>
+              {lang === "ENG" ? "System " : "Kuis "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Records" : "Saya"}</span>
             </h1>
-            <p className="text-gray-500 max-w-lg">
+            <p className="text-gray-400 max-w-lg font-mono text-sm">
               {lang === "ENG" 
-                ? "Manage your active sessions and view past results" 
-                : "Kelola sesi kuis Anda dan lihat hasil sebelumnya"}
+                ? "Manage your active sessions and view past results." 
+                : "Kelola sesi kuis Anda dan lihat hasil sebelumnya."}
             </p>
           </motion.div>
 
@@ -117,18 +124,18 @@ export default function ManageQuizzesPage() {
             ))}
           </div>
         ) : quizzes.length === 0 ? (
-          <div className="glass rounded-[3rem] p-20 text-center border border-white/5">
+          <div className="bg-black/50 backdrop-blur-md rounded-[3rem] p-20 text-center border border-white/10">
             <div className="w-20 h-20 mx-auto rounded-3xl bg-white/5 flex items-center justify-center mb-6">
               <Plus className="w-10 h-10 text-gray-500" />
             </div>
-            <h3 className="text-2xl font-bold mb-2">
-              {lang === "ENG" ? "No Quizzes Yet" : "Belum Ada Kuis"}
+            <h3 className="text-2xl font-bold mb-2 font-mono text-white">
+              {lang === "ENG" ? "NO_RECORDS_FOUND" : "NO_RECORDS_FOUND"}
             </h3>
-            <p className="text-gray-500 mb-8">
+            <p className="text-gray-500 mb-8 font-mono text-sm">
               {lang === "ENG" ? "You haven't created any quizzes." : "Anda belum membuat kuis apapun."}
             </p>
-            <Link href="/create" className="text-[#35D07F] font-bold hover:underline">
-              {lang === "ENG" ? "Start building now" : "Mulai buat sekarang"} →
+            <Link href="/create" className="text-[#35D07F] font-bold hover:underline font-mono">
+              {lang === "ENG" ? "Init Sequence Now" : "Mulai Sekuens"} →
             </Link>
           </div>
         ) : (
@@ -139,9 +146,10 @@ export default function ManageQuizzesPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.05 }}
-                className="group glass rounded-3xl p-6 border border-white/10 hover:border-[#35D07F]/40 transition-all flex flex-col justify-between"
+                className="group relative bg-black/60 backdrop-blur-xl rounded-[2rem] p-6 border border-white/10 hover:border-[#35D07F]/50 hover:shadow-[0_0_30px_rgba(53,208,127,0.2)] transition-all flex flex-col justify-between overflow-hidden"
               >
-                <div>
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+                <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       quiz.status === "waiting" 

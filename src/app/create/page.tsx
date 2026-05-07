@@ -367,10 +367,11 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
-      {/* Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       <TopBar backHref="/dashboard" />
@@ -424,14 +425,18 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
         >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-                {lang === "ENG" ? "Create " : "Buat "}
-                <span className="text-gradient">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
+                Build Mode
+              </div>
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-2 font-mono uppercase">
+                {lang === "ENG" ? "Compile " : "Kompilasi "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
               </h1>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-400 font-mono text-sm">
                 {lang === "ENG"
-                  ? "Design your quiz, set rewards, and share with players."
-                  : "Rancang kuis, tentukan hadiah, dan bagikan ke pemain."}
+                  ? "Design assessment parameters and define CELO reward blocks."
+                  : "Rancang parameter asesmen dan tentukan blok hadiah CELO."}
               </p>
             </div>
             <button

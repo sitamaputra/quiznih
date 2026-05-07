@@ -175,9 +175,11 @@ export default function SpinWheelPage() {
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full"/>
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full"/>
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#A78BFA10_1px,transparent_1px),linear-gradient(to_bottom,#A78BFA10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#A78BFA]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#7C3AED]/20 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       <TopBar backHref="/dashboard" />
@@ -222,14 +224,18 @@ export default function SpinWheelPage() {
       </header>
 
       <div ref={captureRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
-        <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-            🎡 <span className="text-gradient">{mode==="prize"?(lang==="ENG"?"Spin & Win":"Putar & Menang"):(lang==="ENG"?"Random Picker":"Pilih Acak")}</span>
+        <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="text-center mb-8 relative">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A78BFA]/10 border border-[#A78BFA]/30 text-[#A78BFA] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
+            RND_SEED_PROTOCOL
+          </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 uppercase font-mono">
+            <span className="text-2xl filter hue-rotate-[180deg] inline-block -translate-y-1">🎡</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#7C3AED]">{mode==="prize"?(lang==="ENG"?"Spin & Win":"Putar & Menang"):(lang==="ENG"?"Random Picker":"Pilih Acak")}</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-400 font-mono text-sm">
             {mode==="prize"
-              ?(lang==="ENG"?"Customize prizes and spin!":"Atur hadiah dan putar!")
-              :(lang==="ENG"?"Add names, pick a prize, spin to choose!":"Masukkan nama, pilih hadiah, putar untuk memilih!")}
+              ?(lang==="ENG"?"Customize parameters and execute cryptographic spin.":"Atur parameter dan eksekusi putaran kriptografik.")
+              :(lang==="ENG"?"Input nodes, select reward, execute spin sequence.":"Masukkan node, pilih hadiah, eksekusi sekuens putaran.")}
           </p>
         </motion.div>
 

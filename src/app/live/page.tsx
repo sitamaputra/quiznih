@@ -195,29 +195,36 @@ function LiveReportContent() {
   if (!isWatching) {
     return (
       <main className="min-h-screen w-full text-black dark:text-white flex flex-col relative">
-        <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-          <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+        {/* Cyberpunk AI Background */}
+        <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+          <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+          <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
         </div>
 
         <TopBar backHref="/dashboard" />
 
         <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 space-y-3">
-            <h1 className="text-4xl md:text-5xl font-extrabold">
-              📺 <span className="text-gradient">{lang === "ENG" ? "Live Report" : "Laporan Live"}</span>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 space-y-3 relative">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
+              TELEMETRY_LINK
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold uppercase font-mono">
+              <span className="text-2xl filter sepia hue-rotate-[90deg] saturate-200 inline-block -translate-y-1">📺</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Live Report" : "Laporan Live"}</span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+            <p className="text-gray-400 max-w-md mx-auto font-mono text-sm">
               {lang === "ENG"
-                ? "Watch quiz players live, place bets, and set prize variations!"
-                : "Tonton pemain kuis secara live, pasang taruhan, dan atur variasi hadiah!"}
+                ? "Monitor neural-quiz activity, place predictions, and inject prize variations."
+                : "Monitor aktivitas kuis-neural, pasang prediksi, dan injeksi variasi hadiah."}
             </p>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="glass rounded-[2.5rem] border border-[#35D07F]/30 p-10 max-w-md w-full space-y-6"
+            className="bg-black/60 backdrop-blur-xl rounded-[2.5rem] border border-[#35D07F]/30 shadow-[0_0_30px_rgba(53,208,127,0.15)] p-10 max-w-md w-full space-y-6 relative overflow-hidden"
           >
-            <div className="space-y-3">
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] animate-[shimmer_3s_infinite]" />
+            <div className="relative z-10 space-y-3">
               <label className="block text-sm font-bold text-gray-500">
                 {lang === "ENG" ? "Enter Room Code" : "Masukkan Kode Ruangan"}
               </label>
@@ -293,9 +300,11 @@ function LiveReportContent() {
   // ====== LIVE REPORT VIEW ======
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       <TopBar />

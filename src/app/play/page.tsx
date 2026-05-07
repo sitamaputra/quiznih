@@ -444,10 +444,12 @@ export default function PlayPage() {
   if (isJoined) {
     return (
       <main className="min-h-screen w-full text-black dark:text-white flex flex-col relative overflow-hidden">
-        <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
-          <div className="absolute bottom-[15%] right-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[120px] rounded-full" />
-        </div>
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#FCFF5210_1px,transparent_1px),linear-gradient(to_bottom,#FCFF5210_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[15%] right-[10%] w-[300px] h-[300px] bg-[#35D07F]/20 blur-[120px] rounded-full mix-blend-screen" />
+      </div>
 
         {/* Floating Emojis */}
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -779,10 +781,11 @@ export default function PlayPage() {
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
-      {/* Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/15 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#FCFF5210_1px,transparent_1px),linear-gradient(to_bottom,#FCFF5210_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       <TopBar backHref="/dashboard" />
@@ -799,14 +802,18 @@ export default function PlayPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12 space-y-3"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FCFF52] animate-pulse" />
+            CLIENT_NODE
+          </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold uppercase font-mono">
             {lang === "ENG" ? "Join " : "Gabung "}
-            <span className="text-gradient">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FCFF52] to-[#35D07F]">{lang === "ENG" ? "Network" : "Jaringan"}</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+          <p className="text-gray-400 max-w-md mx-auto font-mono text-sm">
             {lang === "ENG"
-              ? "Scan the QR code or enter the room code to join a live quiz session."
-              : "Scan QR code atau masukkan kode ruangan untuk bergabung sesi kuis live."}
+              ? "Scan the QR code or enter the room code to establish connection."
+              : "Scan QR code atau masukkan kode ruangan untuk membuat koneksi."}
           </p>
         </motion.div>
 
@@ -819,19 +826,20 @@ export default function PlayPage() {
               transition={{ delay: 0.1 }}
               whileHover={{ scale: 1.03, y: -3 }}
               onClick={() => setJoinMode("qr")}
-              className="glass rounded-[2rem] p-8 border border-[#FCFF52]/30 hover:border-[#FCFF52]/60 transition-all text-left space-y-5 group"
+              className="bg-black/60 backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 hover:border-[#FCFF52]/60 hover:shadow-[0_0_30px_rgba(252,255,82,0.2)] transition-all text-left space-y-5 group relative overflow-hidden"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FCFF52] to-[#0EC97F] flex items-center justify-center shadow-[0_0_25px_rgba(20,241,149,0.25)] group-hover:shadow-[0_0_40px_rgba(20,241,149,0.4)] transition-shadow">
-                <QrCode className="w-8 h-8 text-black" />
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(252,255,82,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+              <div className="relative z-10 w-16 h-16 rounded-2xl bg-black border border-[#FCFF52] flex items-center justify-center shadow-[0_0_25px_rgba(252,255,82,0.25)] group-hover:shadow-[0_0_40px_rgba(252,255,82,0.4)] transition-shadow">
+                <QrCode className="w-8 h-8 text-[#FCFF52]" />
               </div>
-              <div>
-                <h3 className="text-xl font-extrabold mb-1">
-                  {lang === "ENG" ? "Scan QR Code" : "Scan QR Code"}
+              <div className="relative z-10">
+                <h3 className="text-xl font-extrabold mb-1 font-mono text-white">
+                  {lang === "ENG" ? "OPTICAL_SCAN" : "OPTICAL_SCAN"}
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-400 font-mono text-xs">
                   {lang === "ENG"
-                    ? "Scan the code shown by host"
-                    : "Scan kode yang ditampilkan host"}
+                    ? "Scan host's visual code"
+                    : "Scan kode visual host"}
                 </p>
               </div>
             </motion.button>
@@ -843,19 +851,20 @@ export default function PlayPage() {
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.03, y: -3 }}
               onClick={() => setJoinMode("code")}
-              className="glass rounded-[2rem] p-8 border border-[#35D07F]/30 hover:border-[#35D07F]/60 transition-all text-left space-y-5 group"
+              className="bg-black/60 backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 hover:border-[#35D07F]/60 hover:shadow-[0_0_30px_rgba(53,208,127,0.2)] transition-all text-left space-y-5 group relative overflow-hidden"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#35D07F] to-[#7B3FE4] flex items-center justify-center shadow-[0_0_25px_rgba(153,69,255,0.25)] group-hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-shadow">
-                <Keyboard className="w-8 h-8 text-white" />
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+              <div className="relative z-10 w-16 h-16 rounded-2xl bg-black border border-[#35D07F] flex items-center justify-center shadow-[0_0_25px_rgba(53,208,127,0.25)] group-hover:shadow-[0_0_40px_rgba(53,208,127,0.4)] transition-shadow">
+                <Keyboard className="w-8 h-8 text-[#35D07F]" />
               </div>
-              <div>
-                <h3 className="text-xl font-extrabold mb-1">
-                  {lang === "ENG" ? "Enter Code" : "Masukkan Kode"}
+              <div className="relative z-10">
+                <h3 className="text-xl font-extrabold mb-1 font-mono text-white">
+                  {lang === "ENG" ? "MANUAL_INPUT" : "MANUAL_INPUT"}
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-400 font-mono text-xs">
                   {lang === "ENG"
-                    ? "Type the room code manually"
-                    : "Ketik kode ruangan secara manual"}
+                    ? "Enter unique 6-digit hash"
+                    : "Masukkan hash 6-digit unik"}
                 </p>
               </div>
             </motion.button>
