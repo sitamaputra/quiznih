@@ -1,0 +1,11 @@
+src/components/BlinkShare.tsx
+src/components/Footer.tsx
+src/components/HeroSection.tsx
+src/components/HowItWorks.tsx
+src/components/Leaderboard.tsx
+src/components/Navbar.tsx
+src/components/Providers.tsx
+src/components/SolanaProvider.tsx
+src/components/UpcomingQuizzes.tsx
+src/components/WalletDropdown.tsx
+src/components/WalletModal.tsx

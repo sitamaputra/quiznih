@@ -4,7 +4,7 @@ import { useAccount, useConnect, useConnectors } from "wagmi";
 
 import { motion } from "framer-motion";
 import { 
-  ArrowLeft, Wallet2, Send, Copy, CheckCircle, Loader2, Users, Trophy, Trash2, ShieldX
+  ArrowLeft, Wallet2, Send, Copy, CheckCircle, Loader2, Users, Trophy, Trash2, ShieldX, Eye, MessageCircle, ExternalLink
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, use } from "react";
@@ -173,7 +173,15 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
               </button>
             </div>
           )}
-          <div className="px-4 py-2 rounded-full glass border border-[#35D07F]/30 text-sm font-mono font-bold">
+          <Link href={`/live?code=${quizData.room_code}`} target="_blank" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FCFF52]/10 text-[#FCFF52] hover:bg-[#FCFF52]/20 border border-[#FCFF52]/30 transition-all text-xs font-bold">
+            <Eye className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{lang === "ENG" ? "Live Report" : "Laporan Live"}</span>
+          </Link>
+          <Link href={`/qa?code=${quizData.room_code}&user=Host`} target="_blank" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#06B6D4]/10 text-[#06B6D4] hover:bg-[#06B6D4]/20 border border-[#06B6D4]/30 transition-all text-xs font-bold">
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Q&A</span>
+          </Link>
+          <div className="px-4 py-2 rounded-full glass border border-[#35D07F]/30 text-sm font-mono font-bold ml-2">
             {quizData.room_code}
           </div>
         </div>
@@ -382,19 +390,39 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             {/* Room Code Card */}
             <div className="glass rounded-[2rem] border border-white/5 p-8 flex flex-col items-center justify-center space-y-6">
               <h3 className="text-lg font-bold">🔑 {lang === "ENG" ? "Room Code" : "Kode Ruangan"}</h3>
-              <div className="px-8 py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-mono text-3xl font-extrabold tracking-widest">
+              <div className="px-8 py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-mono text-3xl font-extrabold tracking-widest relative group">
                 {quizData.room_code}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(quizData.room_code);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="absolute -top-3 -right-3 p-2 bg-[#35D07F] text-black rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Copy"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(quizData.room_code);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-                className="text-sm font-bold text-[#35D07F] hover:underline"
-              >
-                {copied ? (lang === "ENG" ? "Copied!" : "Tersalin!") : (lang === "ENG" ? "Copy Code" : "Salin Kode")}
-              </button>
+              {copied && <span className="text-xs text-[#35D07F] font-bold">Copied!</span>}
+              <div className="flex gap-4 w-full">
+                <Link
+                  href={`/live?code=${quizData.room_code}`}
+                  target="_blank"
+                  className="flex-1 flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] hover:bg-[#FCFF52]/20 transition-all text-sm font-bold"
+                >
+                  <Eye className="w-5 h-5" />
+                  {lang === "ENG" ? "Live Report" : "Laporan Live"}
+                </Link>
+                <Link
+                  href={`/qa?code=${quizData.room_code}&user=Host`}
+                  target="_blank"
+                  className="flex-1 flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-[#06B6D4]/10 border border-[#06B6D4]/30 text-[#06B6D4] hover:bg-[#06B6D4]/20 transition-all text-sm font-bold"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Live Q&A
+                </Link>
+              </div>
             </div>
           </div>
 

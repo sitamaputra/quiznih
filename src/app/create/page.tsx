@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import WalletDropdown from "@/components/WalletDropdown";
 import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+import TopBar from "@/components/TopBar";
 
 
 
@@ -35,10 +36,8 @@ export default function CreateQuizPage() {
     balance,
     isDepositing,
     isTestnet: isDevnet,
-    
     refetchBalance: fetchBalance,
     createQuizAndDeposit: depositRewardPool,
-    
     getExplorerTxUrl: getExplorer,
   } = useCeloQuiz();
 
@@ -66,23 +65,23 @@ export default function CreateQuizPage() {
   ]);
 
   const REWARD_TYPES = [
-    { value: "CELO", label: "CELO", icon: "â—Ž", desc: "Kripto CELOana" },
-    { value: "kaos", label: "Kaos", icon: "ðŸ‘•", desc: "Merchandise Kaos" },
-    { value: "tumbler", label: "Tumbler", icon: "â˜•", desc: "Tumbler / Botol Minum" },
-    { value: "sticker", label: "Sticker", icon: "ðŸŽ¨", desc: "Sticker Pack" },
-    { value: "nft", label: "NFT", icon: "ðŸ–¼ï¸", desc: "NFT Gift" },
-    { value: "lainnya", label: "Hadiah Lain", icon: "ðŸŽ", desc: "Tentukan sendiri" },
+    { value: "CELO", label: "CELO", icon: "◎", desc: "Crypto CELO" },
+    { value: "kaos", label: "Kaos", icon: "👕", desc: "Merchandise Kaos" },
+    { value: "tumbler", label: "Tumbler", icon: "☕", desc: "Tumbler / Botol Minum" },
+    { value: "sticker", label: "Sticker", icon: "🎨", desc: "Sticker Pack" },
+    { value: "nft", label: "NFT", icon: "🖼️", desc: "NFT Gift" },
+    { value: "lainnya", label: "Hadiah Lain", icon: "🎁", desc: "Tentukan sendiri" },
   ];
 
   const QUIZ_TEMPLATES = [
     {
-      label: lang === "ENG" ? "CELOana Basics" : "Dasar CELOana",
+      label: lang === "ENG" ? "Celo Basics" : "Dasar Celo",
       data: {
-        title: "CELOana Quiz", description: "Test your CELOana knowledge!",
+        title: "Celo Quiz", description: "Test your Celo knowledge!",
         questions: [
-          { id: 1, text: "Siapa pencipta CELOana?", options: ["Vitalik Buterin", "Anatoly Yakovenko", "Satoshi Nakamoto", "Charles Hoskinson"], correctIndex: 1, timeLimit: 20 },
-          { id: 2, text: "Berapa TPS maksimum CELOana?", options: ["1.000", "10.000", "65.000", "100.000"], correctIndex: 2, timeLimit: 20 },
-          { id: 3, text: "Apa mekanisme konsensus CELOana?", options: ["Proof of Work", "Proof of Stake", "Proof of History", "Proof of Authority"], correctIndex: 2, timeLimit: 20 },
+          { id: 1, text: "Siapa pencipta Celo?", options: ["Rene Reinsberg", "Marek Olszewski", "Satoshi Nakamoto", "Charles Hoskinson"], correctIndex: 0, timeLimit: 20 },
+          { id: 2, text: "Token native Celo adalah?", options: ["ETH", "SOL", "CELO", "BNB"], correctIndex: 2, timeLimit: 20 },
+          { id: 3, text: "Celo fokus pada?", options: ["Gaming", "Mobile-first DeFi", "NFT Marketplace", "Mining"], correctIndex: 1, timeLimit: 20 },
         ]
       }
     },
@@ -93,7 +92,7 @@ export default function CreateQuizPage() {
         questions: [
           { id: 1, text: "Kepanjangan dari NFT adalah?", options: ["Non-Fungible Token", "New Financial Transaction", "Network File Transfer", "None"], correctIndex: 0, timeLimit: 20 },
           { id: 2, text: "Apa itu DeFi?", options: ["Defense Finance", "Decentralized Finance", "Digital Framework", "Distributed Files"], correctIndex: 1, timeLimit: 20 },
-          { id: 3, text: "Smart Contract pertama kali diperkenalkan di?", options: ["Bitcoin", "CELOana", "Ethereum", "Polkadot"], correctIndex: 2, timeLimit: 20 },
+          { id: 3, text: "Smart Contract pertama kali diperkenalkan di?", options: ["Bitcoin", "Celo", "Ethereum", "Polkadot"], correctIndex: 2, timeLimit: 20 },
         ]
       }
     },
@@ -244,7 +243,22 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
   }, [quizId, isPublished]);
 
   const handlePublish = async () => {
-    if (!publicKey) return;
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured) {
+      alert(lang === "ENG" 
+        ? "Database not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel environment variables." 
+        : "Database belum dikonfigurasi. Silakan atur NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY di variabel lingkungan Vercel.");
+      return;
+    }
+
+    // Check wallet connection
+    if (!publicKey) {
+      alert(lang === "ENG" 
+        ? "Please connect your wallet first to publish a quiz." 
+        : "Silakan hubungkan wallet Anda terlebih dahulu untuk mempublikasikan kuis.");
+      return;
+    }
+
     setIsPublishing(true);
     setDepositError(null);
     
@@ -302,16 +316,16 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
       }
 
       // 4. On-chain CELO deposit (if reward type is CELO and amount > 0)
-      const CELOAmount = Number(rewardPool);
-      if (rewardType === "CELO" && CELOAmount > 0) {
-        const depositResult = await depositRewardPool(quizData.id, code, String(CELOAmount));
+      const celoAmount = Number(rewardPool);
+      if (rewardType === "CELO" && celoAmount > 0) {
+        const depositResult = await depositRewardPool(quizData.id, code, rewardPool);
         if (!depositResult.success) {
           setDepositError(depositResult.error || "Deposit failed");
           // Quiz is still created, just not funded on-chain
           // User can retry deposit later
         } else {
           setDepositTx(depositResult.txHash || null);
-          setEscrowAddress(null);
+          setEscrowAddress(depositResult.explorerUrl || null);
         }
       }
 
@@ -353,20 +367,36 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
 
   return (
     <main className="min-h-screen w-full text-black dark:text-white relative">
-      {/* Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+      {/* Cyberpunk AI Background */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
-      {/* Header */}
-      <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between relative z-50">
-        <Link href="/dashboard" className="flex items-center gap-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">{lang === "ENG" ? "Back" : "Kembali"}</span>
-        </Link>
-        {publicKey && <WalletDropdown />}
-      </header>
+      <TopBar backHref="/dashboard" />
+
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-2 flex justify-end relative z-50">
+        {publicKey ? (
+          <WalletDropdown />
+        ) : (
+          <button
+            onClick={() => {
+              if (connectors.length > 0) {
+                connect({ connector: connectors[0] });
+              } else {
+                alert(lang === "ENG" 
+                  ? "No wallet detected. Please install MetaMask or another Web3 wallet." 
+                  : "Wallet tidak terdeteksi. Silakan install MetaMask atau wallet Web3 lainnya.");
+              }
+            }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-bold text-sm hover:shadow-[0_0_20px_rgba(53,208,127,0.4)] transition-all"
+          >
+            <Wallet2 className="w-4 h-4" />
+            {lang === "ENG" ? "Connect Wallet" : "Hubungkan Wallet"}
+          </button>
+        )}
+      </div>
 
       {/* Supabase Connection Diagnostic */}
       {!isSupabaseConfigured && (
@@ -374,8 +404,8 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
           <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400">
             <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
-              <p className="font-bold mb-1">âš ï¸ Supabase Not Connected</p>
-              <p>Environment variables missing on Vercel. Add these in Vercel â†’ Settings â†’ Environment Variables:</p>
+              <p className="font-bold mb-1">⚠️ Supabase Not Connected</p>
+              <p>Environment variables missing on Vercel. Add these in Vercel → Settings → Environment Variables:</p>
               <code className="block mt-2 text-xs bg-black/30 p-2 rounded">
                 NEXT_PUBLIC_SUPABASE_URL = https://your-project.supabase.co<br/>
                 NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJ...your-anon-key
@@ -395,14 +425,18 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
         >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-                {lang === "ENG" ? "Create " : "Buat "}
-                <span className="text-gradient">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
+                Build Mode
+              </div>
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-2 font-mono uppercase">
+                {lang === "ENG" ? "Compile " : "Kompilasi "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
               </h1>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-400 font-mono text-sm">
                 {lang === "ENG"
-                  ? "Design your quiz, set rewards, and share with players."
-                  : "Rancang kuis, tentukan hadiah, dan bagikan ke pemain."}
+                  ? "Design assessment parameters and define CELO reward blocks."
+                  : "Rancang parameter asesmen dan tentukan blok hadiah CELO."}
               </p>
             </div>
             <button
@@ -423,7 +457,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
             className="glass rounded-[2rem] border border-[#35D07F]/30 p-8 mb-8 space-y-6"
           >
             <div className="flex justify-between items-center">
-              <h3 className="font-extrabold text-xl">ðŸ“¥ {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
+              <h3 className="font-extrabold text-xl">📥 {lang === "ENG" ? "Quick Import Quiz" : "Import Kuis Cepat"}</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -462,7 +496,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                         onClick={() => applyTemplate(tpl)}
                         className="px-4 py-2 rounded-xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 font-semibold text-xs hover:border-[#35D07F]/50 hover:text-[#35D07F] transition-all"
                       >
-                        ðŸš€ {tpl.label}
+                        🚀 {tpl.label}
                       </button>
                     ))}
                   </div>
@@ -478,7 +512,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   placeholder={'{ "title": "My Quiz", "questions": [{"text":"...","options":["A","B","C","D"],"correctIndex":0,"timeLimit":20}] }'}
                   className="flex-1 w-full p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#35D07F]/50 transition-all font-mono text-xs resize-none min-h-[200px]"
                 />
-                {importError && <p className="text-red-400 text-sm mt-2 font-semibold">âš ï¸ {importError}</p>}
+                {importError && <p className="text-red-400 text-sm mt-2 font-semibold">⚠️ {importError}</p>}
                 <button
                   onClick={handleImport}
                   disabled={!importJson.trim()}
@@ -561,7 +595,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       </div>
                     )}
                     <div className="px-4 py-3 rounded-xl bg-[#FCFF52]/10 text-sm font-semibold text-[#FCFF52]">
-                      â—Ž {rewardPool} CELO {lang === "ENG" ? "locked in escrow" : "terkunci di eskro"}
+                      ◎ {rewardPool} CELO {lang === "ENG" ? "locked in escrow" : "terkunci di eskro"}
                     </div>
                   </div>
                 ) : depositError ? (
@@ -575,10 +609,10 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       onClick={async () => {
                         if (!quizId) return;
                         setDepositError(null);
-                        const result = await depositRewardPool(quizId, roomCode, String(Number(rewardPool)));
+                        const result = await depositRewardPool(quizId, roomCode, rewardPool);
                         if (result.success) {
                           setDepositTx(result.txHash || null);
-                          setEscrowAddress(null);
+                          setEscrowAddress(result.explorerUrl || null);
                         } else {
                           setDepositError(result.error || "Retry failed");
                         }
@@ -609,7 +643,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               {/* QR Code Card */}
               <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 flex flex-col items-center space-y-6">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                  ðŸ“± {lang === "ENG" ? "Scan to Join" : "Scan untuk Gabung"}
+                  📱 {lang === "ENG" ? "Scan to Join" : "Scan untuk Gabung"}
                 </h3>
                 {/* QR Code Visual */}
                 <div className="bg-white p-5 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.2)]">
@@ -622,14 +656,14 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   }}
                   className="px-6 py-2.5 bg-[#FCFF52]/20 text-[#FCFF52] rounded-full font-bold border border-[#FCFF52]/50 hover:bg-[#FCFF52]/30 transition-all shadow-[0_0_15px_rgba(20,241,149,0.3)] w-full text-center mt-2"
                 >
-                  ðŸ”— {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
+                  🔗 {lang === "ENG" ? "Share Link" : "Bagikan Tautan"}
                 </button>
               </div>
 
               {/* Room Code Card */}
               <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 flex flex-col items-center justify-center space-y-6">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                  ðŸ”‘ {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
+                  🔑 {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
                 </h3>
                 <div className="px-10 py-5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-mono text-4xl md:text-5xl font-extrabold tracking-[0.3em] shadow-[0_0_40px_rgba(153,69,255,0.2)]">
                   {roomCode}
@@ -653,7 +687,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
             <div className="glass rounded-[2rem] border border-black/10 dark:border-white/10 p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold flex items-center gap-2">
-                  ðŸ‘¥ {lang === "ENG" ? "Waiting Room" : "Ruang Tunggu"}
+                  👥 {lang === "ENG" ? "Waiting Room" : "Ruang Tunggu"}
                 </h3>
                              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30">
                   <div className="w-2 h-2 rounded-full bg-[#FCFF52] animate-pulse" />
@@ -698,13 +732,13 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               {/* Quiz Summary */}
               <div className="flex flex-wrap gap-4 pt-4 border-t border-black/5 dark:border-white/5">
                 <div className="px-4 py-2 rounded-xl bg-[#35D07F]/10 text-sm font-semibold">
-                  ðŸ“ {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
+                  📝 {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-[#FCFF52]/10 text-sm font-semibold">
-                  ðŸ’° {rewardPool} CELO
+                  💰 {rewardPool} CELO
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-[#FDE047]/10 text-sm font-semibold">
-                  â± {questions.reduce((a, q) => a + (q.timeLimit || 0), 0)}s {lang === "ENG" ? "total" : "total"}
+                  ⏱ {questions.reduce((a, q) => a + (q.timeLimit || 0), 0)}s {lang === "ENG" ? "total" : "total"}
                 </div>
               </div>
             </div>
@@ -715,7 +749,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                 onClick={() => router.push(`/create/room/${quizId}`)}
                 className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-white dark:text-black font-extrabold text-lg flex items-center justify-center gap-3 transition-all"
               >
-                ðŸŽ® {lang === "ENG" ? "Go to Control Room" : "Ke Ruang Kontrol"}
+                🎮 {lang === "ENG" ? "Go to Control Room" : "Ke Ruang Kontrol"}
               </button>
               <Link
                 href="/manage"
@@ -736,7 +770,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               className="glass rounded-[2rem] p-8 border border-black/10 dark:border-white/10 space-y-6"
             >
               <h2 className="text-xl font-bold flex items-center gap-2">
-                ðŸ“ {lang === "ENG" ? "Quiz Information" : "Informasi Kuis"}
+                📋 {lang === "ENG" ? "Quiz Information" : "Informasi Kuis"}
               </h2>
 
               <div className="space-y-4">
@@ -750,7 +784,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       <div>
                         <p className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Your Balance" : "Saldo Anda"}</p>
                         <p className="text-lg font-black text-[#FCFF52]">
-                          {balance !== null ? `â—Ž ${Number(balance).toFixed(4)} CELO` : "Loading..."}
+                          {balance !== null ? `◎ ${parseFloat(balance).toFixed(4)} CELO` : "Loading..."}
                         </p>
                       </div>
                     </div>
@@ -775,7 +809,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder={lang === "ENG" ? "e.g. CELOana Ecosystem Mastery" : "contoh: Penguasaan Ekosistem CELOana"}
+                    placeholder={lang === "ENG" ? "e.g. Celo Ecosystem Mastery" : "contoh: Penguasaan Ekosistem Celo"}
                     className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#35D07F]/50 transition-all text-lg"
                   />
                 </div>
@@ -899,7 +933,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                             : "bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-[#FCFF52]/50"
                         }`}
                       >
-                        âœ“
+                        ✓
                       </button>
                     </div>
                   ))}
@@ -907,7 +941,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
 
                 <div className="flex items-center gap-4">
                   <label className="text-sm text-gray-500 font-semibold">
-                    â± {lang === "ENG" ? "Time limit:" : "Batas waktu:"}
+                    ⏱ {lang === "ENG" ? "Time limit:" : "Batas waktu:"}
                   </label>
                   <select
                     value={q.timeLimit}

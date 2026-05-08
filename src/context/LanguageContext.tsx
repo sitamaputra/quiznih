@@ -1,10 +1,20 @@
 "use client";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-type Lang = "ENG" | "ID";
+export type Lang = "ENG" | "ID" | "JP" | "CN" | "KR" | "FR";
+
+export const LANGUAGES: { code: Lang; label: string; flag: string }[] = [
+  { code: "ENG", label: "English", flag: "🇺🇸" },
+  { code: "ID", label: "Indonesia", flag: "🇮🇩" },
+  { code: "JP", label: "日本語", flag: "🇯🇵" },
+  { code: "CN", label: "中文", flag: "🇨🇳" },
+  { code: "KR", label: "한국어", flag: "🇰🇷" },
+  { code: "FR", label: "Français", flag: "🇫🇷" },
+];
 
 interface LanguageContextProps {
   lang: Lang;
+  setLang: (l: Lang) => void;
   toggleLang: () => void;
 }
 
@@ -14,11 +24,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>("ENG");
 
   const toggleLang = () => {
-    setLang((prev) => (prev === "ENG" ? "ID" : "ENG"));
+    const idx = LANGUAGES.findIndex(l => l.code === lang);
+    const next = LANGUAGES[(idx + 1) % LANGUAGES.length];
+    setLang(next.code);
   };
 
   return (
-    <LanguageContext.Provider value={{ lang, toggleLang }}>
+    <LanguageContext.Provider value={{ lang, setLang, toggleLang }}>
       {children}
     </LanguageContext.Provider>
   );
