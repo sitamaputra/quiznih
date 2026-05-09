@@ -164,70 +164,69 @@ function QAContent() {
   // ====== JOIN SCREEN ======
   if (!isJoined) {
     return (
-      <main className="min-h-screen w-full text-black dark:text-white flex flex-col relative">
-        {/* Cyberpunk AI Background */}
-        <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#06B6D410_1px,transparent_1px),linear-gradient(to_bottom,#06B6D410_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-          <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#06B6D4]/20 blur-[150px] rounded-full mix-blend-screen" />
-          <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+        <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: '10%', top: '20%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(6,182,212,0.06)', filter: 'blur(100px)' }} />
+          <div style={{ position: 'absolute', right: '10%', bottom: '10%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
         </div>
 
         <TopBar backHref="/dashboard" />
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12" style={{ position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 space-y-3 relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#06B6D4]/10 border border-[#06B6D4]/30 text-[#06B6D4] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] animate-pulse" />
-              COMMS_CHANNEL
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 16px', borderRadius: 100, background: 'rgba(6,182,212,0.10)', border: '1px solid rgba(6,182,212,0.3)', color: '#0891b2', fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#06B6D4', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+              {lang === "ENG" ? "Live Q&A Room" : "Ruang Tanya Jawab Live"}
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold font-mono uppercase">
-              <span className="text-2xl filter hue-rotate-[180deg] inline-block -translate-y-1">💬</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#06B6D4] to-[#FCFF52]">{lang === "ENG" ? "Live Q&A" : "Tanya Jawab"}</span>
+            <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#0a1a0f', margin: '0 0 12px' }}>
+              💬 <span style={{ background: 'linear-gradient(90deg, #06B6D4, #35D07F)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{lang === "ENG" ? "Live Q&A" : "Tanya Jawab"}</span>
             </h1>
-            <p className="text-gray-400 max-w-md mx-auto font-mono text-sm">
+            <p style={{ fontSize: 16, color: '#4a6357', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>
               {lang === "ENG"
-                ? "Establish encrypted query transmission. Anonymization available."
-                : "Buat transmisi kueri terenkripsi. Anonimisasi tersedia."}
+                ? "Create an interactive Q&A space. Ask, vote, and discuss anonymously!"
+                : "Buat ruang Q&A interaktif. Ajukan pertanyaan, voting, dan diskusi anonim!"}
             </p>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="bg-black/60 backdrop-blur-xl rounded-[2.5rem] border border-[#06B6D4]/30 shadow-[0_0_30px_rgba(6,182,212,0.15)] p-10 max-w-md w-full space-y-6 relative overflow-hidden"
+            style={{ background: '#ffffff', border: '1.5px solid rgba(6,182,212,0.2)', boxShadow: '0 4px 24px rgba(6,182,212,0.10)', borderRadius: 24, padding: 40, maxWidth: 480, width: '100%', position: 'relative', overflow: 'hidden' }}
           >
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] animate-[shimmer_3s_infinite]" />
-            <div className="relative z-10 space-y-3">
-              <label className="block text-sm font-bold text-gray-500">
-                {lang === "ENG" ? "Your Name" : "Nama Kamu"}
-              </label>
-              <input
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                placeholder={lang === "ENG" ? "Enter your name" : "Masukkan nama"}
-                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-lg font-semibold placeholder-gray-600 focus:outline-none focus:border-[#06B6D4]/50 transition-all"
-              />
+            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4a6357', marginBottom: 8 }}>
+                  {lang === "ENG" ? "Your Name" : "Nama Kamu"}
+                </label>
+                <input
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  placeholder={lang === "ENG" ? "Enter your name" : "Masukkan nama"}
+                  style={{ width: '100%', padding: '14px 20px', borderRadius: 14, border: '1.5px solid rgba(6,182,212,0.2)', fontSize: 16, fontWeight: 600, color: '#0a1a0f', background: '#f0faff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4a6357', marginBottom: 8 }}>
+                  {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
+                </label>
+                <input
+                  value={roomCode}
+                  onChange={e => setRoomCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. QNA123"
+                  style={{ width: '100%', padding: '14px 20px', borderRadius: 14, border: '1.5px solid rgba(6,182,212,0.2)', textAlign: 'center', fontSize: 22, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', color: '#0a1a0f', background: '#f0faff', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <button onClick={handleJoin} disabled={!roomCode.trim() || !username.trim()}
+                style={{ width: '100%', padding: '16px 0', borderRadius: 14, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #0891b2, #06B6D4)', color: '#fff', fontWeight: 800, fontSize: 17, fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(6,182,212,0.25)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: !roomCode.trim()||!username.trim()?0.4:1 }}
+              >
+                <MessageCircle style={{ width: 20, height: 20 }} />
+                {lang === "ENG" ? "Join Room" : "Masuk Ruangan"}
+              </button>
+
+              <p style={{ textAlign: 'center', fontSize: 12, color: '#4a6357' }}>
+                {lang === "ENG" ? "Create any room code and share it" : "Buat kode ruangan lalu bagikan"}
+              </p>
             </div>
-
-            <div className="space-y-3">
-              <label className="block text-sm font-bold text-gray-500">
-                {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
-              </label>
-              <input
-                value={roomCode}
-                onChange={e => setRoomCode(e.target.value.toUpperCase())}
-                placeholder="e.g. QNA123"
-                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-center text-2xl font-mono font-bold tracking-widest placeholder-gray-600 focus:outline-none focus:border-[#06B6D4]/50 transition-all"
-              />
-            </div>
-
-            <button onClick={handleJoin} disabled={!roomCode.trim() || !username.trim()}
-              className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#06B6D4] to-[#35D07F] text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all disabled:opacity-40 flex items-center justify-center gap-3"
-            >
-              <MessageCircle className="w-6 h-6" />
-              {lang === "ENG" ? "Join Room" : "Masuk Ruangan"}
-            </button>
-
-            <p className="text-center text-xs text-gray-600">
-              {lang === "ENG" ? "Create any room code and share it" : "Buat kode ruangan lalu bagikan"}
-            </p>
           </motion.div>
         </div>
       </main>
@@ -236,12 +235,10 @@ function QAContent() {
 
   // ====== Q&A ROOM VIEW ======
   return (
-    <main className="min-h-screen w-full text-black dark:text-white relative">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#06B6D410_1px,transparent_1px),linear-gradient(to_bottom,#06B6D410_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#06B6D4]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', left: '5%', top: '15%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(6,182,212,0.06)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', right: '5%', bottom: '10%', width: 350, height: 350, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
       </div>
 
       <TopBar />

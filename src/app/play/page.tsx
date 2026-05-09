@@ -443,12 +443,10 @@ export default function PlayPage() {
 
   if (isJoined) {
     return (
-      <main className="min-h-screen w-full text-black dark:text-white flex flex-col relative overflow-hidden">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#FCFF5210_1px,transparent_1px),linear-gradient(to_bottom,#FCFF5210_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[15%] right-[10%] w-[300px] h-[300px] bg-[#35D07F]/20 blur-[120px] rounded-full mix-blend-screen" />
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', left: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', right: '10%', bottom: '15%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
       </div>
 
         {/* Floating Emojis */}
@@ -780,12 +778,10 @@ export default function PlayPage() {
   }
 
   return (
-    <main className="min-h-screen w-full text-black dark:text-white flex flex-col">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#FCFF5210_1px,transparent_1px),linear-gradient(to_bottom,#FCFF5210_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
+    <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', right: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', left: '10%', bottom: '20%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
       </div>
 
       <TopBar backHref="/dashboard" />

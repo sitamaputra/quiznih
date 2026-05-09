@@ -174,17 +174,16 @@ export default function SpinWheelPage() {
   const transStyle = isSpinning ? `transform ${actualDuration}s cubic-bezier(0.17,0.67,0.12,0.99)` : "none";
 
   return (
-    <main className="min-h-screen w-full text-black dark:text-white relative">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#A78BFA10_1px,transparent_1px),linear-gradient(to_bottom,#A78BFA10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#A78BFA]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#7C3AED]/20 blur-[150px] rounded-full mix-blend-screen" />
+    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+      {/* Soft glow orbs */}
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', left: '10%', top: '15%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(167,139,250,0.08)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', right: '5%', bottom: '10%', width: 350, height: 350, borderRadius: '50%', background: 'rgba(252,255,82,0.10)', filter: 'blur(100px)' }} />
       </div>
 
       <TopBar backHref="/dashboard" />
 
-      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-end gap-2 flex-wrap">
+      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-end gap-2 flex-wrap" style={{ position: 'relative', zIndex: 1 }}>
           {/* Capture Controls */}
           <button onClick={() => captureRef.current && takeScreenshot(captureRef.current, "spin_wheel")}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 dark:bg-white/5 border border-white/10 text-gray-400 hover:text-[#FCFF52] hover:border-[#FCFF52]/40 transition-all text-xs font-bold"
@@ -211,31 +210,31 @@ export default function SpinWheelPage() {
             </button>
           )}
           {/* Mode Toggle */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 dark:bg-white/5 border border-white/10">
+          <div className="flex items-center gap-1 p-1 rounded-xl border" style={{ background: 'rgba(0,0,0,0.05)', borderColor: 'rgba(53,208,127,0.2)' }}>
             <button onClick={()=>switchMode("prize")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="prize"?"bg-[#35D07F] text-white shadow-md":"text-gray-400 hover:text-white"}`}>
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="prize"?"bg-[#35D07F] text-white shadow-md":"text-[#4a6357] hover:text-[#1a9f5e]"}`}>
               <Gift className="w-4 h-4"/> {lang==="ENG"?"Prizes":"Hadiah"}
             </button>
             <button onClick={()=>switchMode("name")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="name"?"bg-[#FCFF52] text-black shadow-md":"text-gray-400 hover:text-white"}`}>
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${mode==="name"?"bg-[#FCFF52] text-black shadow-md":"text-[#4a6357] hover:text-[#7a6e00]"}`}>
               <Users className="w-4 h-4"/> {lang==="ENG"?"Names":"Nama"}
             </button>
           </div>
       </header>
 
-      <div ref={captureRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+      <div ref={captureRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24" style={{ position: 'relative', zIndex: 1 }}>
         <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="text-center mb-8 relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A78BFA]/10 border border-[#A78BFA]/30 text-[#A78BFA] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
-            RND_SEED_PROTOCOL
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(167,139,250,0.10)', border: '1px solid rgba(167,139,250,0.3)', color: '#7c3aed', fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#a78bfa', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+            {mode==="prize" ? (lang==="ENG" ? "Spin & Win" : "Putar & Menang") : (lang==="ENG" ? "Random Picker" : "Pilih Acak")}
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 uppercase font-mono">
-            <span className="text-2xl filter hue-rotate-[180deg] inline-block -translate-y-1">🎡</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#7C3AED]">{mode==="prize"?(lang==="ENG"?"Spin & Win":"Putar & Menang"):(lang==="ENG"?"Random Picker":"Pilih Acak")}</span>
+          <h1 style={{ fontSize: 'clamp(28px,4vw,44px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#0a1a0f', margin: '0 0 10px' }}>
+            🎡 <span style={{ background: 'linear-gradient(90deg,#7c3aed,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{mode==="prize"?(lang==="ENG"?"Spin Wheel":"Roda Putar"):(lang==="ENG"?"Random Picker":"Pilih Acak")}</span>
           </h1>
-          <p className="text-gray-400 font-mono text-sm">
+          <p style={{ fontSize: 15, color: '#4a6357', lineHeight: 1.6 }}>
             {mode==="prize"
-              ?(lang==="ENG"?"Customize parameters and execute cryptographic spin.":"Atur parameter dan eksekusi putaran kriptografik.")
-              :(lang==="ENG"?"Input nodes, select reward, execute spin sequence.":"Masukkan node, pilih hadiah, eksekusi sekuens putaran.")}
+              ?(lang==="ENG"?"Customize prizes and spin the wheel for a fair winner!":"Atur hadiah dan putar roda untuk pemenang yang adil!")
+              :(lang==="ENG"?"Add participant names, select a prize, and spin to pick a winner!":"Tambahkan nama peserta, pilih hadiah, dan putar untuk pilih pemenang!")}
           </p>
         </motion.div>
 
@@ -243,18 +242,18 @@ export default function SpinWheelPage() {
           {/* LEFT PANEL */}
           <div className="lg:col-span-2 space-y-5">
             {/* Duration Selector */}
-            <div className="glass rounded-[2rem] border border-white/10 p-5 space-y-3">
-              <h3 className="font-bold text-sm text-gray-500 flex items-center gap-2"><Clock className="w-4 h-4"/> {lang==="ENG"?"Spin Duration":"Durasi Spin"}</h3>
+            <div style={{ background: '#ffffff', border: '1.5px solid rgba(53,208,127,0.18)', borderRadius: 20, padding: 20, boxShadow: '0 2px 12px rgba(53,208,127,0.06)' }}>
+              <h3 style={{ fontWeight: 700, fontSize: 14, color: '#4a6357', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}><Clock className="w-4 h-4"/> {lang==="ENG"?"Spin Duration":"Durasi Spin"}</h3>
               <div className="flex gap-2">
                 {DURATIONS.map(d=>(
                   <button key={d.val} onClick={()=>{setDuration(d.val);setCustomDur("");}}
-                    className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${duration===d.val&&!customDur?"bg-[#35D07F] text-white":"bg-white/5 border border-white/10 text-gray-400 hover:border-[#35D07F]/50"}`}>
+                    style={{ flex: 1, padding: '8px 0', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', border: 'none', background: duration===d.val&&!customDur?'#35D07F':'rgba(53,208,127,0.08)', color: duration===d.val&&!customDur?'#fff':'#1a9f5e', transition: 'all 0.2s', fontFamily: 'inherit' }}>
                     {d.label}
                   </button>
                 ))}
                 <input value={customDur} onChange={e=>{setCustomDur(e.target.value);const v=parseInt(e.target.value);if(v>0&&v<=60)setDuration(v);}}
                   placeholder="Custom" type="number" min="1" max="60"
-                  className="w-20 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-center font-mono placeholder-gray-600 focus:outline-none focus:border-[#35D07F]/50"/>
+                  style={{ width: 80, padding: '8px 12px', borderRadius: 12, border: '1.5px solid rgba(53,208,127,0.2)', fontSize: 14, textAlign: 'center', fontFamily: 'monospace', color: '#0a1a0f', background: '#fff', outline: 'none' }}/>
               </div>
             </div>
 
@@ -295,27 +294,27 @@ export default function SpinWheelPage() {
             )}
 
             {/* Item List */}
-            <div className="glass rounded-[2rem] border border-white/10 p-5 space-y-3">
-              <h3 className="font-bold flex items-center gap-2">
-                {mode==="prize"?<Gift className="w-5 h-5 text-[#FCFF52]"/>:<Users className="w-5 h-5 text-[#35D07F]"/>}
+            <div style={{ background: '#ffffff', border: '1.5px solid rgba(53,208,127,0.18)', borderRadius: 20, padding: 20, boxShadow: '0 2px 12px rgba(53,208,127,0.06)' }}>
+              <h3 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, color: '#0a1a0f' }}>
+                {mode==="prize"?<Gift className="w-5 h-5" style={{color:'#7a6e00'}}/>:<Users className="w-5 h-5" style={{color:'#1a9f5e'}}/>}
                 {mode==="prize"?(lang==="ENG"?"Prizes":"Hadiah"):(lang==="ENG"?"Names":"Daftar Nama")} ({items.length})
               </h3>
               <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
                 {items.map(item=>(
-                  <div key={item.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 border border-white/5">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm" style={{background:item.color+"30"}}>{item.emoji}</div>
-                    <span className="flex-1 font-semibold text-sm truncate">{item.label}</span>
-                    <button onClick={()=>removeItem(item.id)} disabled={items.length<=2} className="p-1 rounded-lg hover:bg-red-500/20 text-gray-500 hover:text-red-400 transition-all disabled:opacity-20">
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 12, background: 'rgba(53,208,127,0.05)', border: '1px solid rgba(53,208,127,0.12)' }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, background: item.color+'25' }}>{item.emoji}</div>
+                    <span style={{ flex: 1, fontWeight: 600, fontSize: 14, color: '#0a1a0f' }}>{item.label}</span>
+                    <button onClick={()=>removeItem(item.id)} disabled={items.length<=2} style={{ padding: 4, borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', opacity: items.length<=2?0.2:1 }}>
                       <Trash2 className="w-3.5 h-3.5"/>
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="flex gap-2 pt-2 border-t border-white/5">
+              <div style={{ display: 'flex', gap: 8, paddingTop: 12, marginTop: 12, borderTop: '1px solid rgba(53,208,127,0.12)' }}>
                 <input value={newEntry} onChange={e=>setNewEntry(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addEntry()}
                   placeholder={mode==="prize"?(lang==="ENG"?"Add prize...":"Tambah hadiah..."):(lang==="ENG"?"Add name...":"Tambah nama...")}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm placeholder-gray-500 focus:outline-none focus:border-[#35D07F]/50"/>
-                <button onClick={addEntry} className="px-4 py-2 rounded-xl bg-[#35D07F]/20 text-[#35D07F] font-bold text-sm hover:bg-[#35D07F]/30 transition-all">
+                  style={{ flex: 1, padding: '8px 14px', borderRadius: 12, border: '1.5px solid rgba(53,208,127,0.2)', fontSize: 14, color: '#0a1a0f', background: '#fff', outline: 'none', fontFamily: 'inherit' }}/>
+                <button onClick={addEntry} style={{ padding: '8px 14px', borderRadius: 12, background: 'rgba(53,208,127,0.12)', border: 'none', color: '#1a9f5e', cursor: 'pointer' }}>
                   <Plus className="w-4 h-4"/>
                 </button>
               </div>
@@ -323,19 +322,19 @@ export default function SpinWheelPage() {
 
             {/* History */}
             {history.length>0&&(
-              <div className="glass rounded-[2rem] border border-white/10 p-5 space-y-3">
-                <h3 className="font-bold text-sm text-gray-500 flex items-center gap-2"><Trophy className="w-4 h-4"/> {lang==="ENG"?"History":"Riwayat"}</h3>
+              <div style={{ background: '#ffffff', border: '1.5px solid rgba(53,208,127,0.15)', borderRadius: 20, padding: 20, boxShadow: '0 2px 12px rgba(53,208,127,0.05)' }}>
+                <h3 style={{ fontWeight: 700, fontSize: 14, color: '#4a6357', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}><Trophy className="w-4 h-4"/> {lang==="ENG"?"History":"Riwayat"}</h3>
                 <div className="space-y-1">
                   {history.map((h,i)=>(
-                    <div key={i} className="flex items-center gap-2 text-sm py-1">
-                      <span className="text-gray-500 text-xs w-5">#{i+1}</span>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, padding: '4px 0' }}>
+                      <span style={{ color: '#4a6357', fontSize: 12, width: 20 }}>#{i+1}</span>
                       <span>{h.item.emoji}</span>
-                      <span className="font-semibold flex-1">{h.item.label}</span>
-                      {h.prize&&<span className="text-xs text-[#FCFF52] font-bold px-2 py-0.5 rounded-full bg-[#FCFF52]/10">🎁 {h.prize}</span>}
+                      <span style={{ fontWeight: 600, flex: 1, color: '#0a1a0f' }}>{h.item.label}</span>
+                      {h.prize&&<span style={{ fontSize: 11, color: '#7a6e00', fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: 'rgba(252,255,82,0.15)' }}>🎁 {h.prize}</span>}
                     </div>
                   ))}
                 </div>
-                <button onClick={()=>setHistory([])} className="text-xs text-gray-600 hover:text-red-400 transition-colors">
+                <button onClick={()=>setHistory([])} style={{ fontSize: 12, color: '#4a6357', background: 'none', border: 'none', cursor: 'pointer', marginTop: 8 }}>
                   {lang==="ENG"?"Clear History":"Hapus Riwayat"}
                 </button>
               </div>

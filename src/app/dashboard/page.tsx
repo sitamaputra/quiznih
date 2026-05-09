@@ -2,13 +2,14 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 import { motion } from "framer-motion";
-import { PlusCircle, Gamepad2, Wallet2, ArrowLeft, Crown, Users, LayoutDashboard, LogOut, MessageCircle } from "lucide-react";
+import { PlusCircle, Gamepad2, Crown, Users, LayoutDashboard, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import WalletDropdown from "@/components/WalletDropdown";
 import { isMiniPayEnvironment } from "@/lib/celo";
 import TopBar from "@/components/TopBar";
+import Image from "next/image";
 
 export default function DashboardPage() {
   const { lang } = useLanguage();
@@ -19,7 +20,6 @@ export default function DashboardPage() {
   const isMiniPay = isMiniPayEnvironment();
 
   useEffect(() => {
-    // Auto-connect in MiniPay, or prompt connect on desktop
     if (!isConnected && connectors.length > 0) {
       if (isMiniPay) {
         connect({ connector: connectors[0] });
@@ -27,246 +27,424 @@ export default function DashboardPage() {
     }
   }, [isConnected, connectors, connect, isMiniPay]);
 
-  const walletAddress = address || "";
-  const shortAddress = walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-    : "";
-
   const handleNavigate = (path: string) => {
     router.push(path);
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center text-black dark:text-white relative overflow-hidden">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[600px] h-[300px] bg-[#06B6D4]/10 blur-[120px] rounded-full mix-blend-screen" />
+    <main
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        background: "linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)",
+        position: "relative",
+        overflowX: "hidden",
+      }}
+    >
+      {/* Soft glow orbs */}
+      <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <div style={{
+          position: "absolute", left: "10%", top: "20%",
+          width: 500, height: 500, borderRadius: "50%",
+          background: "rgba(53,208,127,0.08)", filter: "blur(100px)",
+        }} />
+        <div style={{
+          position: "absolute", right: "5%", bottom: "10%",
+          width: 400, height: 400, borderRadius: "50%",
+          background: "rgba(252,255,82,0.12)", filter: "blur(100px)",
+        }} />
       </div>
 
       <TopBar backHref="/" />
 
-      {/* Wallet Row */}
-      {isConnected && (
-        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-2 flex justify-end relative z-40">
-          <WalletDropdown />
-        </div>
-      )}
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 w-full max-w-5xl -mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 space-y-4 relative"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] text-xs font-mono font-bold uppercase tracking-widest mb-4">
-            <span className="w-2 h-2 rounded-full bg-[#FCFF52] animate-pulse" />
-            AI-Powered Nexus
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {/* Wallet Row */}
+        {isConnected && (
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "68px 24px 0", display: "flex", justifyContent: "flex-end" }}>
+            <WalletDropdown />
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight uppercase font-mono">
-            {lang === "ENG" ? "System " : "Sistem "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] via-[#FCFF52] to-[#06B6D4] animate-pulse">
-              {lang === "ENG" ? "Initialized" : "Diinisialisasi"}
-            </span>
-          </h1>
-          <p className="text-gray-400 text-lg max-w-lg mx-auto font-mono text-sm">
-            {lang === "ENG"
-              ? "Select operational parameter. Host a neural-quiz or interface as a player."
-              : "Pilih parameter operasional. Buat kuis-neural atau masuk sebagai pemain."}
-          </p>
-        </motion.div>
+        )}
 
-        {/* Main 2-col: Creator + Player */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl mb-8">
-          {/* Creator Card */}
+        {/* Hero Header */}
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: isConnected ? "24px 24px 0" : "80px 24px 0", textAlign: "center" }}>
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleNavigate("/create")}
-            className="cursor-pointer group relative bg-black/60 backdrop-blur-xl rounded-[2.5rem] p-10 border-2 border-[#35D07F]/40 hover:border-[#35D07F] hover:shadow-[0_0_40px_rgba(53,208,127,0.3)] transition-all duration-500 overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#35D07F]/20 blur-[60px] rounded-full group-hover:bg-[#35D07F]/40 transition-all duration-500" />
+            {/* Live badge */}
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "7px 16px", borderRadius: 100,
+              background: "rgba(53,208,127,0.10)",
+              border: "1px solid rgba(53,208,127,0.3)",
+              fontSize: 13, color: "#1a9f5e", fontWeight: 600,
+              marginBottom: 24,
+            }}>
+              <span style={{
+                width: 8, height: 8, borderRadius: "50%",
+                background: "#35D07F", display: "inline-block",
+                animation: "pulse-dot 2s ease-in-out infinite",
+              }} />
+              {lang === "ENG" ? "Your Command Center" : "Pusat Komando Anda"}
+            </div>
 
-            <div className="relative z-10 space-y-6">
-              <div className="w-20 h-20 rounded-2xl bg-black border border-[#35D07F] flex items-center justify-center shadow-[0_0_30px_rgba(53,208,127,0.3)] group-hover:shadow-[0_0_50px_rgba(53,208,127,0.5)] transition-shadow">
-                <Crown className="w-10 h-10 text-[#35D07F]" />
-              </div>
+            <h1 style={{
+              fontSize: "clamp(36px, 5.5vw, 60px)",
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.1,
+              margin: "0 0 16px",
+              color: "#0a1a0f",
+            }}>
+              {lang === "ENG" ? "What would you like" : "Apa yang ingin"}
+              <br />
+              <span style={{
+                background: "linear-gradient(90deg, #35D07F, #1a9f5e)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}>
+                {lang === "ENG" ? "to do today?" : "kamu lakukan hari ini?"}
+              </span>
+            </h1>
 
-              <div>
-                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white tracking-tight">
-                  {lang === "ENG" ? "Create Quiz" : "Buat Kuis"} <span className="text-[#35D07F] text-sm align-top">[HOST]</span>
+            <p style={{
+              fontSize: 17, color: "#4a6357",
+              maxWidth: 480, margin: "0 auto 52px",
+              lineHeight: 1.6,
+            }}>
+              {lang === "ENG"
+                ? "Host quizzes, join games, spin the wheel — all on Celo blockchain."
+                : "Buat kuis, ikut game, putar roda — semuanya di blockchain Celo."}
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Main Cards Grid */}
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 40px" }}>
+
+          {/* Top row: Creator + Player */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 20,
+            marginBottom: 20,
+          }}>
+            {/* Create Quiz Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              onClick={() => handleNavigate("/create")}
+              style={{
+                position: "relative", overflow: "hidden",
+                background: "#ffffff",
+                border: "1.5px solid rgba(53,208,127,0.2)",
+                boxShadow: "0 3px 20px rgba(53,208,127,0.09)",
+                borderRadius: 24, padding: 36,
+                cursor: "pointer", transition: "all 0.3s",
+              }}
+              whileHover={{
+                y: -5,
+                boxShadow: "0 12px 40px rgba(53,208,127,0.18)",
+                borderColor: "rgba(53,208,127,0.5)",
+              }}
+            >
+              {/* Accent bar */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                background: "linear-gradient(90deg, #35D07F, #FCFF52)",
+                borderRadius: "24px 24px 0 0",
+              }} />
+              {/* Green glow */}
+              <div style={{
+                position: "absolute", top: -40, right: -40,
+                width: 160, height: 160, borderRadius: "50%",
+                background: "rgba(53,208,127,0.08)", filter: "blur(40px)",
+                pointerEvents: "none",
+              }} />
+
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 16,
+                  background: "rgba(53,208,127,0.12)",
+                  border: "1px solid rgba(53,208,127,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 20,
+                }}>
+                  <Crown style={{ width: 26, height: 26, color: "#1a9f5e" }} />
+                </div>
+
+                <div style={{
+                  display: "inline-block", padding: "3px 10px",
+                  borderRadius: 6, background: "rgba(53,208,127,0.10)",
+                  color: "#1a9f5e", fontSize: 11, fontWeight: 700,
+                  letterSpacing: "0.05em", marginBottom: 10,
+                }}>HOST</div>
+
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: "#0a1a0f", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+                  {lang === "ENG" ? "Create Quiz" : "Buat Kuis"}
                 </h2>
-                <p className="text-gray-400 leading-relaxed text-sm">
+                <p style={{ fontSize: 14, color: "#4a6357", lineHeight: 1.6, margin: "0 0 24px" }}>
                   {lang === "ENG"
                     ? "Build an interactive quiz room, set CELO rewards, and challenge your friends!"
                     : "Bikin ruang kuis interaktif, atur hadiah CELO, dan tantang teman-temanmu!"}
                 </p>
-              </div>
 
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2 text-[#35D07F] font-bold group-hover:gap-3 transition-all">
-                  <PlusCircle className="w-5 h-5" />
-                  <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Start Creating" : "Mulai Buat"}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#1a9f5e", fontWeight: 700 }}>
+                    <PlusCircle style={{ width: 18, height: 18 }} />
+                    <span style={{ fontSize: 14 }}>{lang === "ENG" ? "Start Creating →" : "Mulai Buat →"}</span>
+                  </div>
+                  <Link
+                    href="/manage"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      color: "#4a6357", textDecoration: "none", fontSize: 13, fontWeight: 500,
+                      transition: "color 0.2s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#1a9f5e")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#4a6357")}
+                  >
+                    <LayoutDashboard style={{ width: 15, height: 15 }} />
+                    <span>{lang === "ENG" ? "Manage Quizzes" : "Kelola Kuis"}</span>
+                  </Link>
                 </div>
-                <Link 
-                  href="/manage"
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center gap-2 text-gray-500 hover:text-[#35D07F] text-xs font-mono uppercase transition-all"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>{lang === "ENG" ? "Manage Quizzes" : "Kelola Kuis"}</span>
-                </Link>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Player Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleNavigate("/play")}
-            className="cursor-pointer group relative bg-black/60 backdrop-blur-xl rounded-[2.5rem] p-10 border-2 border-[#FCFF52]/40 hover:border-[#FCFF52] hover:shadow-[0_0_40px_rgba(252,255,82,0.2)] transition-all duration-500 overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(252,255,82,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#FCFF52]/20 blur-[60px] rounded-full group-hover:bg-[#FCFF52]/40 transition-all duration-500" />
+            {/* Join Game Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              onClick={() => handleNavigate("/play")}
+              style={{
+                position: "relative", overflow: "hidden",
+                background: "#ffffff",
+                border: "1.5px solid rgba(252,255,82,0.3)",
+                boxShadow: "0 3px 20px rgba(252,255,82,0.08)",
+                borderRadius: 24, padding: 36,
+                cursor: "pointer", transition: "all 0.3s",
+              }}
+              whileHover={{
+                y: -5,
+                boxShadow: "0 12px 40px rgba(252,255,82,0.18)",
+                borderColor: "rgba(252,255,82,0.55)",
+              }}
+            >
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                background: "linear-gradient(90deg, #FCFF52, #35D07F)",
+                borderRadius: "24px 24px 0 0",
+              }} />
+              <div style={{
+                position: "absolute", top: -40, right: -40,
+                width: 160, height: 160, borderRadius: "50%",
+                background: "rgba(252,255,82,0.10)", filter: "blur(40px)",
+                pointerEvents: "none",
+              }} />
 
-            <div className="relative z-10 space-y-6">
-              <div className="w-20 h-20 rounded-2xl bg-black border border-[#FCFF52] flex items-center justify-center shadow-[0_0_30px_rgba(252,255,82,0.3)] group-hover:shadow-[0_0_50px_rgba(252,255,82,0.5)] transition-shadow">
-                <Users className="w-10 h-10 text-[#FCFF52]" />
-              </div>
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 16,
+                  background: "rgba(252,255,82,0.15)",
+                  border: "1px solid rgba(252,255,82,0.3)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 20,
+                }}>
+                  <Users style={{ width: 26, height: 26, color: "#997000" }} />
+                </div>
 
-              <div>
-                <h2 className="text-3xl font-extrabold mb-2 font-mono text-white tracking-tight">
-                  {lang === "ENG" ? "Join Game" : "Main Kuis"} <span className="text-[#FCFF52] text-sm align-top">[CLIENT]</span>
+                <div style={{
+                  display: "inline-block", padding: "3px 10px",
+                  borderRadius: 6, background: "rgba(252,255,82,0.15)",
+                  color: "#7a6e00", fontSize: 11, fontWeight: 700,
+                  letterSpacing: "0.05em", marginBottom: 10,
+                }}>PLAYER</div>
+
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: "#0a1a0f", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
+                  {lang === "ENG" ? "Join Game" : "Main Kuis"}
                 </h2>
-                <p className="text-gray-400 leading-relaxed text-sm">
+                <p style={{ fontSize: 14, color: "#4a6357", lineHeight: 1.6, margin: "0 0 24px" }}>
                   {lang === "ENG"
                     ? "Enter a room code to join the action. Answer fast and win real CELO prizes!"
                     : "Masukkan kode ruangan untuk beraksi. Jawab cepat dan menangkan hadiah CELO!"}
                 </p>
-              </div>
 
-              <div className="flex items-center gap-2 text-[#FCFF52] font-bold group-hover:gap-3 transition-all">
-                <Gamepad2 className="w-5 h-5" />
-                <span className="font-mono uppercase tracking-wide">{lang === "ENG" ? "Enter Arena" : "Masuk Arena"}</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Bottom row: Tools */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-          {/* Spin Wheel Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleNavigate("/spin")}
-            className="cursor-pointer group relative bg-black/50 backdrop-blur-md rounded-[2rem] p-7 border border-[#06B6D4]/30 hover:border-[#06B6D4] transition-all duration-500 overflow-hidden"
-          >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#06B6D4]/10 blur-[60px] rounded-full group-hover:bg-[#06B6D4]/30 transition-all duration-500" />
-
-            <div className="relative z-10 space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-black border border-[#06B6D4] flex items-center justify-center shadow-[0_0_25px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-shadow">
-                <span className="text-2xl filter hue-rotate-[180deg]">🎡</span>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
-                  {lang === "ENG" ? "Spin Wheel" : "Roda Putar"} <span className="text-[#06B6D4] text-[10px] ml-1">[RND_SEED]</span>
-                </h2>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  {lang === "ENG"
-                    ? "Can't decide a winner? Spin the wheel and let fate decide the prize!"
-                    : "Bingung pilih pemenang? Putar roda dan biarkan takdir yang memilih!"}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-[#06B6D4] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
-                <span>⚡</span>
-                <span>{lang === "ENG" ? "Spin Now" : "Putar Sekarang"}</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Live Report Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleNavigate("/live")}
-            className="cursor-pointer group relative bg-black/50 backdrop-blur-md rounded-[2rem] p-7 border border-[#35D07F]/30 hover:border-[#35D07F] transition-all duration-500 overflow-hidden"
-          >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#35D07F]/10 blur-[60px] rounded-full group-hover:bg-[#35D07F]/30 transition-all duration-500" />
-
-            <div className="relative z-10 space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-black border border-[#35D07F] flex items-center justify-center shadow-[0_0_25px_rgba(53,208,127,0.3)] group-hover:shadow-[0_0_40px_rgba(53,208,127,0.5)] transition-shadow">
-                <span className="text-2xl filter sepia hue-rotate-[90deg] saturate-200">📺</span>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
-                  {lang === "ENG" ? "Live Report" : "Laporan Live"} <span className="text-[#35D07F] text-[10px] ml-1">[TELEMETRY]</span>
-                </h2>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  {lang === "ENG"
-                    ? "Watch the leaderboard update in real-time and feel the match intensity."
-                    : "Tonton skor secara real-time dan rasakan ketegangan pertandingannya."}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-[#35D07F] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
-                <span className="w-2 h-2 rounded-full bg-[#35D07F] animate-pulse inline-block" />
-                <span>{lang === "ENG" ? "Watch Match" : "Tonton Match"}</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Q&A Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            whileHover={{ scale: 1.03, y: -5 }}
-            onClick={() => handleNavigate("/qa")}
-            className="cursor-pointer group relative bg-black/50 backdrop-blur-md rounded-[2rem] p-7 border border-[#FCFF52]/30 hover:border-[#FCFF52] transition-all duration-500 overflow-hidden"
-          >
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#FCFF52]/10 blur-[60px] rounded-full group-hover:bg-[#FCFF52]/30 transition-all duration-500" />
-
-            <div className="relative z-10 space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-black border border-[#FCFF52] flex items-center justify-center shadow-[0_0_25px_rgba(252,255,82,0.3)] group-hover:shadow-[0_0_40px_rgba(252,255,82,0.5)] transition-shadow">
-                <MessageCircle className="w-7 h-7 text-[#FCFF52]" />
-              </div>
-
-              <div>
-                <h2 className="text-xl font-extrabold mb-1 font-mono text-white">
-                  {lang === "ENG" ? "Live Q&A" : "Tanya Jawab"} <span className="text-[#FCFF52] text-[10px] ml-1">[COMMS]</span>
-                </h2>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  {lang === "ENG"
-                    ? "Create an interactive Q&A space. Ask, vote, and chat anonymously!"
-                    : "Buat ruang Q&A interaktif. Ajukan pertanyaan, voting, dan diskusi!"}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-[#FCFF52] font-mono font-bold uppercase text-xs group-hover:gap-3 transition-all">
-                  <span>💬</span>
-                  <span>{lang === "ENG" ? "Create / Join Q&A" : "Buat / Gabung Q&A"}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#7a6e00", fontWeight: 700 }}>
+                  <Gamepad2 style={{ width: 18, height: 18 }} />
+                  <span style={{ fontSize: 14 }}>{lang === "ENG" ? "Enter Arena →" : "Masuk Arena →"}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
+          </div>
+
+          {/* Bottom row: Tools */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 20,
+          }}>
+            {/* Spin Wheel */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              onClick={() => handleNavigate("/spin")}
+              style={{
+                position: "relative", overflow: "hidden",
+                background: "#ffffff",
+                border: "1.5px solid rgba(6,182,212,0.2)",
+                boxShadow: "0 2px 16px rgba(6,182,212,0.07)",
+                borderRadius: 20, padding: 28,
+                cursor: "pointer", transition: "all 0.3s",
+              }}
+              whileHover={{
+                y: -4,
+                boxShadow: "0 8px 30px rgba(6,182,212,0.14)",
+                borderColor: "rgba(6,182,212,0.4)",
+              }}
+            >
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                background: "linear-gradient(90deg, #06B6D4, #35D07F)",
+                borderRadius: "20px 20px 0 0",
+              }} />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: "rgba(6,182,212,0.10)",
+                  border: "1px solid rgba(6,182,212,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 16, fontSize: 22,
+                }}>🎡</div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0a1a0f", margin: "0 0 6px", letterSpacing: "-0.01em" }}>
+                  {lang === "ENG" ? "Spin Wheel" : "Roda Putar"}
+                </h2>
+                <p style={{ fontSize: 13, color: "#4a6357", lineHeight: 1.55, margin: "0 0 16px" }}>
+                  {lang === "ENG"
+                    ? "Can't decide a winner? Let fate spin the prize!"
+                    : "Bingung pilih pemenang? Biarkan takdir yang memilih!"}
+                </p>
+                <span style={{ fontSize: 13, color: "#0891b2", fontWeight: 700 }}>
+                  {lang === "ENG" ? "Spin Now →" : "Putar Sekarang →"}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Live Report */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.5 }}
+              onClick={() => handleNavigate("/live")}
+              style={{
+                position: "relative", overflow: "hidden",
+                background: "#ffffff",
+                border: "1.5px solid rgba(53,208,127,0.2)",
+                boxShadow: "0 2px 16px rgba(53,208,127,0.07)",
+                borderRadius: 20, padding: 28,
+                cursor: "pointer", transition: "all 0.3s",
+              }}
+              whileHover={{
+                y: -4,
+                boxShadow: "0 8px 30px rgba(53,208,127,0.14)",
+                borderColor: "rgba(53,208,127,0.4)",
+              }}
+            >
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                background: "linear-gradient(90deg, #35D07F, #1a9f5e)",
+                borderRadius: "20px 20px 0 0",
+              }} />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: "rgba(53,208,127,0.10)",
+                  border: "1px solid rgba(53,208,127,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 16, fontSize: 22,
+                }}>📺</div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0a1a0f", margin: "0 0 6px", letterSpacing: "-0.01em" }}>
+                  {lang === "ENG" ? "Live Report" : "Laporan Live"}
+                </h2>
+                <p style={{ fontSize: 13, color: "#4a6357", lineHeight: 1.55, margin: "0 0 16px" }}>
+                  {lang === "ENG"
+                    ? "Watch the leaderboard update in real-time."
+                    : "Tonton skor secara real-time dan rasakan ketegangan."}
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#1a9f5e", fontWeight: 700, fontSize: 13 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#35D07F", display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
+                  {lang === "ENG" ? "Watch Match →" : "Tonton Match →"}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Live Q&A */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              onClick={() => handleNavigate("/qa")}
+              style={{
+                position: "relative", overflow: "hidden",
+                background: "#ffffff",
+                border: "1.5px solid rgba(252,255,82,0.28)",
+                boxShadow: "0 2px 16px rgba(252,255,82,0.07)",
+                borderRadius: 20, padding: 28,
+                cursor: "pointer", transition: "all 0.3s",
+              }}
+              whileHover={{
+                y: -4,
+                boxShadow: "0 8px 30px rgba(252,255,82,0.14)",
+                borderColor: "rgba(252,255,82,0.5)",
+              }}
+            >
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 3,
+                background: "linear-gradient(90deg, #FCFF52, #35D07F)",
+                borderRadius: "20px 20px 0 0",
+              }} />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: "rgba(252,255,82,0.15)",
+                  border: "1px solid rgba(252,255,82,0.3)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 16,
+                }}>
+                  <MessageCircle style={{ width: 22, height: 22, color: "#7a6e00" }} />
+                </div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0a1a0f", margin: "0 0 6px", letterSpacing: "-0.01em" }}>
+                  {lang === "ENG" ? "Live Q&A" : "Tanya Jawab"}
+                </h2>
+                <p style={{ fontSize: 13, color: "#4a6357", lineHeight: 1.55, margin: "0 0 16px" }}>
+                  {lang === "ENG"
+                    ? "Create an interactive Q&A space. Ask, vote, and discuss!"
+                    : "Buat ruang Q&A interaktif. Ajukan pertanyaan dan diskusi!"}
+                </p>
+                <span style={{ fontSize: 13, color: "#7a6e00", fontWeight: 700 }}>
+                  {lang === "ENG" ? "Create / Join Q&A →" : "Buat / Gabung Q&A →"}
+                </span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Footer mini */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            style={{ textAlign: "center", paddingTop: 40, paddingBottom: 24 }}
+          >
+            <p style={{ fontSize: 13, color: "#4a6357" }}>
+              {lang === "ENG"
+                ? "Powered by Celo blockchain · Rewards paid on-chain"
+                : "Didukung blockchain Celo · Hadiah dibayar on-chain"}
+            </p>
           </motion.div>
         </div>
       </div>

@@ -194,61 +194,54 @@ function LiveReportContent() {
   // ====== JOIN / ROOM CODE SCREEN ======
   if (!isWatching) {
     return (
-      <main className="min-h-screen w-full text-black dark:text-white flex flex-col relative">
-        {/* Cyberpunk AI Background */}
-        <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-          <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
-          <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+        {/* Soft glow orbs */}
+        <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: '10%', top: '20%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
+          <div style={{ position: 'absolute', right: '10%', bottom: '10%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.10)', filter: 'blur(100px)' }} />
         </div>
 
         <TopBar backHref="/dashboard" />
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-12" style={{ position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 space-y-3 relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
-              TELEMETRY_LINK
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 16px', borderRadius: 100, background: 'rgba(53,208,127,0.10)', border: '1px solid rgba(53,208,127,0.3)', color: '#1a9f5e', fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#35D07F', display: 'inline-block', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+              {lang === "ENG" ? "Live Monitor" : "Monitor Live"}
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold uppercase font-mono">
-              <span className="text-2xl filter sepia hue-rotate-[90deg] saturate-200 inline-block -translate-y-1">📺</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Live Report" : "Laporan Live"}</span>
+            <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#0a1a0f', margin: '0 0 12px' }}>
+              📺 <span style={{ background: 'linear-gradient(90deg, #35D07F, #1a9f5e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{lang === "ENG" ? "Live Report" : "Laporan Live"}</span>
             </h1>
-            <p className="text-gray-400 max-w-md mx-auto font-mono text-sm">
+            <p style={{ fontSize: 16, color: '#4a6357', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>
               {lang === "ENG"
-                ? "Monitor neural-quiz activity, place predictions, and inject prize variations."
-                : "Monitor aktivitas kuis-neural, pasang prediksi, dan injeksi variasi hadiah."}
+                ? "Monitor quiz activity, place predictions, and add prize variations."
+                : "Monitor aktivitas kuis, pasang prediksi, dan tambahkan variasi hadiah."}
             </p>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="bg-black/60 backdrop-blur-xl rounded-[2.5rem] border border-[#35D07F]/30 shadow-[0_0_30px_rgba(53,208,127,0.15)] p-10 max-w-md w-full space-y-6 relative overflow-hidden"
+            style={{ background: '#ffffff', border: '1.5px solid rgba(53,208,127,0.2)', boxShadow: '0 4px 24px rgba(53,208,127,0.10)', borderRadius: 24, padding: 40, maxWidth: 480, width: '100%', position: 'relative', overflow: 'hidden' }}
           >
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] animate-[shimmer_3s_infinite]" />
-            <div className="relative z-10 space-y-3">
-              <label className="block text-sm font-bold text-gray-500">
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4a6357', marginBottom: 8 }}>
                 {lang === "ENG" ? "Enter Room Code" : "Masukkan Kode Ruangan"}
               </label>
               <input
                 value={roomCode}
                 onChange={e => setRoomCode(e.target.value.toUpperCase())}
                 placeholder="e.g. ABC123"
-                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-center text-2xl font-mono font-bold tracking-widest placeholder-gray-600 focus:outline-none focus:border-[#35D07F]/50 transition-all"
+                style={{ width: '100%', padding: '16px 24px', borderRadius: 14, border: '1.5px solid rgba(53,208,127,0.2)', textAlign: 'center', fontSize: 22, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', color: '#0a1a0f', background: '#f8fffc', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
-            {/* Prize Pool Selector */}
-            <div className="space-y-3">
-              <label className="block text-sm font-bold text-gray-500">
+            <div style={{ display: 'block', marginBottom: 0 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4a6357', marginBottom: 10 }}>
                 {lang === "ENG" ? "Prize Variation" : "Variasi Hadiah"}
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 10 }}>
                 {PRIZE_POOL_TYPES.map(pt => (
                   <button key={pt.id} onClick={() => setSelectedPrizePool(pt)}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 text-xs font-bold transition-all ${
-                      selectedPrizePool.id === pt.id
-                        ? "border-[#FCFF52] bg-[#FCFF52]/10 text-[#FCFF52]"
-                        : "border-white/10 bg-white/5 text-gray-500 hover:border-[#FCFF52]/40"
-                    }`}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 12, borderRadius: 12, border: `1.5px solid ${selectedPrizePool.id===pt.id?'rgba(53,208,127,0.5)':'rgba(53,208,127,0.15)'}`, background: selectedPrizePool.id===pt.id?'rgba(53,208,127,0.1)':'#fff', fontSize: 12, fontWeight: 700, color: selectedPrizePool.id===pt.id?'#1a9f5e':'#4a6357', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}
                   >
                     <span className="text-xl">{pt.icon}</span>
                     <span>{pt.label}</span>
@@ -278,8 +271,8 @@ function LiveReportContent() {
               )}
             </div>
 
-            <button onClick={handleWatch} disabled={!roomCode.trim() || isLoading}
-              className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(53,208,127,0.5)] transition-all disabled:opacity-40 flex items-center justify-center gap-3"
+              <button onClick={handleWatch} disabled={!roomCode.trim() || isLoading}
+                style={{ width: '100%', padding: '16px 0', borderRadius: 14, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1a9f5e, #35D07F)', color: '#fff', fontWeight: 800, fontSize: 17, fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(53,208,127,0.25)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: !roomCode.trim()||isLoading?0.4:1, marginTop: 16 }}
             >
               {isLoading ? (
                 <><Loader2 className="w-6 h-6 animate-spin" /> Loading...</>
@@ -288,7 +281,7 @@ function LiveReportContent() {
               )}
             </button>
 
-            <p className="text-center text-xs text-gray-600">
+            <p style={{ textAlign: 'center', fontSize: 12, color: '#4a6357', marginTop: 8 }}>
               {lang === "ENG" ? 'Try demo code: "123456"' : 'Coba kode demo: "123456"'}
             </p>
           </motion.div>
@@ -299,12 +292,11 @@ function LiveReportContent() {
 
   // ====== LIVE REPORT VIEW ======
   return (
-    <main className="min-h-screen w-full text-black dark:text-white relative">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+      {/* Soft glow orbs */}
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', left: '5%', top: '15%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', right: '5%', bottom: '10%', width: 350, height: 350, borderRadius: '50%', background: 'rgba(252,255,82,0.10)', filter: 'blur(100px)' }} />
       </div>
 
       <TopBar />
