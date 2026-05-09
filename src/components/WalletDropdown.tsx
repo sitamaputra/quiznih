@@ -61,7 +61,19 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-[#35D07F]/10 dark:bg-[#35D07F]/20 border border-[#35D07F] px-4 py-2 rounded-full shadow-[0_0_15px_rgba(53,208,127,0.2)] hover:bg-[#35D07F]/20 transition-all font-semibold text-sm text-[#35D07F] dark:text-[#7DFCB4]"
+        style={{
+          background: '#FCFF52',
+          color: '#0a1a0f',
+          border: 'none',
+          borderRadius: '50px',
+          fontWeight: 900,
+          padding: '0.5rem 1.2rem',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          cursor: 'pointer',
+        }}
       >
         <Wallet2 className="w-4 h-4" />
         <span>{shortAddr}</span>

@@ -17,12 +17,29 @@ function MiniPayAutoConnect() {
   const { connect } = useConnect();
 
   useEffect(() => {
-    const isMiniPay =
-      typeof window !== "undefined" && (window as any).ethereum?.isMiniPay;
-    if (isMiniPay && connectors.length > 0) {
-      // Auto-connect using the first available injected connector
-      connect({ connector: connectors[0] });
+    let isMiniPay = false;
+    try {
+      isMiniPay = typeof window !== "undefined" && !!(window as any).ethereum?.isMiniPay;
+    } catch {
+      return;
     }
+
+    if (!isMiniPay || connectors.length === 0) return;
+
+    // Timeout guard: if wagmi never resolves, don't hang the UI
+    const timeout = setTimeout(() => {}, 8000);
+
+    try {
+      connect(
+        { connector: connectors[0] },
+        { onError: () => clearTimeout(timeout) }
+      );
+    } catch {
+      // Swallow synchronous connector errors (e.g. "Cannot redefine property: ethereum")
+      clearTimeout(timeout);
+    }
+
+    return () => clearTimeout(timeout);
   }, [connectors, connect]);
 
   return null;

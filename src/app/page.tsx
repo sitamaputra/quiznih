@@ -5,7 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
 import { IS_TESTNET } from "@/lib/celo";
-import { motion } from "framer-motion";
+
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 
@@ -22,7 +22,7 @@ function Hero() {
         justifyContent: "center",
         overflow: "hidden",
         padding: "120px 24px 80px",
-        background: "linear-gradient(150deg, #ffffff 0%, #f0fdf6 40%, #fffde8 100%)",
+        background: "#f0fdf6",
       }}
     >
       {/* Google Font */}
@@ -208,8 +208,7 @@ function Hero() {
           <div
             style={{
               display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center",
-              marginTop: 48, borderTop: "1px solid rgba(53,208,127,0.15)",
-              paddingTop: 24,
+              marginTop: 48, paddingTop: 24,
             }}
           >
             {[
@@ -292,7 +291,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" style={{ padding: "100px 24px", background: "#f8fffe" }}>
+    <section id="how-it-works" style={{ padding: "100px 24px", background: "linear-gradient(#f0fdf6, #ffffff)" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         {/* Heading */}
         <div style={{ textAlign: "center", marginBottom: 64 }}>
@@ -308,10 +307,8 @@ function HowItWorks() {
             style={{
               fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 700,
               letterSpacing: "-0.02em", margin: 0,
-              background: 'linear-gradient(90deg, #35D07F, #FCFF52)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: '#0a1a0f',
+              WebkitTextFillColor: '#0a1a0f',
             }}
           >
             {lang === "ENG" ? "Three steps to earning" : "Tiga langkah untuk menghasilkan"}
@@ -414,7 +411,7 @@ function UpcomingQuizzes() {
       id="quizzes"
       style={{
         padding: "100px 24px",
-        background: "linear-gradient(160deg, #f0fdf6, #fffde8)",
+        background: "linear-gradient(#ffffff, #f0fdf6)",
       }}
     >
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -431,10 +428,8 @@ function UpcomingQuizzes() {
             style={{
               fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 700,
               letterSpacing: "-0.02em", margin: 0,
-              background: 'linear-gradient(90deg, #35D07F, #FCFF52)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: '#0a1a0f',
+              WebkitTextFillColor: '#0a1a0f',
             }}
           >
             {lang === "ENG" ? "Join a Quiz" : "Ikuti Kuis"}
@@ -505,7 +500,7 @@ function UpcomingQuizzes() {
 
                   <div
                     style={{
-                      borderTop: "1px solid rgba(53,208,127,0.10)", paddingTop: 12,
+                      paddingTop: 12,
                       display: "flex", justifyContent: "space-between", alignItems: "center",
                     }}
                   >
@@ -546,7 +541,7 @@ function MiniPayBanner() {
   const { lang } = useLanguage();
 
   return (
-    <section style={{ padding: "100px 24px 0", background: "#ffffff", overflow: "hidden" }}>
+    <section id="minipay" style={{ padding: "100px 24px 0", background: "linear-gradient(#f0fdf6, #fffde8)", overflow: "hidden" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         {/* Text + CTAs — centered */}
         <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto", marginBottom: 48 }}>
@@ -555,10 +550,8 @@ function MiniPayBanner() {
               fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800,
               margin: "0 0 16px",
               letterSpacing: "-0.03em", lineHeight: 1.1,
-              background: 'linear-gradient(90deg, #35D07F, #FCFF52)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: '#0a1a0f',
+              WebkitTextFillColor: '#0a1a0f',
             }}
           >
             {lang === "ENG" ? "Play with Celo MiniPay" : "Main dengan Celo MiniPay"}
@@ -621,7 +614,7 @@ function MiniPayBanner() {
         </div>
 
         {/* Phone mockup image — bleeds to bottom */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", background: "#fffde8", position: "relative", borderRadius: "32px 32px 0 0" }}>
           <Image
             src="/minipay-phones.png"
             alt="MiniPay App Screenshots"
@@ -633,6 +626,18 @@ function MiniPayBanner() {
               width: "100%", maxWidth: 900, height: "auto",
               filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.12))",
               display: "block",
+              mixBlendMode: "multiply",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "120px",
+              background: "linear-gradient(to bottom, transparent, #fffde8)",
+              pointerEvents: "none",
             }}
           />
         </div>
@@ -657,7 +662,7 @@ function Leaderboard() {
   ];
 
   return (
-    <section id="leaderboard" style={{ padding: "100px 24px", background: "#ffffff" }}>
+    <section id="leaderboard" style={{ padding: "100px 24px", background: "linear-gradient(#fffde8, #ffffff)" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 64 }}>
           <p
@@ -672,10 +677,8 @@ function Leaderboard() {
             style={{
               fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 700,
               letterSpacing: "-0.02em", margin: 0,
-              background: 'linear-gradient(90deg, #35D07F, #FCFF52)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: '#0a1a0f',
+              WebkitTextFillColor: '#0a1a0f',
             }}
           >
             {lang === "ENG" ? "Live Leaderboard" : "Papan Peringkat"}
@@ -798,8 +801,7 @@ function SiteFooter() {
     <footer
       style={{
         position: "relative", padding: "60px 24px 40px",
-        background: "#f8fffe",
-        borderTop: "1px solid rgba(53,208,127,0.12)",
+        background: "#ffffff",
       }}
     >
       <div
@@ -884,7 +886,6 @@ function SiteFooter() {
       <div
         style={{
           maxWidth: 1200, margin: "40px auto 0",
-          borderTop: "1px solid rgba(53,208,127,0.12)",
           paddingTop: 24, textAlign: "center",
         }}
       >
@@ -899,33 +900,16 @@ function SiteFooter() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { type: "tween", duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } },
-};
-
-const sectionStyle = { willChange: "transform, opacity" } as const;
-
 export default function Home() {
   return (
     <main style={{ width: "100%", display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
       <Hero />
-      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} style={sectionStyle}>
-        <HowItWorks />
-      </motion.div>
-      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} style={sectionStyle}>
-        <UpcomingQuizzes />
-      </motion.div>
-      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} style={sectionStyle}>
-        <MiniPayBanner />
-      </motion.div>
-      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} style={sectionStyle}>
-        <Leaderboard />
-      </motion.div>
-      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} style={sectionStyle}>
-        <SiteFooter />
-      </motion.div>
+      <HowItWorks />
+      <UpcomingQuizzes />
+      <MiniPayBanner />
+      <Leaderboard />
+      <SiteFooter />
     </main>
   );
 }

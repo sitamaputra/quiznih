@@ -49,45 +49,69 @@ export default function Navbar() {
   };
 
   return (
-    <><nav className="fixed top-0 w-full z-50 text-black dark:text-white" style={{ background: "#ffffff", borderBottom: "1px solid rgba(53,208,127,0.12)", backdropFilter: scrolled ? "blur(16px)" : "none", WebkitBackdropFilter: scrolled ? "blur(16px)" : "none", boxShadow: scrolled ? "0 2px 20px rgba(53,208,127,0.08)" : "none", transition: "box-shadow 0.3s ease, backdrop-filter 0.3s ease" }}>
+    <><nav
+      className="fixed top-0 w-full z-50 text-black dark:text-white"
+      style={{
+        background: "#35D07F",
+        boxShadow: "0 2px 16px rgba(53,208,127,0.3)",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2.5">
-              <img src="/quiznih-logo.png" alt="Quiznih" className="w-9 h-9 rounded-[10px] object-cover" />
-              <span className="text-xl" style={{ letterSpacing: "-0.02em", fontWeight: 900, background: 'linear-gradient(90deg, #35D07F, #FCFF52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                Quiznih
-              </span>
-            </Link>
+        <div className="flex items-center justify-between h-20" style={{ position: "relative" }}>
+
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-2.5" style={{ textDecoration: "none" }}>
+            <img
+              src="/quiznih-logo.png"
+              alt="Quiznih"
+              style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover" }}
+            />
+            <span style={{ fontWeight: 900, fontSize: 18, letterSpacing: "-0.02em", color: "#ffffff" }}>
+              Quiznih
+            </span>
+          </Link>
+
+          {/* Center: Nav links (absolutely centered) */}
+          <div
+            className="hidden md:flex items-center gap-8"
+            style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}
+          >
+            <a
+              href="#how-it-works"
+              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+              onMouseOver={e => (e.currentTarget.style.color = "#000")}
+              onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
+            >
+              How it Works
+            </a>
+            <a
+              href="#quizzes"
+              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+              onMouseOver={e => (e.currentTarget.style.color = "#000")}
+              onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
+            >
+              Join a Quiz
+            </a>
+            <a
+              href="#minipay"
+              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+              onMouseOver={e => (e.currentTarget.style.color = "#000")}
+              onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
+            >
+              Play with MiniPay
+            </a>
+            <a
+              href="#leaderboard"
+              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 600, textDecoration: "none", transition: "color 0.2s" }}
+              onMouseOver={e => (e.currentTarget.style.color = "#000")}
+              onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
+            >
+              Leaderboard
+            </a>
           </div>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <a href="#how-it-works" className="transition-colors font-medium" style={{ color: "#0a1a0f" }} onMouseOver={e => (e.currentTarget.style.color = "#0a1a0f")} onMouseOut={e => (e.currentTarget.style.color = "#4a6357")}>
-              {lang === "ENG" ? "How it Works" : "Cara Kerja"}
-            </a>
-            <a href="#leaderboard" className="transition-colors font-medium" style={{ color: "#0a1a0f" }} onMouseOver={e => (e.currentTarget.style.color = "#0a1a0f")} onMouseOut={e => (e.currentTarget.style.color = "#4a6357")}>
-              {lang === "ENG" ? "Leaderboard" : "Papan Peringkat"}
-            </a>
-            
-            <div className="flex items-center gap-2 border-l border-black/10 dark:border-white/10 pl-6">
-              {mounted && (
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                >
-                  {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                </button>
-              )}
-
-              <button 
-                onClick={toggleLang}
-                className="flex items-center gap-2 bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 border border-black/10 dark:border-white/20 px-3 py-1.5 rounded-full transition-colors text-xs font-bold"
-              >
-                <Globe2 className="w-3 h-3" />
-                {lang}
-              </button>
-            </div>
-
+          {/* Right: Controls + Auth */}
+          <div className="hidden md:flex items-center gap-2">
             {/* Auth Section */}
             {mounted && (
               <div className="relative flex items-center gap-3">
@@ -95,7 +119,8 @@ export default function Navbar() {
                 {!user && !isConnected && (
                   <button
                     onClick={() => setIsAuthOpen(true)}
-                    className="flex items-center gap-2 bg-[#35D07F] hover:bg-[#2bb86e] text-black px-5 py-2.5 rounded-full transition-all font-semibold text-sm shadow-[0_0_15px_rgba(53,208,127,0.4)]"
+                    className="flex items-center gap-2 transition-all text-sm"
+                    style={{ background: "#FCFF52", color: "#0a1a0f", fontWeight: 900, border: "none", borderRadius: 50, padding: "10px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", cursor: "pointer" }}
                   >
                     <LogIn className="w-4 h-4" />
                     <span>{lang === "ENG" ? "Sign In / Connect" : "Masuk / Hubung"}</span>
@@ -107,7 +132,8 @@ export default function Navbar() {
                   <div className="relative">
                     <button
                       onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                      className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/20 px-4 py-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all font-semibold text-sm"
+                      className="flex items-center gap-2 transition-all font-semibold text-sm"
+                      style={{ background: "#FCFF52", color: "#0a1a0f", border: "none", borderRadius: 50, padding: "8px 16px", cursor: "pointer" }}
                     >
                       <User className="w-4 h-4" />
                       <span className="max-w-[100px] truncate">
@@ -138,26 +164,13 @@ export default function Navbar() {
             )}
           </div>
 
+          {/* Mobile controls */}
           <div className="md:hidden flex items-center gap-4">
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-            )}
-            <button 
-              onClick={toggleLang}
-              className="flex items-center gap-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/20 text-black dark:text-white px-2 py-1 rounded text-xs"
-            >
-              <Globe2 className="w-3 h-3" />
-              {lang}
-            </button>
             <button className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white">
               <Menu className="w-6 h-6" />
             </button>
           </div>
+
         </div>
       </div>
     </nav>

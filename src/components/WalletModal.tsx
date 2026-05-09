@@ -3,7 +3,7 @@ import { X, ChevronRight, Loader2, Wallet2, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { useConnect, useConnectors, useAccount } from "wagmi";
-import { WALLET_LIST } from "@/lib/wagmi";
+import { WALLET_INSTALL_LIST as WALLET_LIST } from "@/lib/wagmi";
 import { useState, useEffect } from "react";
 
 interface WalletModalProps {

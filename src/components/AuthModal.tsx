@@ -6,7 +6,7 @@ import { useAccount, useConnect, useConnectors } from "wagmi";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/context/LanguageContext";
 import { isMiniPayEnvironment } from "@/lib/celo";
-import { WALLET_LIST } from "@/lib/wagmi";
+import { WALLET_INSTALL_LIST as WALLET_LIST } from "@/lib/wagmi";
 import Image from "next/image";
 
 interface AuthModalProps {
@@ -40,12 +40,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
   // Close modal when wallet is connected
   useEffect(() => {
-    if (isConnected && connectingWalletId) {
+    if (isConnected) {
       setConnectingWalletId(null);
       onClose();
       if (onSuccess) onSuccess();
     }
-  }, [isConnected, connectingWalletId, onClose, onSuccess]);
+  }, [isConnected]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

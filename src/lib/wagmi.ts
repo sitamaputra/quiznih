@@ -8,19 +8,32 @@ import { http, createConfig } from "wagmi";
 import { celo, celoAlfajores } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 
-export const wagmiConfig = createConfig({
-  chains: [celo, celoAlfajores],
-  // EIP-6963: auto-discover all injected wallets (MetaMask, Rabby, OKX, Bitget, Trust, etc.)
-  multiInjectedProviderDiscovery: true,
-  connectors: [
-    // Fallback injected connector (for wallets that don't support EIP-6963 yet, including MiniPay)
-    injected(),
-  ],
-  transports: {
-    [celo.id]: http(),
-    [celoAlfajores.id]: http(),
-  },
-});
+function createSafeConfig() {
+  try {
+    return createConfig({
+      chains: [celo, celoAlfajores],
+      multiInjectedProviderDiscovery: true,
+      connectors: [injected()],
+      transports: {
+        [celo.id]: http(),
+        [celoAlfajores.id]: http(),
+      },
+    });
+  } catch {
+    // Fallback when wallet extensions conflict (e.g. "Cannot redefine property: ethereum")
+    return createConfig({
+      chains: [celo, celoAlfajores],
+      multiInjectedProviderDiscovery: false,
+      connectors: [],
+      transports: {
+        [celo.id]: http(),
+        [celoAlfajores.id]: http(),
+      },
+    });
+  }
+}
+
+export const wagmiConfig = createSafeConfig();
 
 /**
  * Static wallet list for display when no wallets are detected

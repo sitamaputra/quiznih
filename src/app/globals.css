@@ -118,3 +118,12 @@ body {
   50% { transform: translateY(-10px); }
 }
 .float-anim { animation: float 4s ease-in-out infinite; }
+
+html, body {
+  background: #ffffff;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}

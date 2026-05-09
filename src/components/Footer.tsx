@@ -13,8 +13,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded bg-[#FCFF52] flex items-center justify-center font-black text-black text-xs">Q</div>
-          <span className="font-extrabold text-lg font-mono tracking-widest text-black dark:text-white">
-            QUIZ<span className="text-[#c4a700] dark:text-[#FCFF52]">NIH</span>
+          <span className="font-extrabold text-lg font-mono tracking-widest" style={{ background: 'linear-gradient(90deg, #35D07F, #FCFF52)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontWeight: 900 }}>
+            QUIZNIH
           </span>
         </div>
 
