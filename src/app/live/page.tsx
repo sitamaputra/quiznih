@@ -214,8 +214,8 @@ function LiveReportContent() {
             </h1>
             <p style={{ fontSize: 16, color: '#4a6357', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>
               {lang === "ENG"
-                ? "Monitor quiz activity, place predictions, and add prize variations."
-                : "Monitor aktivitas kuis, pasang prediksi, dan tambahkan variasi hadiah."}
+                ? "Monitor quiz activity and place predictions."
+                : "Monitor aktivitas kuis dan pasang prediksi."}
             </p>
           </motion.div>
 
@@ -234,42 +234,6 @@ function LiveReportContent() {
               />
             </div>
 
-            <div style={{ display: 'block', marginBottom: 0 }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4a6357', marginBottom: 10 }}>
-                {lang === "ENG" ? "Prize Variation" : "Variasi Hadiah"}
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 10 }}>
-                {PRIZE_POOL_TYPES.map(pt => (
-                  <button key={pt.id} onClick={() => setSelectedPrizePool(pt)}
-                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 12, borderRadius: 12, border: `1.5px solid ${selectedPrizePool.id===pt.id?'rgba(53,208,127,0.5)':'rgba(53,208,127,0.15)'}`, background: selectedPrizePool.id===pt.id?'rgba(53,208,127,0.1)':'#fff', fontSize: 12, fontWeight: 700, color: selectedPrizePool.id===pt.id?'#1a9f5e':'#4a6357', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}
-                  >
-                    <span className="text-xl">{pt.icon}</span>
-                    <span>{pt.label}</span>
-                  </button>
-                ))}
-              </div>
-              {selectedPrizePool.id === "custom" && (
-                <div className="space-y-2 pt-2">
-                  {customPrizes.map((cp, i) => (
-                    <input key={i} value={cp} onChange={e => {
-                      const n = [...customPrizes]; n[i] = e.target.value; setCustomPrizes(n);
-                    }}
-                      placeholder={`${lang === "ENG" ? "Prize" : "Hadiah"} #${i + 1}`}
-                      className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm placeholder-gray-500 focus:outline-none focus:border-[#FCFF52]/50"
-                    />
-                  ))}
-                </div>
-              )}
-              {selectedPrizePool.id !== "custom" && (
-                <div className="flex flex-wrap gap-1">
-                  {selectedPrizePool.prizes.map((p, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-[#FCFF52]/10 text-[#FCFF52] text-xs font-bold">
-                      {MEDALS[i]} {p}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
 
               <button onClick={handleWatch} disabled={!roomCode.trim() || isLoading}
                 style={{ width: '100%', padding: '16px 0', borderRadius: 14, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #1a9f5e, #35D07F)', color: '#fff', fontWeight: 800, fontSize: 17, fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(53,208,127,0.25)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: !roomCode.trim()||isLoading?0.4:1, marginTop: 16 }}
