@@ -366,12 +366,10 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
     : "";
 
   return (
-    <main className="min-h-screen w-full text-black dark:text-white relative">
-      {/* Cyberpunk AI Background */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#050505]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#35D07F10_1px,transparent_1px),linear-gradient(to_bottom,#35D07F10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="absolute top-[15%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/20 blur-[150px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/20 blur-[150px] rounded-full mix-blend-screen" />
+    <main className="min-h-screen w-full text-[#0a1a0f] relative">
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', left: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(53,208,127,0.08)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', right: '10%', bottom: '15%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(252,255,82,0.09)', filter: 'blur(100px)' }} />
       </div>
 
       <TopBar backHref="/dashboard" />
@@ -429,9 +427,9 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                 <span className="w-1.5 h-1.5 rounded-full bg-[#35D07F] animate-pulse" />
                 Build Mode
               </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-2 font-mono uppercase">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-2 uppercase text-[#0a1a0f]">
                 {lang === "ENG" ? "Compile " : "Kompilasi "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#1a9f5e]">{lang === "ENG" ? "Quiz" : "Kuis"}</span>
               </h1>
               <p className="text-gray-400 font-mono text-sm">
                 {lang === "ENG"
@@ -665,7 +663,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                 <h3 className="text-lg font-bold flex items-center gap-2">
                   🔑 {lang === "ENG" ? "Room Code" : "Kode Ruangan"}
                 </h3>
-                <div className="px-10 py-5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-mono text-4xl md:text-5xl font-extrabold tracking-[0.3em] shadow-[0_0_40px_rgba(153,69,255,0.2)]">
+                <div className="px-10 py-5 rounded-2xl bg-white border border-[#35D07F]/30 text-[#0a1a0f] font-mono text-4xl md:text-5xl font-extrabold tracking-[0.3em] shadow-[0_0_20px_rgba(53,208,127,0.1)]">
                   {roomCode}
                 </div>
                 <button
@@ -747,7 +745,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => router.push(`/create/room/${quizId}`)}
-                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-white dark:text-black font-extrabold text-lg flex items-center justify-center gap-3 transition-all"
+                className="flex-1 py-5 rounded-2xl bg-gradient-to-r from-[#1a9f5e] to-[#35D07F] text-white font-extrabold text-lg flex items-center justify-center gap-3 transition-all"
               >
                 🎮 {lang === "ENG" ? "Go to Control Room" : "Ke Ruang Kontrol"}
               </button>
@@ -810,7 +808,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder={lang === "ENG" ? "e.g. Celo Ecosystem Mastery" : "contoh: Penguasaan Ekosistem Celo"}
-                    className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#35D07F]/50 transition-all text-lg"
+                    style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontSize: 18, fontFamily: "inherit" }}
                   />
                 </div>
 
@@ -823,7 +821,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     placeholder={lang === "ENG" ? "Brief description..." : "Deskripsi singkat..."}
-                    className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#35D07F]/50 transition-all resize-none"
+                    style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontFamily: "inherit", resize: "none" }}
                   />
                 </div>
 
@@ -838,11 +836,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                         key={rt.value}
                         type="button"
                         onClick={() => setRewardType(rt.value as any)}
-                        className={`flex flex-col items-center gap-1 p-3 rounded-2xl border-2 transition-all font-semibold text-xs ${
-                          rewardType === rt.value
-                            ? "border-[#FCFF52] bg-[#FCFF52]/15 text-[#FCFF52]"
-                            : "border-black/10 dark:border-white/10 bg-white/50 dark:bg-white/5 text-gray-500 hover:border-[#FCFF52]/40"
-                        }`}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 12, borderRadius: 16, border: `2px solid ${rewardType===rt.value?'rgba(53,208,127,0.5)':'rgba(53,208,127,0.15)'}`, background: rewardType===rt.value?'rgba(53,208,127,0.1)':'#fff', fontSize: 12, fontWeight: 700, color: rewardType===rt.value?'#1a9f5e':'#4a6357', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}
                       >
                         <span className="text-2xl">{rt.icon}</span>
                         <span>{rt.label}</span>
@@ -859,7 +853,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                         min="0"
                         step="0.01"
                         placeholder="0.00"
-                        className="flex-1 px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#FCFF52]/30 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCFF52]/50 transition-all text-lg font-mono"
+                        style={{ flex: 1, padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontSize: 18, fontFamily: "monospace" }}
                       />
                       <span className="font-black text-[#FCFF52] text-xl">CELO</span>
                     </div>
@@ -870,7 +864,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                       value={rewardDesc}
                       onChange={(e) => setRewardDesc(e.target.value)}
                       placeholder={lang === "ENG" ? `Describe the ${REWARD_TYPES.find(r=>r.value===rewardType)?.label} prize...` : `Deskripsi hadiah ${REWARD_TYPES.find(r=>r.value===rewardType)?.label}...`}
-                      className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#FCFF52]/30 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCFF52]/50 transition-all"
+                      style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontFamily: "inherit" }}
                     />
                   )}
                 </div>
@@ -908,7 +902,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   value={q.text}
                   onChange={(e) => updateQuestion(q.id, "text", e.target.value)}
                   placeholder={lang === "ENG" ? "Enter your question..." : "Tulis pertanyaanmu..."}
-                  className="w-full px-6 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#35D07F]/50 transition-all"
+                  style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontFamily: "inherit" }}
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -919,11 +913,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                         value={opt}
                         onChange={(e) => updateOption(q.id, optIdx, e.target.value)}
                         placeholder={`${lang === "ENG" ? "Option" : "Opsi"} ${String.fromCharCode(65 + optIdx)}`}
-                        className={`w-full px-5 py-3 rounded-xl border transition-all focus:outline-none ${
-                          q.correctIndex === optIdx
-                            ? "bg-[#FCFF52]/10 border-[#FCFF52]/50 ring-2 ring-[#FCFF52]/30"
-                            : "bg-white/50 dark:bg-white/5 border-black/10 dark:border-white/10"
-                        } text-black dark:text-white placeholder-gray-400`}
+                        style={{ width: '100%', padding: '12px 20px', paddingRight: 40, borderRadius: 12, outline: 'none', fontFamily: 'inherit', border: `1.5px solid ${q.correctIndex === optIdx ? 'rgba(53,208,127,0.8)' : 'rgba(53,208,127,0.3)'}`, background: q.correctIndex === optIdx ? 'rgba(53,208,127,0.1)' : '#fff', color: '#0a1a0f' }}
                       />
                       <button
                         onClick={() => updateQuestion(q.id, "correctIndex", optIdx)}
@@ -946,7 +936,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   <select
                     value={q.timeLimit}
                     onChange={(e) => updateQuestion(q.id, "timeLimit", Number(e.target.value))}
-                    className="px-4 py-2 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white focus:outline-none"
+                    style={{ padding: "8px 16px", borderRadius: 12, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f" }}
                   >
                     <option value={10}>10s</option>
                     <option value={15}>15s</option>

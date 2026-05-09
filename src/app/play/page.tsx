@@ -822,17 +822,17 @@ export default function PlayPage() {
               transition={{ delay: 0.1 }}
               whileHover={{ scale: 1.03, y: -3 }}
               onClick={() => setJoinMode("qr")}
-              className="bg-black/60 backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 hover:border-[#FCFF52]/60 hover:shadow-[0_0_30px_rgba(252,255,82,0.2)] transition-all text-left space-y-5 group relative overflow-hidden"
+              className="glass rounded-[2rem] p-8 hover:border-[#FCFF52] transition-all text-left space-y-5 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(252,255,82,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
-              <div className="relative z-10 w-16 h-16 rounded-2xl bg-black border border-[#FCFF52] flex items-center justify-center shadow-[0_0_25px_rgba(252,255,82,0.25)] group-hover:shadow-[0_0_40px_rgba(252,255,82,0.4)] transition-shadow">
-                <QrCode className="w-8 h-8 text-[#FCFF52]" />
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(252,255,82,0.08)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+              <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#ffffff] border border-[#35D07F] flex items-center justify-center shadow-[0_0_15px_rgba(53,208,127,0.1)] group-hover:shadow-[0_0_20px_rgba(53,208,127,0.2)] transition-shadow">
+                <QrCode className="w-8 h-8 text-[#1a9f5e]" />
               </div>
               <div className="relative z-10">
-                <h3 className="text-xl font-extrabold mb-1 font-mono text-white">
+                <h3 className="text-xl font-extrabold mb-1 font-mono text-[#0a1a0f]">
                   {lang === "ENG" ? "OPTICAL_SCAN" : "OPTICAL_SCAN"}
                 </h3>
-                <p className="text-sm text-gray-400 font-mono text-xs">
+                <p className="font-mono text-xs text-[#4a6357]">
                   {lang === "ENG"
                     ? "Scan host's visual code"
                     : "Scan kode visual host"}
@@ -847,17 +847,17 @@ export default function PlayPage() {
               transition={{ delay: 0.2 }}
               whileHover={{ scale: 1.03, y: -3 }}
               onClick={() => setJoinMode("code")}
-              className="bg-black/60 backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 hover:border-[#35D07F]/60 hover:shadow-[0_0_30px_rgba(53,208,127,0.2)] transition-all text-left space-y-5 group relative overflow-hidden"
+              className="glass rounded-[2rem] p-8 hover:border-[#35D07F] transition-all text-left space-y-5 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
-              <div className="relative z-10 w-16 h-16 rounded-2xl bg-black border border-[#35D07F] flex items-center justify-center shadow-[0_0_25px_rgba(53,208,127,0.25)] group-hover:shadow-[0_0_40px_rgba(53,208,127,0.4)] transition-shadow">
-                <Keyboard className="w-8 h-8 text-[#35D07F]" />
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.08)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
+              <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#ffffff] border border-[#FCFF52] flex items-center justify-center shadow-[0_0_15px_rgba(252,255,82,0.1)] group-hover:shadow-[0_0_20px_rgba(252,255,82,0.2)] transition-shadow">
+                <Keyboard className="w-8 h-8 text-[#7a6e00]" />
               </div>
               <div className="relative z-10">
-                <h3 className="text-xl font-extrabold mb-1 font-mono text-white">
+                <h3 className="text-xl font-extrabold mb-1 font-mono text-[#0a1a0f]">
                   {lang === "ENG" ? "MANUAL_INPUT" : "MANUAL_INPUT"}
                 </h3>
-                <p className="text-sm text-gray-400 font-mono text-xs">
+                <p className="font-mono text-xs text-[#4a6357]">
                   {lang === "ENG"
                     ? "Enter unique 6-digit hash"
                     : "Masukkan hash 6-digit unik"}
@@ -878,13 +878,13 @@ export default function PlayPage() {
             </h3>
 
             {/* QR Scanner Placeholder */}
-            <div className="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border-2 border-[#FCFF52]/50 bg-black/80 flex items-center justify-center">
-              <div className="absolute inset-4 border-2 border-[#FCFF52] rounded-2xl border-dashed animate-pulse" />
-              <QrCode className="w-16 h-16 text-[#FCFF52]/50" />
+            <div className="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border-2 border-[#1a9f5e]/50 bg-[#e8fdf2] flex items-center justify-center">
+              <div className="absolute inset-4 border-2 border-[#1a9f5e] rounded-2xl border-dashed animate-pulse" />
+              <QrCode className="w-16 h-16 text-[#1a9f5e]/50" />
 
               {/* Scanning line animation */}
               <motion.div
-                className="absolute left-4 right-4 h-0.5 bg-[#FCFF52] shadow-[0_0_10px_rgba(20,241,149,0.8)]"
+                className="absolute left-4 right-4 h-0.5 bg-[#35D07F] shadow-[0_0_10px_rgba(53,208,127,0.6)]"
                 animate={{ top: ["10%", "85%", "10%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -898,22 +898,22 @@ export default function PlayPage() {
 
             {/* Manual code input as fallback */}
             <div className="pt-4 border-t border-black/5 dark:border-white/10 space-y-3">
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
-                className="w-full px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-[#FCFF52]/50"
-              />
-              <div className="flex gap-3">
                 <input
                   type="text"
-                  value={roomCode}
-                  onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                  maxLength={6}
-                  placeholder="ABCXYZ"
-                  className="flex-1 px-5 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white font-mono text-center text-lg tracking-widest uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FCFF52]/50"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
+                  style={{ width: '100%', padding: '12px 20px', borderRadius: 12, border: '1.5px solid rgba(53,208,127,0.3)', outline: 'none', background: '#fff', color: '#0a1a0f', fontWeight: 600, fontFamily: 'inherit', textAlign: 'center' }}
                 />
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={roomCode}
+                    onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                    maxLength={6}
+                    placeholder="ABCXYZ"
+                    style={{ flex: 1, padding: '12px 20px', borderRadius: 12, border: '1.5px solid rgba(53,208,127,0.3)', outline: 'none', background: '#fff', color: '#0a1a0f', fontFamily: 'monospace', fontSize: 18, fontWeight: 700, letterSpacing: '0.15em', textAlign: 'center', textTransform: 'uppercase' }}
+                  />
                 <button
                   onClick={handleJoinWithCode}
                   disabled={roomCode.length < 4 || !playerName.trim() || isJoining}
@@ -1011,7 +1011,7 @@ export default function PlayPage() {
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
-                className="w-full px-8 py-4 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#35D07F]/30 focus:border-[#35D07F] text-black dark:text-white text-center text-xl placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
+                style={{ width: '100%', padding: '16px 24px', borderRadius: 16, border: '2px solid rgba(53,208,127,0.3)', outline: 'none', background: '#fff', color: '#0a1a0f', fontSize: 18, fontWeight: 700, fontFamily: 'inherit', textAlign: 'center' }}
               />
               <input
                 type="text"
@@ -1019,7 +1019,7 @@ export default function PlayPage() {
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                 maxLength={6}
                 placeholder="_ _ _ _ _ _"
-                className="w-full px-8 py-6 rounded-2xl bg-white/50 dark:bg-white/5 border-2 border-[#35D07F]/30 focus:border-[#35D07F] text-black dark:text-white font-mono text-center text-3xl tracking-[0.3em] uppercase placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none transition-all"
+                style={{ width: '100%', padding: '16px 24px', borderRadius: 16, border: '2px solid rgba(53,208,127,0.3)', outline: 'none', background: '#fff', color: '#0a1a0f', fontSize: 28, fontWeight: 800, fontFamily: 'monospace', letterSpacing: '0.25em', textAlign: 'center', textTransform: 'uppercase' }}
               />
             </div>
 

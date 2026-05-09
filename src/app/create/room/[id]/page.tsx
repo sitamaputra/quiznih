@@ -135,10 +135,10 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
   if (!quizData) return <div className="min-h-screen flex items-center justify-center">Quiz not found</div>;
 
   return (
-    <main className="min-h-screen w-full text-black dark:text-white relative">
-      <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#35D07F]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[5%] w-[350px] h-[350px] bg-[#FCFF52]/10 blur-[150px] rounded-full" />
+    <main className="min-h-screen w-full text-[#0a1a0f] relative">
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', left: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(53,208,127,0.08)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', right: '10%', bottom: '15%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(252,255,82,0.09)', filter: 'blur(100px)' }} />
       </div>
 
       <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4 flex items-center justify-between gap-4 flex-wrap">
@@ -255,8 +255,8 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                           className="flex items-center gap-4 p-5 rounded-2xl border transition-all"
                           style={{
-                            background: idx === 0 ? 'rgba(253,224,71,0.08)' : idx === 1 ? 'rgba(209,213,219,0.05)' : 'rgba(255,255,255,0.03)',
-                            borderColor: idx < 3 ? `${COLORS[idx]}40` : 'rgba(255,255,255,0.08)'
+                            background: idx === 0 ? 'rgba(253,224,71,0.1)' : idx === 1 ? 'rgba(209,213,219,0.15)' : '#fff',
+                            borderColor: idx < 3 ? `${COLORS[idx]}60` : 'rgba(53,208,127,0.15)'
                           }}
                         >
                           {/* Rank */}
@@ -336,7 +336,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                     .slice(0,3)
                     .map((p,idx) => (
                       <div key={p.user_wallet} className={`flex items-center justify-between p-4 rounded-2xl ${
-                        idx===0?'bg-[#FDE047]/15 border border-[#FDE047]/40':idx===1?'bg-white/5 border border-white/10':'bg-white/3 border border-white/5'
+                        idx===0?'bg-[#FDE047]/15 border border-[#FDE047]/40':idx===1?'bg-gray-100 border border-gray-300':'bg-white border border-[#35D07F]/20'
                       }`}>
                         <span className="text-2xl">{['🥇','🥈','🥉'][idx]}</span>
                         <span className="font-extrabold text-lg">{p.player_name}</span>
@@ -390,7 +390,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             {/* Room Code Card */}
             <div className="glass rounded-[2rem] border border-white/5 p-8 flex flex-col items-center justify-center space-y-6">
               <h3 className="text-lg font-bold">🔑 {lang === "ENG" ? "Room Code" : "Kode Ruangan"}</h3>
-              <div className="px-8 py-4 rounded-xl bg-black dark:bg-white text-white dark:text-black font-mono text-3xl font-extrabold tracking-widest relative group">
+              <div className="px-8 py-4 rounded-xl bg-white border border-[#35D07F]/30 text-[#0a1a0f] font-mono text-3xl font-extrabold tracking-widest relative group shadow-sm">
                 {quizData.room_code}
                 <button
                   onClick={() => {
@@ -452,7 +452,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                         key={p.user_wallet}
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-red-500/20 transition-all group"
+                        className="flex items-center justify-between p-4 rounded-2xl bg-white border border-[#35D07F]/10 hover:border-red-500/20 shadow-sm transition-all group"
                       >
                         <div className="flex items-center gap-3">
                           <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
