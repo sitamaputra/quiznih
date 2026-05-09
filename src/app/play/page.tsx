@@ -15,9 +15,9 @@ import { useCeloQuiz } from "@/hooks/useCeloQuiz";
 import TopBar from "@/components/TopBar";
 
 const BGM_URLS = [
-  "https://cdn.pixabay.com/audio/2024/11/28/audio_3fac7f0464.mp3",
-  "https://cdn.pixabay.com/audio/2022/10/25/audio_32ff41a00f.mp3",
-  "https://cdn.pixabay.com/audio/2023/09/06/audio_13fae43d92.mp3",
+  "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3", // upbeat fun
+  "https://cdn.pixabay.com/audio/2022/12/28/audio_651f88db25.mp3", // game music
+  "https://cdn.pixabay.com/audio/2023/10/24/audio_3327d532ab.mp3", // chiptune happy
 ];
 
 const FLOATING_EMOJIS = ["🎯","⚡","🔥","💎","🏆","🎮","✨","🚀","💰","🎉","⭐","🎪"];
@@ -387,7 +387,15 @@ export default function PlayPage() {
         }
 
         setIsJoined(true);
-          
+        
+        // Auto-play music on successful join
+        if (!audioRef.current) {
+          audioRef.current = new Audio(BGM_URLS[currentBgm]);
+          audioRef.current.loop = true;
+          audioRef.current.volume = 0.3;
+        }
+        audioRef.current.play().catch(() => console.log("Audio autoplay blocked"));
+        setMusicOn(true);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         console.error("Error joining:", message);
@@ -467,7 +475,12 @@ export default function PlayPage() {
         <TopBar />
 
         <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-between z-10">
-          <button onClick={() => { setIsJoined(false); if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } }} className="flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition-colors group text-sm font-medium">
+          <button onClick={() => { 
+            if (window.confirm(lang === "ENG" ? "Are you sure you want to leave the room?" : "Yakin ingin keluar dari ruangan kuis ini?")) {
+              setIsJoined(false); 
+              if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } 
+            }
+          }} className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group text-sm font-medium">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             {lang === "ENG" ? "Leave Room" : "Keluar Ruangan"}
           </button>
