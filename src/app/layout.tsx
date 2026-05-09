@@ -20,12 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${outfit.variable} antialiased`}>
-      <body className="min-h-screen selection:bg-[#FCFF52] selection:text-black flex flex-col items-center transition-colors" style={{ backgroundColor: 'var(--background)' }}>
+      <body className="min-h-screen selection:bg-[#FCFF52] selection:text-black flex flex-col items-center" style={{ background: 'linear-gradient(160deg, #e8fdf2 0%, #fafffe 40%, #fffef0 100%)', color: '#0a1a0f' }}>
         <Providers>
-          {/* Adaptive Background Glow */}
+          {/* Global Background Glow — subtle green + yellow */}
           <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#FCFF52] opacity-[0.03] dark:opacity-[0.03] blur-[150px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#35D07F] opacity-[0.05] dark:opacity-[0.04] blur-[150px] rounded-full" />
+            <div style={{ position: 'absolute', top: '-5%', left: '-5%', width: '45%', height: '45%', background: '#35D07F', opacity: 0.07, filter: 'blur(120px)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', bottom: '-5%', right: '-5%', width: '40%', height: '40%', background: '#FCFF52', opacity: 0.09, filter: 'blur(120px)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', top: '40%', right: '20%', width: '30%', height: '30%', background: '#35D07F', opacity: 0.04, filter: 'blur(100px)', borderRadius: '50%' }} />
           </div>
           
           {children}

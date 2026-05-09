@@ -174,11 +174,11 @@ export default function SpinWheelPage() {
   const transStyle = isSpinning ? `transform ${actualDuration}s cubic-bezier(0.17,0.67,0.12,0.99)` : "none";
 
   return (
-    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+    <main className="min-h-screen w-full text-[#0a1a0f] relative">
       {/* Soft glow orbs */}
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', left: '10%', top: '15%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(167,139,250,0.08)', filter: 'blur(100px)' }} />
-        <div style={{ position: 'absolute', right: '5%', bottom: '10%', width: 350, height: 350, borderRadius: '50%', background: 'rgba(252,255,82,0.10)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', left: '5%', top: '10%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(167,139,250,0.10)', filter: 'blur(120px)' }} />
+        <div style={{ position: 'absolute', right: '0%', bottom: '5%', width: 450, height: 450, borderRadius: '50%', background: 'rgba(252,255,82,0.14)', filter: 'blur(120px)' }} />
       </div>
 
       <TopBar backHref="/dashboard" />

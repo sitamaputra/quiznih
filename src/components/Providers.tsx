@@ -9,8 +9,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <CeloProvider>
       <NextThemesProvider
         attribute="class"
-        defaultTheme="dark"
-        enableSystem
+        defaultTheme="light"
+        enableSystem={false}
         disableTransitionOnChange
       >
         <LanguageProvider>

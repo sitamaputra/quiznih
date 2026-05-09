@@ -36,22 +36,26 @@ export default function DashboardPage() {
       style={{
         minHeight: "100vh",
         width: "100%",
-        background: "linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)",
         position: "relative",
         overflowX: "hidden",
       }}
     >
-      {/* Soft glow orbs */}
+      {/* Soft glow orbs — memperkuat warna dari layout.tsx */}
       <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
         <div style={{
-          position: "absolute", left: "10%", top: "20%",
-          width: 500, height: 500, borderRadius: "50%",
-          background: "rgba(53,208,127,0.08)", filter: "blur(100px)",
+          position: "absolute", left: "5%", top: "15%",
+          width: 600, height: 600, borderRadius: "50%",
+          background: "rgba(53,208,127,0.12)", filter: "blur(120px)",
         }} />
         <div style={{
-          position: "absolute", right: "5%", bottom: "10%",
-          width: 400, height: 400, borderRadius: "50%",
-          background: "rgba(252,255,82,0.12)", filter: "blur(100px)",
+          position: "absolute", right: "0%", bottom: "5%",
+          width: 500, height: 500, borderRadius: "50%",
+          background: "rgba(252,255,82,0.15)", filter: "blur(120px)",
+        }} />
+        <div style={{
+          position: "absolute", right: "30%", top: "50%",
+          width: 300, height: 300, borderRadius: "50%",
+          background: "rgba(53,208,127,0.07)", filter: "blur(80px)",
         }} />
       </div>
 

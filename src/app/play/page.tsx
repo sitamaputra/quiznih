@@ -443,7 +443,7 @@ export default function PlayPage() {
 
   if (isJoined) {
     return (
-      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative overflow-hidden">
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', left: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
         <div style={{ position: 'absolute', right: '10%', bottom: '15%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
@@ -778,7 +778,7 @@ export default function PlayPage() {
   }
 
   return (
-    <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col" style={{ background: 'linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)' }}>
+    <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col">
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', right: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
         <div style={{ position: 'absolute', left: '10%', bottom: '20%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />

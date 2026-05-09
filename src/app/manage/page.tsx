@@ -70,21 +70,20 @@ export default function ManageQuizzesPage() {
     <main style={{
       minHeight: "100vh",
       width: "100%",
-      background: "linear-gradient(160deg, #f0fdf6 0%, #ffffff 50%, #fffde8 100%)",
       position: "relative",
       overflowX: "hidden",
     }}>
       {/* Soft glow orbs */}
       <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
         <div style={{
-          position: "absolute", right: "5%", top: "10%",
-          width: 400, height: 400, borderRadius: "50%",
-          background: "rgba(53,208,127,0.07)", filter: "blur(100px)",
+          position: "absolute", right: "0%", top: "5%",
+          width: 500, height: 500, borderRadius: "50%",
+          background: "rgba(53,208,127,0.11)", filter: "blur(120px)",
         }} />
         <div style={{
-          position: "absolute", left: "0%", bottom: "20%",
-          width: 350, height: 350, borderRadius: "50%",
-          background: "rgba(252,255,82,0.10)", filter: "blur(100px)",
+          position: "absolute", left: "0%", bottom: "15%",
+          width: 450, height: 450, borderRadius: "50%",
+          background: "rgba(252,255,82,0.13)", filter: "blur(120px)",
         }} />
       </div>
 
