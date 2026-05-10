@@ -451,10 +451,23 @@ export default function PlayPage() {
 
   if (isJoined) {
     return (
-      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative overflow-hidden">
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative overflow-hidden" style={{ background: "linear-gradient(135deg, #f8fff9 0%, #ffffff 100%)" }}>
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', left: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
-        <div style={{ position: 'absolute', right: '10%', bottom: '15%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], x: [0, 50, 0], y: [0, -30, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          style={{ position: 'absolute', left: '5%', top: '15%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(252,255,82,0.12)', filter: 'blur(120px)' }} 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0], x: [0, -60, 0], y: [0, 40, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          style={{ position: 'absolute', right: '5%', bottom: '10%', width: 600, height: 600, borderRadius: '50%', background: 'rgba(53,208,127,0.1)', filter: 'blur(120px)' }} 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          style={{ position: 'absolute', left: '40%', top: '40%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(6,182,212,0.08)', filter: 'blur(100px)' }} 
+        />
       </div>
 
         {/* Floating Emojis */}
@@ -582,45 +595,55 @@ export default function PlayPage() {
               className="w-full space-y-8"
             >
               {/* Progress & Timer */}
-              <div className="flex items-center justify-between glass px-6 py-4 rounded-full border border-black/10 dark:border-white/10">
-                <span className="font-bold text-gray-500">
-                  📝 {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
+              <div className="flex items-center justify-between px-8 py-5 rounded-full border border-black/5 bg-white/70 backdrop-blur-md shadow-sm mb-4">
+                <span className="font-bold text-gray-500 font-mono tracking-wider text-sm uppercase">
+                  {lang === "ENG" ? "Question" : "Soal"} {currentQuestionIndex + 1} / {questions.length}
                 </span>
-                <div className="flex items-center gap-2 text-[#35D07F] font-extrabold text-xl">
-                  <Clock className="w-5 h-5" />
+                <motion.div 
+                  animate={{ scale: timeLeft <= 5 ? [1, 1.1, 1] : 1, color: timeLeft <= 5 ? ["#ef4444", "#35D07F", "#ef4444"] : "#35D07F" }}
+                  transition={{ duration: 1, repeat: timeLeft <= 5 ? Infinity : 0 }}
+                  className="flex items-center gap-2 font-black text-2xl font-mono"
+                >
+                  <Clock className="w-6 h-6" />
                   {timeLeft}s
-                </div>
+                </motion.div>
               </div>
 
               {/* Question */}
-              <div className="glass p-10 rounded-[2.5rem] border border-[#35D07F]/30 text-center shadow-[0_0_30px_rgba(153,69,255,0.15)]">
-                <h2 className="text-2xl md:text-3xl font-extrabold leading-tight">
+              <motion.div 
+                initial={{ y: 20 }} animate={{ y: 0 }}
+                className="relative glass p-10 md:p-12 rounded-[2.5rem] border border-[#35D07F]/20 text-center bg-white/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(53,208,127,0.1)] overflow-hidden mb-6"
+              >
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#FCFF52] via-[#35D07F] to-[#06B6D4]" />
+                <h2 className="text-3xl md:text-4xl font-extrabold leading-tight text-[#0a1a0f] tracking-tight">
                   {questions[currentQuestionIndex]?.question_text}
                 </h2>
-              </div>
+              </motion.div>
 
               {/* Options */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                 {(questions[currentQuestionIndex]?.options || []).map((opt: string, idx: number) => (
-                  <button
+                  <motion.button
                     key={idx}
                     disabled={selectedAnswer !== null}
                     onClick={() => handleAnswerSelection(idx)}
-                    className={`p-6 rounded-2xl text-lg font-bold transition-all ${
+                    whileHover={{ scale: selectedAnswer === null ? 1.02 : 1, y: selectedAnswer === null ? -2 : 0 }}
+                    whileTap={{ scale: selectedAnswer === null ? 0.98 : 1 }}
+                    className={`relative p-6 md:p-8 rounded-[2rem] text-lg md:text-xl font-bold transition-all duration-300 overflow-hidden ${
                       selectedAnswer === idx
-                        ? "bg-[#35D07F] text-white shadow-[0_0_20px_rgba(153,69,255,0.4)] scale-[1.02]"
-                        : "glass hover:bg-[#35D07F]/10 hover:border-[#35D07F]/50 border border-black/10 dark:border-white/10"
-                    } ${selectedAnswer !== null && selectedAnswer !== idx ? "opacity-50" : ""}`}
+                        ? "bg-gradient-to-br from-[#35D07F] to-[#1a9f5e] text-white shadow-[0_10px_30px_rgba(53,208,127,0.4)] border-transparent"
+                        : "bg-white hover:bg-gray-50 border-2 border-gray-100 hover:border-[#35D07F]/40 shadow-sm hover:shadow-md text-gray-800"
+                    } ${selectedAnswer !== null && selectedAnswer !== idx ? "opacity-40 scale-95" : ""}`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
-                        selectedAnswer === idx ? "bg-white/20" : "bg-black/5 dark:bg-white/10"
+                    <div className="relative z-10 flex items-center gap-5 text-left">
+                      <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black font-mono shadow-sm ${
+                        selectedAnswer === idx ? "bg-white/20 text-white" : "bg-gray-100 text-gray-400"
                       }`}>
                         {String.fromCharCode(65 + idx)}
                       </div>
-                      {opt}
+                      <span className="leading-snug">{opt}</span>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </motion.div>
@@ -791,10 +814,18 @@ export default function PlayPage() {
   }
 
   return (
-    <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col">
+    <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative overflow-hidden" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)" }}>
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', right: '10%', top: '20%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
-        <div style={{ position: 'absolute', left: '10%', bottom: '20%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0], x: [0, -40, 0], y: [0, 30, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          style={{ position: 'absolute', right: '5%', top: '15%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(252,255,82,0.1)', filter: 'blur(120px)' }} 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.3, 1], rotate: [0, 90, 0], x: [0, 50, 0], y: [0, -40, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          style={{ position: 'absolute', left: '5%', bottom: '10%', width: 600, height: 600, borderRadius: '50%', background: 'rgba(53,208,127,0.12)', filter: 'blur(120px)' }} 
+        />
       </div>
 
       <TopBar backHref="/dashboard" />
