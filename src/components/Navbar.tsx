@@ -64,7 +64,7 @@ export default function Navbar() {
             <img
               src="/quiznih-logo.png"
               alt="Quiznih"
-              style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover" }}
+              style={{ width: 36, height: 36, objectFit: "contain", background: "none", border: "none", borderRadius: "10px" }}
             />
             <span style={{ fontWeight: 900, fontSize: 18, letterSpacing: "-0.02em", color: "#ffffff" }}>
               Quiznih
