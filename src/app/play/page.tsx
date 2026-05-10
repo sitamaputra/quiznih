@@ -74,6 +74,25 @@ export default function PlayPage() {
   const [currentBgm, setCurrentBgm] = useState(0);
   const [streak, setStreak] = useState(0);
   const [floatingEmojis, setFloatingEmojis] = useState<{id:number;emoji:string;x:number;delay:number}[]>([]);
+  const [celebrationEmojis, setCelebrationEmojis] = useState<{id:number;emoji:string;x:number;y:number;scale:number}[]>([]);
+  const [showRankPanel, setShowRankPanel] = useState(false);
+
+  const CELEBRATION_CORRECT = ["🎉","🔥","💯","⚡","✅","🏆","👏","💪","🌟","😎","🥳","💎"];
+  const CELEBRATION_WRONG = ["😭","💔","😢","❌","😩","🫠","😬","👀"];
+
+  const triggerCelebration = (correct: boolean) => {
+    const pool = correct ? CELEBRATION_CORRECT : CELEBRATION_WRONG;
+    const count = correct ? 12 : 6;
+    const burst = Array.from({length: count}, (_, i) => ({
+      id: Date.now() + i,
+      emoji: pool[Math.floor(Math.random() * pool.length)],
+      x: 20 + Math.random() * 60,
+      y: 20 + Math.random() * 60,
+      scale: 0.8 + Math.random() * 1.2,
+    }));
+    setCelebrationEmojis(burst);
+    setTimeout(() => setCelebrationEmojis([]), 2000);
+  };
 
   // Initialize floating emojis
   useEffect(() => {
@@ -152,9 +171,11 @@ export default function PlayPage() {
       setStreak(s => s + 1);
       // Correct SFX
       try { new Audio(CORRECT_SFX_URL).play(); } catch(_) {}
+      triggerCelebration(true);
     } else {
       setStreak(0);
       try { new Audio(WRONG_SFX_URL).play(); } catch(_) {}
+      triggerCelebration(false);
     }
     
     // Attempt to update score live on Supabase
@@ -526,8 +547,83 @@ export default function PlayPage() {
                 <span className="text-sm font-mono font-semibold">{walletShort}</span>
               </div>
             )}
+            {/* Rank Toggle */}
+            <button onClick={() => setShowRankPanel(!showRankPanel)}
+              className={`p-2.5 rounded-xl border transition-all ${showRankPanel ? "bg-[#35D07F]/20 border-[#35D07F]/40 text-[#1a9f5e]" : "bg-white/60 border-gray-200 text-gray-500 hover:text-[#1a9f5e]"}`}
+              title="Leaderboard"
+            >
+              <Trophy className="w-4 h-4" />
+            </button>
           </div>
         </header>
+
+        {/* Celebration Emoji Burst */}
+        <AnimatePresence>
+          {celebrationEmojis.map(ce => (
+            <motion.div
+              key={ce.id}
+              initial={{ opacity: 1, scale: 0, y: 0 }}
+              animate={{ opacity: 0, scale: ce.scale * 2, y: -120 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="fixed pointer-events-none z-50 text-4xl sm:text-5xl"
+              style={{ left: `${ce.x}%`, top: `${ce.y}%` }}
+            >
+              {ce.emoji}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Rank Panel (slide-out) */}
+        <AnimatePresence>
+          {showRankPanel && (
+            <motion.div
+              initial={{ x: 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 300, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed right-0 top-0 h-full w-72 sm:w-80 z-40 pt-20 pb-8 px-4"
+              style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)", borderLeft: "1px solid rgba(53,208,127,0.15)", boxShadow: "-8px 0 30px rgba(0,0,0,0.08)" }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-extrabold text-[#0a1a0f] flex items-center gap-2"><Trophy className="w-5 h-5 text-[#FCFF52]" /> Leaderboard</h3>
+                <button onClick={() => setShowRankPanel(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+              </div>
+              {/* Current Player */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#35D07F]/10 to-[#FCFF52]/10 border border-[#35D07F]/20 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#35D07F]/20 flex items-center justify-center text-xl">{AVATARS[selectedAvatar].emoji}</div>
+                  <div className="flex-1">
+                    <div className="font-bold text-sm text-[#0a1a0f]">{playerName || "You"}</div>
+                    <div className="text-xs text-[#4a6357]">{lang === "ENG" ? "Your Score" : "Skor Anda"}</div>
+                  </div>
+                  <div className="text-xl font-black text-[#35D07F]">{score}</div>
+                </div>
+              </div>
+              {/* Mock leaderboard */}
+              <div className="space-y-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+                {[
+                  { name: playerName || "You", sc: score, avatar: AVATARS[selectedAvatar].emoji, isYou: true },
+                  { name: "Alex", sc: Math.max(0, score - 50 + Math.floor(Math.random() * 100)), avatar: "🦊" },
+                  { name: "Bella", sc: Math.max(0, score - 80 + Math.floor(Math.random() * 120)), avatar: "🐱" },
+                  { name: "Chris", sc: Math.max(0, score - 120 + Math.floor(Math.random() * 80)), avatar: "🤖" },
+                  { name: "Diana", sc: Math.max(0, score - 200 + Math.floor(Math.random() * 60)), avatar: "🦄" },
+                ].sort((a, b) => b.sc - a.sc).map((p, i) => (
+                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${(p as any).isYou ? "bg-[#35D07F]/10 border border-[#35D07F]/20" : "bg-gray-50 border border-transparent"}`}>
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black ${i === 0 ? "bg-[#FCFF52] text-black" : i === 1 ? "bg-gray-200 text-gray-600" : i === 2 ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-400"}`}>
+                      {i + 1}
+                    </div>
+                    <span className="text-lg">{p.avatar}</span>
+                    <div className="flex-1">
+                      <span className={`text-sm font-bold ${(p as any).isYou ? "text-[#1a9f5e]" : "text-[#0a1a0f]"}`}>{p.name}</span>
+                    </div>
+                    <span className="font-black text-sm text-[#0a1a0f]">{p.sc}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* 1. Waiting Area */}
         {quizState === "waiting" && (
@@ -842,19 +938,18 @@ export default function PlayPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12 space-y-3"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] text-[10px] font-mono font-bold uppercase tracking-widest mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FCFF52] animate-pulse" />
-            CLIENT_NODE
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#1a9f5e] text-xs font-bold uppercase tracking-widest mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#35D07F] animate-pulse" />
+            {lang === "ENG" ? "Player Zone" : "Zona Pemain"}
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold uppercase font-mono">
-            {lang === "ENG" ? "Join " : "Gabung "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FCFF52] to-[#35D07F]">{lang === "ENG" ? "Network" : "Jaringan"}</span>
+          <h1 className="text-4xl md:text-6xl font-extrabold">
+            {lang === "ENG" ? "Join the " : "Masuk "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">Arena! 🎮</span>
           </h1>
-          <p className="text-gray-400 max-w-md mx-auto font-mono text-sm">
+          <p className="text-[#4a6357] max-w-md mx-auto text-base">
             {lang === "ENG"
-              ? "Scan the QR code or enter the room code to establish connection."
-              : "Scan QR code atau masukkan kode ruangan untuk membuat koneksi."}
-          </p>
+              ? "Scan the QR code or enter the room code to jump into the game."
+              : "Scan QR code atau masukkan kode ruangan untuk masuk ke permainan."}          </p>
         </motion.div>
 
         {joinMode === "select" && (
@@ -873,13 +968,13 @@ export default function PlayPage() {
                 <QrCode className="w-8 h-8 text-[#1a9f5e]" />
               </div>
               <div className="relative z-10">
-                <h3 className="text-xl font-extrabold mb-1 font-mono text-[#0a1a0f]">
-                  {lang === "ENG" ? "OPTICAL_SCAN" : "OPTICAL_SCAN"}
+                <h3 className="text-xl font-extrabold mb-1 text-[#0a1a0f]">
+                  {lang === "ENG" ? "Scan QR" : "Scan QR"} 📷
                 </h3>
-                <p className="font-mono text-xs text-[#4a6357]">
+                <p className="text-xs text-[#4a6357]">
                   {lang === "ENG"
-                    ? "Scan host's visual code"
-                    : "Scan kode visual host"}
+                    ? "Scan the host's QR code"
+                    : "Scan QR code dari host"}
                 </p>
               </div>
             </motion.button>
@@ -898,13 +993,13 @@ export default function PlayPage() {
                 <Keyboard className="w-8 h-8 text-[#7a6e00]" />
               </div>
               <div className="relative z-10">
-                <h3 className="text-xl font-extrabold mb-1 font-mono text-[#0a1a0f]">
-                  {lang === "ENG" ? "MANUAL_INPUT" : "MANUAL_INPUT"}
+                <h3 className="text-xl font-extrabold mb-1 text-[#0a1a0f]">
+                  {lang === "ENG" ? "Enter Code" : "Masukkan Kode"} ⌨️
                 </h3>
-                <p className="font-mono text-xs text-[#4a6357]">
+                <p className="text-xs text-[#4a6357]">
                   {lang === "ENG"
-                    ? "Enter unique 6-digit hash"
-                    : "Masukkan hash 6-digit unik"}
+                    ? "Type the 6-digit room code"
+                    : "Ketik kode ruangan 6 digit"}
                 </p>
               </div>
             </motion.button>
