@@ -56,9 +56,7 @@ body {
 
 /* Glass card — used in spin/live/qa detail panels */
 .glass {
-  background: rgba(255, 255, 255, 0.80);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(53, 208, 127, 0.18);
 }
 

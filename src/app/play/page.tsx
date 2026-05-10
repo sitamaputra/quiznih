@@ -1,5 +1,6 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
+import { t } from "@/lib/translations";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -403,7 +404,7 @@ export default function PlayPage() {
             setQuizState('playing'); // Start immediately in demo
             quizFound = true;
           } else {
-            throw new Error(lang === "ENG" ? "Quiz not found. Check your room code." : "Kuis tidak ditemukan. Periksa kode ruangan Anda.");
+            throw new Error(t("play.notFound", lang));
           }
         }
 
@@ -425,7 +426,7 @@ export default function PlayPage() {
         setIsJoining(false);
       }
     } else {
-      alert(lang === "ENG" ? "Please enter room code and your name." : "Harap masukkan kode ruangan dan nama Anda.");
+      alert(t("play.enterCodeAndName", lang));
     }
   };
 
@@ -510,13 +511,13 @@ export default function PlayPage() {
 
         <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-between z-10">
           <button onClick={() => { 
-            if (window.confirm(lang === "ENG" ? "Are you sure you want to leave the room?" : "Yakin ingin keluar dari ruangan kuis ini?")) {
+            if (window.confirm(t("play.leaveConfirm", lang))) {
               setIsJoined(false); 
               if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } 
             }
           }} className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group text-sm font-medium">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-            {lang === "ENG" ? "Leave Room" : "Keluar Ruangan"}
+            {t("play.leaveRoom", lang)}
           </button>
           <div className="flex items-center gap-2">
             {/* Music Controls */}
@@ -586,7 +587,7 @@ export default function PlayPage() {
               style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(20px)", borderLeft: "1px solid rgba(53,208,127,0.15)", boxShadow: "-8px 0 30px rgba(0,0,0,0.08)" }}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-extrabold text-[#0a1a0f] flex items-center gap-2"><Trophy className="w-5 h-5 text-[#FCFF52]" /> Leaderboard</h3>
+                <h3 className="text-lg font-extrabold text-[#0a1a0f] flex items-center gap-2"><Trophy className="w-5 h-5 text-[#FCFF52]" /> {t("play.leaderboard", lang)}</h3>
                 <button onClick={() => setShowRankPanel(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
               </div>
               {/* Current Player */}
@@ -595,7 +596,7 @@ export default function PlayPage() {
                   <div className="w-10 h-10 rounded-xl bg-[#35D07F]/20 flex items-center justify-center text-xl">{AVATARS[selectedAvatar].emoji}</div>
                   <div className="flex-1">
                     <div className="font-bold text-sm text-[#0a1a0f]">{playerName || "You"}</div>
-                    <div className="text-xs text-[#4a6357]">{lang === "ENG" ? "Your Score" : "Skor Anda"}</div>
+                    <div className="text-xs text-[#4a6357]">{t("play.yourScore", lang)}</div>
                   </div>
                   <div className="text-xl font-black text-[#35D07F]">{score}</div>
                 </div>
@@ -638,34 +639,32 @@ export default function PlayPage() {
                   <Clock className="w-8 h-8 text-[#FCFF52]" />
                 </div>
                 <h2 className="text-3xl font-extrabold">
-                  {lang === "ENG" ? "Waiting for Host..." : "Menunggu Host..."}
+                  {t("play.waitingHost", lang)}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400">
-                  {lang === "ENG"
-                    ? `You've joined room ${roomCode}. The quiz will start when the host begins the session.`
-                    : `Anda sudah bergabung di ruangan ${roomCode}. Kuis akan dimulai saat host memulai sesi.`}
+                  {`${t("play.joinedRoom", lang)} ${roomCode}. ${t("play.quizWillStart", lang)}`}
                 </p>
               </div>
 
               <div className="flex flex-wrap justify-center gap-8 text-center pt-4">
                 <div>
                   <div className="text-2xl font-extrabold text-[#FCFF52]">12</div>
-                  <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Players" : "Pemain"}</div>
+                  <div className="text-xs text-gray-500 font-semibold">{t("play.players", lang)}</div>
                 </div>
                 <div>
-                  📝 {questions.length} {lang === "ENG" ? "Questions" : "Soal"}
-                  <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Questions" : "Soal"}</div>
+                  📝 {questions.length} {t("play.questions", lang)}
+                  <div className="text-xs text-gray-500 font-semibold">{t("play.questions", lang)}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-extrabold text-[#FDE047]">{quizInfo?.reward_pool_amount || 0} CELO</div>
-                  <div className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Prize Pool" : "Total Hadiah"}</div>
+                  <div className="text-xs text-gray-500 font-semibold">{t("play.prizePool", lang)}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 justify-center">
                 <div className="w-3 h-3 rounded-full bg-[#FCFF52] animate-pulse" />
                 <span className="text-sm text-gray-500 font-medium">
-                  {lang === "ENG" ? "Connected & waiting..." : "Terhubung & menunggu..."}
+                  {t("play.connected", lang)}
                 </span>
               </div>
               
@@ -691,9 +690,9 @@ export default function PlayPage() {
               className="w-full space-y-8"
             >
               {/* Progress & Timer */}
-              <div className="flex items-center justify-between px-8 py-5 rounded-full border border-black/5 bg-white/70 backdrop-blur-md shadow-sm mb-4">
+              <div className="flex items-center justify-between px-8 py-5 rounded-full border border-black/5 bg-white/90 shadow-sm mb-4">
                 <span className="font-bold text-gray-500 font-mono tracking-wider text-sm uppercase">
-                  {lang === "ENG" ? "Question" : "Soal"} {currentQuestionIndex + 1} / {questions.length}
+                  {t("play.question", lang)} {currentQuestionIndex + 1} / {questions.length}
                 </span>
                 <motion.div 
                   animate={{ scale: timeLeft <= 5 ? [1, 1.1, 1] : 1, color: timeLeft <= 5 ? ["#ef4444", "#35D07F", "#ef4444"] : "#35D07F" }}
@@ -708,7 +707,7 @@ export default function PlayPage() {
               {/* Question */}
               <motion.div 
                 initial={{ y: 20 }} animate={{ y: 0 }}
-                className="relative glass p-10 md:p-12 rounded-[2.5rem] border border-[#35D07F]/20 text-center bg-white/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(53,208,127,0.1)] overflow-hidden mb-6"
+                className="relative glass p-10 md:p-12 rounded-[2.5rem] border border-[#35D07F]/20 text-center bg-white/95 shadow-[0_10px_40px_rgba(53,208,127,0.1)] overflow-hidden mb-6"
               >
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#FCFF52] via-[#35D07F] to-[#06B6D4]" />
                 <h2 className="text-3xl md:text-4xl font-extrabold leading-tight text-[#0a1a0f] tracking-tight">
@@ -764,12 +763,12 @@ export default function PlayPage() {
               
               <h2 className="text-4xl font-extrabold">
                 {isCorrect 
-                  ? (lang === "ENG" ? "Correct!" : "Benar!") 
-                  : (lang === "ENG" ? "Incorrect" : "Salah")}
+                  ? t("play.correct", lang) 
+                  : t("play.incorrect", lang)}
               </h2>
               
               <div className="glass p-6 rounded-[2rem] border border-black/10 dark:border-white/10 inline-block">
-                <p className="text-sm text-gray-500 mb-2">{lang === "ENG" ? "Correct Answer:" : "Jawaban Benar:"}</p>
+                <p className="text-sm text-gray-500 mb-2">{t("play.correctAnswer", lang)}</p>
                 <p className="text-xl font-bold text-[#FCFF52]">
                   {questions[currentQuestionIndex]?.options?.[questions[currentQuestionIndex]?.correct_answer_index]}
                 </p>
@@ -778,7 +777,7 @@ export default function PlayPage() {
               <div className="pt-8 space-y-4">
                 {/* Countdown progress bar */}
                 <div className="text-sm text-gray-500 font-semibold">
-                  {lang === "ENG" ? `Next question in ${revealCountdown}s...` : `Soal berikutnya dalam ${revealCountdown} detik...`}
+                  {`${t("play.nextIn", lang)} ${revealCountdown}s...`}
                 </div>
                 <div className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
                   <motion.div
@@ -793,7 +792,7 @@ export default function PlayPage() {
                   onClick={nextQuestion}
                   className="text-xs text-gray-400 hover:text-[#35D07F] transition-colors underline"
                 >
-                  {lang === "ENG" ? "Skip ▶" : "Lewati ▶"}
+                  {t("play.skip", lang)}
                 </button>
               </div>
             </motion.div>
@@ -816,20 +815,20 @@ export default function PlayPage() {
 
               <div className="space-y-2">
                 <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FDE047] to-[#EAB308]">
-                  {lang === "ENG" ? "Quiz Completed!" : "Kuis Selesai!"}
+                  {t("play.quizComplete", lang)}
                 </h2>
                 <p className="text-gray-500 font-medium">
-                  {lang === "ENG" ? "Here are your final stats" : "Inilah statistik akhir Anda"}
+                  {t("play.finalStats", lang)}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/5 dark:border-white/5">
-                  <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Score</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">{t("play.score", lang)}</div>
                   <div className="text-3xl font-black text-[#35D07F]">{score}</div>
                 </div>
                 <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/30 border border-black/5 dark:border-white/5">
-                  <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Rank</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">{t("play.rank", lang)}</div>
                   <div className="text-3xl font-black text-[#FCFF52]">#{claimRank || "?"}</div>
                 </div>
               </div>
@@ -838,8 +837,8 @@ export default function PlayPage() {
               <div className="p-6 rounded-2xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 space-y-3">
                 <h3 className="font-bold text-lg mb-1">
                   {hasClaimed 
-                    ? (lang === "ENG" ? "Reward Claimed!" : "Hadiah Diklaim!")
-                    : (lang === "ENG" ? "Claim Your Reward" : "Klaim Hadiah Anda")}
+                    ? t("play.rewardClaimed", lang)
+                    : t("play.claimReward", lang)}
                 </h3>
                 {claimRewardAmount && (
                   <div className="text-4xl font-black text-[#FCFF52] drop-shadow-sm my-2">
@@ -855,7 +854,7 @@ export default function PlayPage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-center gap-2 text-[#FCFF52] font-bold text-sm">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{lang === "ENG" ? "On-chain transfer confirmed" : "Transfer on-chain dikonfirmasi"}</span>
+                      <span>{t("play.onchainConfirmed", lang)}</span>
                     </div>
                     <a
                       href={getExplorer(claimTxSignature)}
@@ -864,13 +863,13 @@ export default function PlayPage() {
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-xs font-bold hover:bg-[#35D07F]/20 transition-all"
                     >
                       <ExternalLink className="w-3 h-3" />
-                      {lang === "ENG" ? "View on Celo Explorer" : "Lihat di Celo Explorer"}
+                      {t("play.viewExplorer", lang)}
                     </a>
                   </div>
                 )}
                 {!hasClaimed && (
                   <p className="text-xs text-gray-500">
-                    {lang === "ENG" ? "CELO will be sent directly to your wallet." : "CELO akan dikirim langsung ke wallet Anda."}
+                    {t("play.celoToWallet", lang)}
                   </p>
                 )}
               </div>
@@ -887,11 +886,11 @@ export default function PlayPage() {
                 className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#FDE047] to-[#EAB308] text-black font-extrabold text-lg hover:shadow-[0_0_30px_rgba(253,224,71,0.5)] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 {isClaiming ? (
-                  <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> {lang === "ENG" ? "Claiming on-chain..." : "Mengklaim on-chain..."}</span>
+                  <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> {t("play.claiming", lang)}</span>
                 ) : hasClaimed ? (
-                  <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> {lang === "ENG" ? "Claimed!" : "Berhasil Diklaim!"}</span>
+                  <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> {t("play.claimed", lang)}</span>
                 ) : (
-                  <span className="flex items-center gap-2"><Gift className="w-5 h-5" /> {lang === "ENG" ? "Claim Reward" : "Klaim Hadiah"}</span>
+                  <span className="flex items-center gap-2"><Gift className="w-5 h-5" /> {t("play.claimBtn", lang)}</span>
                 )}
               </button>
               
@@ -900,7 +899,7 @@ export default function PlayPage() {
                 className="block text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
                 onClick={() => setQuizState("waiting")}
               >
-                {lang === "ENG" ? "Back to Dashboard" : "Kembali ke Dasbor"}
+                {t("play.backDashboard", lang)}
               </Link>
             </motion.div>
           </div>
@@ -940,16 +939,14 @@ export default function PlayPage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#1a9f5e] text-xs font-bold uppercase tracking-widest mb-3">
             <span className="w-2 h-2 rounded-full bg-[#35D07F] animate-pulse" />
-            {lang === "ENG" ? "Player Zone" : "Zona Pemain"}
+            {t("play.playerZone", lang)}
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold">
-            {lang === "ENG" ? "Join the " : "Masuk "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">Arena! 🎮</span>
+            {t("play.joinArena", lang)} 
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#35D07F] to-[#FCFF52]">{t("play.arena", lang)} 🎮</span>
           </h1>
           <p className="text-[#4a6357] max-w-md mx-auto text-base">
-            {lang === "ENG"
-              ? "Scan the QR code or enter the room code to jump into the game."
-              : "Scan QR code atau masukkan kode ruangan untuk masuk ke permainan."}          </p>
+            {t("play.subtitle", lang)}</p>
         </motion.div>
 
         {joinMode === "select" && (
@@ -969,12 +966,10 @@ export default function PlayPage() {
               </div>
               <div className="relative z-10">
                 <h3 className="text-xl font-extrabold mb-1 text-[#0a1a0f]">
-                  {lang === "ENG" ? "Scan QR" : "Scan QR"} 📷
+                  {t("play.scanQR", lang)} 📷
                 </h3>
                 <p className="text-xs text-[#4a6357]">
-                  {lang === "ENG"
-                    ? "Scan the host's QR code"
-                    : "Scan QR code dari host"}
+                  {t("play.scanDesc", lang)}
                 </p>
               </div>
             </motion.button>
@@ -994,12 +989,10 @@ export default function PlayPage() {
               </div>
               <div className="relative z-10">
                 <h3 className="text-xl font-extrabold mb-1 text-[#0a1a0f]">
-                  {lang === "ENG" ? "Enter Code" : "Masukkan Kode"} ⌨️
+                  {t("play.enterCode", lang)} ⌨️
                 </h3>
                 <p className="text-xs text-[#4a6357]">
-                  {lang === "ENG"
-                    ? "Type the 6-digit room code"
-                    : "Ketik kode ruangan 6 digit"}
+                  {t("play.enterCodeDesc", lang)}
                 </p>
               </div>
             </motion.button>
@@ -1013,7 +1006,7 @@ export default function PlayPage() {
             className="glass rounded-[2.5rem] border border-[#FCFF52]/30 p-10 max-w-md w-full text-center space-y-8"
           >
             <h3 className="text-2xl font-bold">
-              {lang === "ENG" ? "Scan QR Code" : "Scan QR Code"}
+              {t("play.scanQRCode", lang)}
             </h3>
 
             {/* QR Scanner Placeholder */}
@@ -1030,9 +1023,7 @@ export default function PlayPage() {
             </div>
 
             <p className="text-sm text-gray-500">
-              {lang === "ENG"
-                ? "Point your camera at the QR code displayed by the quiz host."
-                : "Arahkan kamera Anda ke QR code yang ditampilkan oleh host kuis."}
+              {t("play.pointCamera", lang)}
             </p>
 
             {/* Manual code input as fallback */}
@@ -1041,7 +1032,7 @@ export default function PlayPage() {
                   type="text"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
+                  placeholder={t("play.yourName", lang)}
                   style={{ width: '100%', padding: '12px 20px', borderRadius: 12, border: '1.5px solid rgba(53,208,127,0.3)', outline: 'none', background: '#fff', color: '#0a1a0f', fontWeight: 600, fontFamily: 'inherit', textAlign: 'center' }}
                 />
                 <div className="flex gap-3">
@@ -1081,7 +1072,7 @@ export default function PlayPage() {
             {/* Avatar Picker */}
             <div className="space-y-3">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                {lang === "ENG" ? "Pick Your Character" : "Pilih Karaktermu"}
+                {t("play.pickCharacter", lang)}
               </p>
               <div className="flex items-center justify-center gap-4">
                 <button
@@ -1135,12 +1126,10 @@ export default function PlayPage() {
 
             <div className="space-y-2">
               <h3 className="text-2xl font-bold">
-                {lang === "ENG" ? "Enter Room Code" : "Masukkan Kode Ruangan"}
+                {t("play.enterRoomCode", lang)}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {lang === "ENG"
-                  ? "Ask the host for the 6-character room code."
-                  : "Minta kode ruangan 6 karakter dari host."}
+                {t("play.askHost", lang)}
               </p>
             </div>
 
@@ -1149,7 +1138,7 @@ export default function PlayPage() {
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                placeholder={lang === "ENG" ? "Your Name" : "Nama Anda"}
+                placeholder={t("play.yourName", lang)}
                 style={{ width: '100%', padding: '16px 24px', borderRadius: 16, border: '2px solid rgba(53,208,127,0.3)', outline: 'none', background: '#fff', color: '#0a1a0f', fontSize: 18, fontWeight: 700, fontFamily: 'inherit', textAlign: 'center' }}
               />
               <input
@@ -1169,9 +1158,9 @@ export default function PlayPage() {
               style={{ background: `linear-gradient(135deg, ${AVATARS[selectedAvatar].color}, #FCFF52)` }}
             >
               {isJoining ? (
-                <span className="flex items-center gap-2"><span className="animate-spin text-xl">⏳</span> {lang === "ENG" ? "Joining..." : "Bergabung..."}</span>
+                <span className="flex items-center gap-2"><span className="animate-spin text-xl">⏳</span> {t("play.joining", lang)}</span>
               ) : (
-                <><span className="text-xl">{AVATARS[selectedAvatar].emoji}</span> {lang === "ENG" ? "Join Room" : "Gabung Ruangan"}</>
+                <><span className="text-xl">{AVATARS[selectedAvatar].emoji}</span> {t("play.joinRoom", lang)}</>
               )}
             </button>
 
@@ -1179,7 +1168,7 @@ export default function PlayPage() {
               onClick={() => setJoinMode("select")}
               className="text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
             >
-              ⬅️ {lang === "ENG" ? "Back" : "Kembali"}
+              ⬅️ {t("play.back", lang)}
             </button>
           </motion.div>
         )}

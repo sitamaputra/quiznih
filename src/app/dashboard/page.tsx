@@ -10,6 +10,7 @@ import WalletDropdown from "@/components/WalletDropdown";
 import { isMiniPayEnvironment } from "@/lib/celo";
 import TopBar from "@/components/TopBar";
 import Image from "next/image";
+import { t } from "@/lib/translations";
 
 export default function DashboardPage() {
   const { lang } = useLanguage();
@@ -90,7 +91,7 @@ export default function DashboardPage() {
                 background: "#35D07F", display: "inline-block",
                 animation: "pulse-dot 2s ease-in-out infinite",
               }} />
-              {lang === "ENG" ? "Your Command Center" : "Pusat Komando Anda"}
+              {t("dash.badge", lang)}
             </div>
 
             <h1 style={{
@@ -101,7 +102,7 @@ export default function DashboardPage() {
               margin: "0 0 16px",
               color: "#0a1a0f",
             }}>
-              {lang === "ENG" ? "What would you like" : "Apa yang ingin"}
+              {t("dash.title1", lang)}
               <br />
               <span style={{
                 background: "linear-gradient(90deg, #35D07F, #1a9f5e)",
@@ -109,7 +110,7 @@ export default function DashboardPage() {
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
               }}>
-                {lang === "ENG" ? "to do today?" : "kamu lakukan hari ini?"}
+                {t("dash.title2", lang)}
               </span>
             </h1>
 
@@ -118,9 +119,7 @@ export default function DashboardPage() {
               maxWidth: 480, margin: "0 auto 52px",
               lineHeight: 1.6,
             }}>
-              {lang === "ENG"
-                ? "Host quizzes, join games, spin the wheel — all on Celo blockchain."
-                : "Buat kuis, ikut game, putar roda — semuanya di blockchain Celo."}
+              {t("dash.subtitle", lang)}
             </p>
           </motion.div>
         </div>
@@ -188,18 +187,16 @@ export default function DashboardPage() {
                 }}>HOST</div>
 
                 <h2 style={{ fontSize: 24, fontWeight: 700, color: "#0a1a0f", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
-                  {lang === "ENG" ? "Create Quiz" : "Buat Kuis"}
+                  {t("dash.createQuiz", lang)}
                 </h2>
                 <p style={{ fontSize: 14, color: "#4a6357", lineHeight: 1.6, margin: "0 0 24px" }}>
-                  {lang === "ENG"
-                    ? "Build an interactive quiz room, set CELO rewards, and challenge your friends!"
-                    : "Bikin ruang kuis interaktif, atur hadiah CELO, dan tantang teman-temanmu!"}
+                  {t("dash.createDesc", lang)}
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#1a9f5e", fontWeight: 700 }}>
                     <PlusCircle style={{ width: 18, height: 18 }} />
-                    <span style={{ fontSize: 14 }}>{lang === "ENG" ? "Start Creating →" : "Mulai Buat →"}</span>
+                    <span style={{ fontSize: 14 }}>{t("dash.startCreating", lang)}</span>
                   </div>
                   <Link
                     href="/manage"
@@ -213,7 +210,7 @@ export default function DashboardPage() {
                     onMouseLeave={(e) => (e.currentTarget.style.color = "#4a6357")}
                   >
                     <LayoutDashboard style={{ width: 15, height: 15 }} />
-                    <span>{lang === "ENG" ? "Manage Quizzes" : "Kelola Kuis"}</span>
+                    <span>{t("dash.manageQuizzes", lang)}</span>
                   </Link>
                 </div>
               </div>
@@ -270,17 +267,15 @@ export default function DashboardPage() {
                 }}>PLAYER</div>
 
                 <h2 style={{ fontSize: 24, fontWeight: 700, color: "#0a1a0f", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
-                  {lang === "ENG" ? "Join Game" : "Main Kuis"}
+                  {t("dash.joinGame", lang)}
                 </h2>
                 <p style={{ fontSize: 14, color: "#4a6357", lineHeight: 1.6, margin: "0 0 24px" }}>
-                  {lang === "ENG"
-                    ? "Enter a room code to join the action. Answer fast and win real CELO prizes!"
-                    : "Masukkan kode ruangan untuk beraksi. Jawab cepat dan menangkan hadiah CELO!"}
+                  {t("dash.joinDesc", lang)}
                 </p>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#7a6e00", fontWeight: 700 }}>
                   <Gamepad2 style={{ width: 18, height: 18 }} />
-                  <span style={{ fontSize: 14 }}>{lang === "ENG" ? "Enter Arena →" : "Masuk Arena →"}</span>
+                  <span style={{ fontSize: 14 }}>{t("dash.enterArena", lang)}</span>
                 </div>
               </div>
             </motion.div>
@@ -326,15 +321,13 @@ export default function DashboardPage() {
                   marginBottom: 16, fontSize: 22,
                 }}>🎡</div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0a1a0f", margin: "0 0 6px", letterSpacing: "-0.01em" }}>
-                  {lang === "ENG" ? "Spin Wheel" : "Roda Putar"}
+                  {t("dash.spinWheel", lang)}
                 </h2>
                 <p style={{ fontSize: 13, color: "#4a6357", lineHeight: 1.55, margin: "0 0 16px" }}>
-                  {lang === "ENG"
-                    ? "Can't decide a winner? Let fate spin the prize!"
-                    : "Bingung pilih pemenang? Biarkan takdir yang memilih!"}
+                  {t("dash.spinDesc", lang)}
                 </p>
                 <span style={{ fontSize: 13, color: "#0891b2", fontWeight: 700 }}>
-                  {lang === "ENG" ? "Spin Now →" : "Putar Sekarang →"}
+                  {t("dash.spinNow", lang)}
                 </span>
               </div>
             </motion.div>
@@ -373,16 +366,14 @@ export default function DashboardPage() {
                   marginBottom: 16, fontSize: 22,
                 }}>📺</div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0a1a0f", margin: "0 0 6px", letterSpacing: "-0.01em" }}>
-                  {lang === "ENG" ? "Live Report" : "Laporan Live"}
+                  {t("dash.liveReport", lang)}
                 </h2>
                 <p style={{ fontSize: 13, color: "#4a6357", lineHeight: 1.55, margin: "0 0 16px" }}>
-                  {lang === "ENG"
-                    ? "Watch the leaderboard update in real-time."
-                    : "Tonton skor secara real-time dan rasakan ketegangan."}
+                  {t("dash.liveDesc", lang)}
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#1a9f5e", fontWeight: 700, fontSize: 13 }}>
                   <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#35D07F", display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
-                  {lang === "ENG" ? "Watch Match →" : "Tonton Match →"}
+                  {t("dash.watchMatch", lang)}
                 </div>
               </div>
             </motion.div>
@@ -423,15 +414,13 @@ export default function DashboardPage() {
                   <MessageCircle style={{ width: 22, height: 22, color: "#7a6e00" }} />
                 </div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0a1a0f", margin: "0 0 6px", letterSpacing: "-0.01em" }}>
-                  {lang === "ENG" ? "Live Q&A" : "Tanya Jawab"}
+                  {t("dash.liveQA", lang)}
                 </h2>
                 <p style={{ fontSize: 13, color: "#4a6357", lineHeight: 1.55, margin: "0 0 16px" }}>
-                  {lang === "ENG"
-                    ? "Create an interactive Q&A space. Ask, vote, and discuss!"
-                    : "Buat ruang Q&A interaktif. Ajukan pertanyaan dan diskusi!"}
+                  {t("dash.qaDesc", lang)}
                 </p>
                 <span style={{ fontSize: 13, color: "#7a6e00", fontWeight: 700 }}>
-                  {lang === "ENG" ? "Create / Join Q&A →" : "Buat / Gabung Q&A →"}
+                  {t("dash.qaAction", lang)}
                 </span>
               </div>
             </motion.div>
@@ -464,22 +453,22 @@ export default function DashboardPage() {
              <div style={{ position: "relative", zIndex: 1 }}>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0a1a0f", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8 }}>
                   <MessageCircle style={{ width: 20, height: 20, color: "#1a9f5e" }} />
-                  {lang === "ENG" ? "Got Feedback?" : "Punya Masukan?"}
+                  {t("dash.feedback", lang)}
                 </h2>
                 <p style={{ fontSize: 14, color: "#4a6357", margin: "0 0 20px" }}>
-                  {lang === "ENG" ? "Help us improve your Quiznih experience. Report bugs or suggest features!" : "Bantu kami meningkatkan pengalaman Quiznih Anda. Laporkan bug atau sarankan fitur!"}
+                  {t("dash.feedbackDesc", lang)}
                 </p>
                 
                 <form 
                   onSubmit={(e) => { 
                     e.preventDefault(); 
-                    alert(lang === "ENG" ? "Thank you for your feedback!" : "Terima kasih atas masukan Anda!");
+                    alert(t("dash.feedbackThanks", lang));
                     (e.target as HTMLFormElement).reset();
                   }}
                   style={{ display: "flex", flexDirection: "column", gap: 16 }}
                 >
                   <textarea 
-                    placeholder={lang === "ENG" ? "Share your thoughts or report a bug..." : "Bagikan pendapat atau laporkan bug..."}
+                    placeholder={t("dash.feedbackPlaceholder", lang)}
                     required
                     style={{
                       width: "100%", minHeight: 120,
@@ -514,7 +503,7 @@ export default function DashboardPage() {
                       e.currentTarget.style.boxShadow = "0 4px 12px rgba(53,208,127,0.3)";
                     }}
                   >
-                    {lang === "ENG" ? "Send Feedback" : "Kirim Masukan"}
+                    {t("dash.feedbackSubmit", lang)}
                   </button>
                 </form>
              </div>
@@ -528,9 +517,7 @@ export default function DashboardPage() {
             style={{ textAlign: "center", paddingTop: 40, paddingBottom: 24 }}
           >
             <p style={{ fontSize: 13, color: "#4a6357" }}>
-              {lang === "ENG"
-                ? "Powered by Celo blockchain · Rewards paid on-chain"
-                : "Didukung blockchain Celo · Hadiah dibayar on-chain"}
+              {t("dash.footer", lang)}
             </p>
           </motion.div>
         </div>
