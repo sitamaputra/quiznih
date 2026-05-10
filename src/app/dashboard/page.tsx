@@ -437,6 +437,89 @@ export default function DashboardPage() {
             </motion.div>
           </div>
 
+          {/* Feedback Form Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            style={{
+              marginTop: 40,
+              background: "#ffffff",
+              border: "1.5px solid rgba(53,208,127,0.2)",
+              boxShadow: "0 3px 20px rgba(53,208,127,0.05)",
+              borderRadius: 24,
+              padding: "36px",
+              position: "relative",
+              overflow: "hidden"
+            }}
+          >
+             {/* decorative background element */}
+             <div style={{
+                position: "absolute", top: -60, left: -60,
+                width: 200, height: 200, borderRadius: "50%",
+                background: "rgba(53,208,127,0.05)", filter: "blur(40px)",
+                pointerEvents: "none",
+             }} />
+             
+             <div style={{ position: "relative", zIndex: 1 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0a1a0f", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8 }}>
+                  <MessageCircle style={{ width: 20, height: 20, color: "#1a9f5e" }} />
+                  {lang === "ENG" ? "Got Feedback?" : "Punya Masukan?"}
+                </h2>
+                <p style={{ fontSize: 14, color: "#4a6357", margin: "0 0 20px" }}>
+                  {lang === "ENG" ? "Help us improve your Quiznih experience. Report bugs or suggest features!" : "Bantu kami meningkatkan pengalaman Quiznih Anda. Laporkan bug atau sarankan fitur!"}
+                </p>
+                
+                <form 
+                  onSubmit={(e) => { 
+                    e.preventDefault(); 
+                    alert(lang === "ENG" ? "Thank you for your feedback!" : "Terima kasih atas masukan Anda!");
+                    (e.target as HTMLFormElement).reset();
+                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: 16 }}
+                >
+                  <textarea 
+                    placeholder={lang === "ENG" ? "Share your thoughts or report a bug..." : "Bagikan pendapat atau laporkan bug..."}
+                    required
+                    style={{
+                      width: "100%", minHeight: 120,
+                      padding: "16px", borderRadius: 16,
+                      background: "rgba(53,208,127,0.03)",
+                      border: "1.5px solid rgba(53,208,127,0.2)",
+                      color: "#0a1a0f", fontSize: 14,
+                      outline: "none", resize: "vertical",
+                      fontFamily: "inherit",
+                      transition: "border-color 0.2s"
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = "rgba(53,208,127,0.5)")}
+                    onBlur={(e) => (e.target.style.borderColor = "rgba(53,208,127,0.2)")}
+                  />
+                  <button 
+                    type="submit"
+                    style={{
+                      alignSelf: "flex-end",
+                      padding: "12px 24px", borderRadius: 12,
+                      background: "linear-gradient(90deg, #35D07F, #1a9f5e)",
+                      color: "#fff", fontWeight: 700, fontSize: 14,
+                      border: "none", cursor: "pointer",
+                      boxShadow: "0 4px 12px rgba(53,208,127,0.3)",
+                      transition: "transform 0.2s, box-shadow 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(53,208,127,0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(53,208,127,0.3)";
+                    }}
+                  >
+                    {lang === "ENG" ? "Send Feedback" : "Kirim Masukan"}
+                  </button>
+                </form>
+             </div>
+          </motion.div>
+
           {/* Footer mini */}
           <motion.div
             initial={{ opacity: 0 }}
