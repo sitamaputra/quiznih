@@ -164,7 +164,7 @@ function QAContent() {
   // ====== JOIN SCREEN ======
   if (!isJoined) {
     return (
-      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative">
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative" style={{ background: '#e8fdf2' }}>
         <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
           <div style={{ position: 'absolute', left: '10%', top: '20%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(6,182,212,0.06)', filter: 'blur(100px)' }} />
           <div style={{ position: 'absolute', right: '10%', bottom: '10%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(252,255,82,0.08)', filter: 'blur(100px)' }} />
@@ -235,7 +235,7 @@ function QAContent() {
 
   // ====== Q&A ROOM VIEW ======
   return (
-    <main className="min-h-screen w-full text-[#0a1a0f] relative">
+    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: '#e8fdf2' }}>
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', left: '5%', top: '15%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(6,182,212,0.06)', filter: 'blur(100px)' }} />
         <div style={{ position: 'absolute', right: '5%', bottom: '10%', width: 350, height: 350, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
@@ -436,7 +436,7 @@ function QAContent() {
       <div className="fixed bottom-0 left-0 right-0 z-40">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6 pt-3">
           <motion.div initial={{ y: 40 }} animate={{ y: 0 }}
-            className="rounded-2xl border border-[#06B6D4]/30 bg-white/90 dark:bg-[#0a0a12]/95 backdrop-blur-xl p-4 shadow-2xl"
+            className="rounded-2xl border border-[#06B6D4]/30 bg-white/95 p-4 shadow-2xl"
           >
             <div className="flex items-center gap-3">
               <input

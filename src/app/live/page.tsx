@@ -194,7 +194,7 @@ function LiveReportContent() {
   // ====== JOIN / ROOM CODE SCREEN ======
   if (!isWatching) {
     return (
-      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative">
+      <main className="min-h-screen w-full text-[#0a1a0f] flex flex-col relative" style={{ background: '#e8fdf2' }}>
         {/* Soft glow orbs */}
         <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
           <div style={{ position: 'absolute', left: '10%', top: '20%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
@@ -256,7 +256,7 @@ function LiveReportContent() {
 
   // ====== LIVE REPORT VIEW ======
   return (
-    <main className="min-h-screen w-full text-[#0a1a0f] relative">
+    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: '#e8fdf2' }}>
       {/* Soft glow orbs */}
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', left: '5%', top: '15%', width: 400, height: 400, borderRadius: '50%', background: 'rgba(53,208,127,0.07)', filter: 'blur(100px)' }} />
@@ -553,7 +553,8 @@ function LiveReportContent() {
         {showWinner && sortedPlayers.length > 0 && (
           <>
             <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-50"
+              className="fixed inset-0 z-50"
+              style={{ background: 'rgba(0,0,0,0.6)' }}
               onClick={() => setShowWinner(false)}
             />
             <motion.div
@@ -563,7 +564,7 @@ function LiveReportContent() {
               transition={{type:"spring",stiffness:300,damping:25}}
               className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg p-4"
             >
-              <div className="rounded-[2.5rem] border-2 border-[#FCFF52]/50 p-10 text-center space-y-5 shadow-[0_0_100px_rgba(252,255,82,0.3)] bg-[#0a0a12]/95 backdrop-blur-xl">
+              <div className="rounded-[2.5rem] border-2 border-[#FCFF52]/50 p-10 text-center space-y-5 shadow-[0_0_100px_rgba(252,255,82,0.3)]" style={{ background: '#ffffff' }}>
                 <motion.div initial={{scale:0}} animate={{scale:1}} transition={{delay:0.2,type:"spring",stiffness:200}}
                   className="text-7xl"
                 >{sortedPlayers[0]?.avatar_emoji || "🏆"}</motion.div>
