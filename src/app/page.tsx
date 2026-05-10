@@ -240,11 +240,12 @@ function Hero() {
           <Image
             src="/quiznih-hero-3d.png"
             alt="Quiznih 3D Icon"
-            width={420}
-            height={420}
+            width={560}
+            height={560}
             priority
+            className="mix-blend-multiply"
             style={{
-              maxWidth: 420, width: "100%", height: "auto",
+              maxWidth: 560, width: "100%", height: "auto",
               animation: "hero-float 4s ease-in-out infinite",
               filter: "drop-shadow(0 20px 60px rgba(53,208,127,0.25))",
             }}
@@ -820,6 +821,7 @@ function SiteFooter() {
               alt="Quiznih"
               width={28}
               height={28}
+              className="mix-blend-multiply"
               style={{ borderRadius: 8, objectFit: "cover" }}
             />
             <span style={{ fontWeight: 700, fontSize: 18, color: "#0a1a0f" }}>Quiznih</span>
