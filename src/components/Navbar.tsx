@@ -1,7 +1,7 @@
 "use client";
 import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
 import Link from "next/link";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, LANGUAGES } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -10,7 +10,7 @@ import AuthModal from "./AuthModal";
 import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
-  const { lang, toggleLang } = useLanguage();
+  const { lang, setLang, toggleLang } = useLanguage();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { address, isConnected } = useAccount();
@@ -19,6 +19,7 @@ export default function Navbar() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -112,9 +113,34 @@ export default function Navbar() {
 
           {/* Right: Controls + Auth */}
           <div className="hidden md:flex items-center gap-2">
-            {/* Auth Section */}
             {mounted && (
               <div className="relative flex items-center gap-3">
+                {/* Language Selector */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                    className="flex items-center gap-1.5 transition-all text-sm font-semibold hover:bg-white/30"
+                    style={{ background: "rgba(255,255,255,0.2)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 50, padding: "8px 14px", cursor: "pointer" }}
+                  >
+                    <Globe2 className="w-4 h-4" />
+                    <span>{LANGUAGES.find(l => l.code === lang)?.code || lang}</span>
+                  </button>
+                  {isLangDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-[#1A1A2E] border border-black/10 dark:border-white/10 rounded-2xl shadow-xl p-2 z-50">
+                      {LANGUAGES.map((l) => (
+                        <button
+                          key={l.code}
+                          onClick={() => { setLang(l.code); setIsLangDropdownOpen(false); }}
+                          className={`flex items-center gap-3 w-full px-3 py-2 text-sm rounded-xl transition-colors font-semibold ${lang === l.code ? "bg-[#35D07F]/10 text-[#35D07F]" : "hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300"}`}
+                        >
+                          <span className="text-lg">{l.flag}</span>
+                          <span>{l.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {/* 1. Master Login Button (If completely unauthenticated) */}
                 {!user && !isConnected && (
                   <button
