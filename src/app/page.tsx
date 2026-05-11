@@ -129,8 +129,8 @@ function Hero() {
             }}
           >
             {lang === "ENG"
-              ? "Join quizzes, stake your knowledge, compete with others, and win real CELO tokens — all on-chain."
-              : "Ikuti kuis, unjukkan pengetahuanmu, bersaing dengan orang lain, dan menangkan token CELO nyata — semuanya on-chain."}
+              ? "Test your knowledge in interactive quizzes, compete with friends and earn real CELO tokens completely on-chain."
+              : "Uji pengetahuanmu di kuis interaktif, bersaing dengan teman dan dapatkan token CELO sungguhan sepenuhnya on-chain."}
           </p>
 
           {/* CTAs */}
