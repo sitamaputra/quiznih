@@ -68,7 +68,7 @@ export default function Navbar() {
               alt="Quiznih"
               style={{ width: 36, height: 36, objectFit: "contain", background: "none", border: "none", borderRadius: "10px" }}
             />
-            <span style={{ fontWeight: 900, fontSize: 18, letterSpacing: "-0.02em", color: "#ffffff" }}>
+            <span style={{ fontWeight: 900, fontSize: 22, letterSpacing: "-0.02em", color: "#ffffff" }}>
               Quiznih
             </span>
           </Link>
@@ -80,7 +80,7 @@ export default function Navbar() {
           >
             <a
               href="#how-it-works"
-              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+              style={{ color: "rgba(0,0,0,0.6)", fontSize: 16, fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
               onMouseOver={e => (e.currentTarget.style.color = "#000")}
               onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
             >
@@ -88,7 +88,7 @@ export default function Navbar() {
             </a>
             <a
               href="#quizzes"
-              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+              style={{ color: "rgba(0,0,0,0.6)", fontSize: 16, fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
               onMouseOver={e => (e.currentTarget.style.color = "#000")}
               onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
             >
@@ -96,7 +96,7 @@ export default function Navbar() {
             </a>
             <a
               href="#minipay"
-              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
+              style={{ color: "rgba(0,0,0,0.6)", fontSize: 16, fontWeight: 700, textDecoration: "none", transition: "color 0.2s" }}
               onMouseOver={e => (e.currentTarget.style.color = "#000")}
               onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
             >
@@ -104,7 +104,7 @@ export default function Navbar() {
             </a>
             <a
               href="#leaderboard"
-              style={{ color: "rgba(0,0,0,0.6)", fontWeight: 600, textDecoration: "none", transition: "color 0.2s" }}
+              style={{ color: "rgba(0,0,0,0.6)", fontSize: 16, fontWeight: 600, textDecoration: "none", transition: "color 0.2s" }}
               onMouseOver={e => (e.currentTarget.style.color = "#000")}
               onMouseOut={e => (e.currentTarget.style.color = "rgba(0,0,0,0.6)")}
             >
@@ -120,7 +120,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                    className="flex items-center gap-1.5 transition-all text-sm font-semibold hover:bg-white/30"
+                    className="flex items-center gap-1.5 transition-all text-base font-semibold hover:bg-white/30"
                     style={{ background: "rgba(255,255,255,0.2)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 50, padding: "8px 14px", cursor: "pointer" }}
                   >
                     <Globe2 className="w-4 h-4" />
@@ -132,7 +132,7 @@ export default function Navbar() {
                         <button
                           key={l.code}
                           onClick={() => { setLang(l.code); setIsLangDropdownOpen(false); }}
-                          className={`flex items-center gap-3 w-full px-3 py-2 text-sm rounded-xl transition-colors font-semibold ${lang === l.code ? "bg-[#35D07F]/10 text-[#35D07F]" : "hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300"}`}
+                          className={`flex items-center gap-3 w-full px-3 py-2 text-base rounded-xl transition-colors font-semibold ${lang === l.code ? "bg-[#35D07F]/10 text-[#35D07F]" : "hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300"}`}
                         >
                           <span className="text-lg">{l.flag}</span>
                           <span>{l.label}</span>
@@ -146,7 +146,7 @@ export default function Navbar() {
                 {!user && !isConnected && (
                   <button
                     onClick={() => setIsAuthOpen(true)}
-                    className="flex items-center gap-2 transition-all text-sm"
+                    className="flex items-center gap-2 transition-all text-base"
                     style={{ background: "#FCFF52", color: "#0a1a0f", fontWeight: 900, border: "none", borderRadius: 50, padding: "10px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", cursor: "pointer" }}
                   >
                     <LogIn className="w-4 h-4" />
@@ -159,7 +159,7 @@ export default function Navbar() {
                   <div className="relative">
                     <button
                       onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                      className="flex items-center gap-2 transition-all font-semibold text-sm"
+                      className="flex items-center gap-2 transition-all font-semibold text-base"
                       style={{ background: "#FCFF52", color: "#0a1a0f", border: "none", borderRadius: 50, padding: "8px 16px", cursor: "pointer" }}
                     >
                       <User className="w-4 h-4" />
@@ -171,11 +171,11 @@ export default function Navbar() {
                       <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-2xl shadow-xl p-2 z-50">
                         <div className="px-3 py-2 border-b border-black/10 dark:border-white/10 mb-2">
                           <p className="text-xs text-gray-500 font-semibold">{t("auto.2", lang)}</p>
-                          <p className="text-sm font-bold truncate">{user.email}</p>
+                          <p className="text-base font-bold truncate">{user.email}</p>
                         </div>
                         <button
                           onClick={handleLogout}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-semibold"
+                          className="flex items-center gap-2 w-full px-3 py-2 text-base text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-semibold"
                         >
                           <LogOut className="w-4 h-4" />
                           {t("auto.3", lang)}

@@ -110,7 +110,7 @@ function Hero() {
           {/* Subtitle */}
           <p
             style={{
-              fontSize: "clamp(18px, 2.5vw, 22px)", color: "#0a1a0f",
+              fontSize: "clamp(20px, 3vw, 24px)", color: "#0a1a0f",
               maxWidth: 520, margin: "0 0 16px", lineHeight: 1.4,
               textAlign: "center", fontWeight: 600,
             }}
@@ -123,7 +123,7 @@ function Hero() {
           {/* Body */}
           <p
             style={{
-              fontSize: "clamp(15px, 1.8vw, 17px)", color: "#4a6357",
+              fontSize: "clamp(17px, 2vw, 19px)", color: "#4a6357",
               maxWidth: 480, margin: "0 0 40px", lineHeight: 1.6,
               textAlign: "center",
             }}
@@ -141,7 +141,7 @@ function Hero() {
                   padding: "16px 36px", borderRadius: 14, border: "none",
                   cursor: "pointer",
                   background: "linear-gradient(135deg, #1a9f5e, #35D07F)",
-                  color: "#fff", fontWeight: 700, fontSize: 17,
+                  color: "#fff", fontWeight: 700, fontSize: 18,
                   fontFamily: "inherit",
                   boxShadow: "0 4px 14px rgba(53,208,127,0.25)",
                   transition: "transform 0.2s, box-shadow 0.2s",
@@ -165,7 +165,7 @@ function Hero() {
                   padding: "16px 36px", borderRadius: 14, cursor: "pointer",
                   background: "transparent",
                   border: "1.5px solid rgba(53,208,127,0.3)",
-                  color: "#0a1a0f", fontWeight: 600, fontSize: 17,
+                  color: "#0a1a0f", fontWeight: 600, fontSize: 18,
                   fontFamily: "inherit",
                   transition: "border-color 0.2s, background 0.2s",
                 }}
@@ -352,10 +352,10 @@ function HowItWorks() {
                 height={72}
                 style={{ marginBottom: 20, objectFit: "contain" }}
               />
-              <h3 style={{ fontSize: 20, fontWeight: 600, color: "#0a1a0f", margin: "0 0 10px" }}>
+              <h3 style={{ fontSize: 22, fontWeight: 600, color: "#0a1a0f", margin: "0 0 10px" }}>
                 {s.title}
               </h3>
-              <p style={{ fontSize: 15, color: "#4a6357", margin: 0, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 16, color: "#4a6357", margin: 0, lineHeight: 1.6 }}>
                 {s.desc}
               </p>
             </div>
@@ -702,7 +702,7 @@ function Leaderboard() {
 
               <span
                 style={{
-                  flex: 1, fontFamily: "monospace", fontSize: 15,
+                  flex: 1, fontFamily: "monospace", fontSize: 16,
                   color: "#4a6357", cursor: "pointer",
                   display: "flex", alignItems: "center", gap: 8,
                 }}
@@ -741,7 +741,7 @@ function Leaderboard() {
             style={{
               padding: "12px 28px", borderRadius: 12, background: "transparent",
               border: "1.5px solid rgba(53,208,127,0.3)",
-              color: "#1a9f5e", fontWeight: 600, fontSize: 15,
+              color: "#1a9f5e", fontWeight: 600, fontSize: 16,
               cursor: "pointer", fontFamily: "inherit",
               transition: "all 0.2s",
             }}
