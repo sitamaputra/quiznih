@@ -21,12 +21,7 @@ interface Player {
   avatar_emoji?: string;
 }
 
-interface Bet {
-  playerWallet: string;
-  playerName: string;
-  amount: number;
-  timestamp: number;
-}
+
 
 const PRIZE_POOL_TYPES = [
   { id: "celo", label: "CELO", icon: "💰", prizes: ["0.5 CELO", "0.3 CELO", "0.2 CELO"] },
@@ -59,10 +54,7 @@ function LiveReportContent() {
   const [quizInfo, setQuizInfo] = useState<any>(null);
   const [selectedPrizePool, setSelectedPrizePool] = useState(PRIZE_POOL_TYPES[0]);
   const [customPrizes, setCustomPrizes] = useState(["", "", ""]);
-  const [bets, setBets] = useState<Bet[]>([]);
-  const [myBet, setMyBet] = useState<string | null>(null);
-  const [betAmount, setBetAmount] = useState("0.1");
-  const [showBetPanel, setShowBetPanel] = useState(false);
+
   const [isDemo, setIsDemo] = useState(false);
   const [liveTime, setLiveTime] = useState(0);
   const { takeScreenshot, startRecording, stopRecording, isRecording, recordingTime, formatRecTime } = useCapture();
@@ -166,16 +158,7 @@ function LiveReportContent() {
     }
   };
 
-  const handleBet = (playerWallet: string, playerName: string) => {
-    if (myBet) return;
-    setMyBet(playerWallet);
-    setBets(prev => [...prev, {
-      playerWallet, playerName,
-      amount: parseFloat(betAmount) || 0.1,
-      timestamp: Date.now(),
-    }]);
-    setShowBetPanel(false);
-  };
+
 
   const sortedPlayers = [...players].sort((a, b) => (b.final_score || 0) - (a.final_score || 0));
   const MEDALS = ["🥇", "🥈", "🥉"];
@@ -214,8 +197,8 @@ function LiveReportContent() {
             </h1>
             <p style={{ fontSize: 16, color: '#4a6357', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>
               {lang === "ENG"
-                ? "Monitor quiz activity and place predictions."
-                : "Monitor aktivitas kuis dan pasang prediksi."}
+                ? "Monitor quiz activity."
+                : "Monitor aktivitas kuis."}
             </p>
           </motion.div>
 
@@ -316,18 +299,7 @@ function LiveReportContent() {
         >
           <div>
             <h1 className="text-2xl font-extrabold text-gradient">{quizInfo?.title || "Live Quiz"}</h1>
-            <p className="text-gray-500 text-sm">{lang === "ENG" ? "Real-time scoreboard & betting" : "Papan skor & taruhan real-time"}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setShowBetPanel(!showBetPanel)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all ${
-                showBetPanel ? "bg-[#FCFF52] text-black" : "bg-[#FCFF52]/15 text-[#FCFF52] border border-[#FCFF52]/40 hover:bg-[#FCFF52]/25"
-              }`}
-            >
-              <Target className="w-4 h-4" />
-              {lang === "ENG" ? "Bet Panel" : "Panel Taruhan"}
-              <ChevronDown className={`w-4 h-4 transition-transform ${showBetPanel ? "rotate-180" : ""}`} />
-            </button>
+            <p className="text-gray-500 text-sm">{lang === "ENG" ? "Real-time scoreboard" : "Papan skor real-time"}</p>
           </div>
         </motion.div>
 
@@ -364,16 +336,7 @@ function LiveReportContent() {
                     <p className="font-extrabold text-lg truncate">{p.player_name || "Anonymous"}</p>
                     <p className="text-xs text-gray-500 font-mono">{p.user_wallet}</p>
                   </div>
-                  {myBet === p.user_wallet && (
-                    <span className="px-3 py-1 rounded-full bg-[#FCFF52]/20 text-[#FCFF52] text-xs font-bold">
-                      🎯 {lang === "ENG" ? "Your Bet" : "Taruhanmu"}
-                    </span>
-                  )}
-                  {bets.filter(b => b.playerWallet === p.user_wallet).length > 0 && myBet !== p.user_wallet && (
-                    <span className="px-2 py-1 rounded-full bg-white/5 text-gray-400 text-xs font-bold">
-                      {bets.filter(b => b.playerWallet === p.user_wallet).length} bet
-                    </span>
-                  )}
+
                   <motion.div key={p.final_score} initial={{ scale: 1.3 }} animate={{ scale: 1 }} className="text-right">
                     <div className="text-2xl font-black" style={{ color: idx === 0 ? "#FDE047" : "#FCFF52" }}>
                       {p.final_score || 0}
@@ -467,48 +430,6 @@ function LiveReportContent() {
               </div>
             </div>
 
-            {/* Betting Panel */}
-            <AnimatePresence>
-              {showBetPanel && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
-                  className="glass rounded-[2rem] border border-[#35D07F]/30 p-6 space-y-4 overflow-hidden"
-                >
-                  <h3 className="font-bold flex items-center gap-2">
-                    <Target className="w-5 h-5 text-[#35D07F]" />
-                    {lang === "ENG" ? "Place Your Bet" : "Pasang Taruhan"}
-                  </h3>
-                  {myBet ? (
-                    <div className="text-center py-4 space-y-2">
-                      <p className="text-[#35D07F] font-bold">✅ {lang === "ENG" ? "Bet placed!" : "Taruhan dipasang!"}</p>
-                      <p className="text-sm text-gray-500">
-                        {lang === "ENG" ? "You bet on" : "Kamu bertaruh pada"}: <strong>{bets.find(b => b.playerWallet === myBet)?.playerName}</strong>
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number" step="0.01" min="0.01"
-                          className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-mono focus:outline-none focus:border-[#35D07F]/50"
-                        />
-                        <span className="text-sm font-bold text-[#FCFF52]">CELO</span>
-                      </div>
-                      <p className="text-xs text-gray-500">{lang === "ENG" ? "Pick a player to bet on:" : "Pilih pemain untuk taruhan:"}</p>
-                      <div className="space-y-2 max-h-[250px] overflow-y-auto">
-                        {sortedPlayers.map(p => (
-                          <button key={p.user_wallet} onClick={() => handleBet(p.user_wallet, p.player_name)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#35D07F]/50 hover:bg-[#35D07F]/5 transition-all text-left"
-                          >
-                            <span className="text-lg">{p.avatar_emoji || "👤"}</span>
-                            <span className="font-bold text-sm flex-1">{p.player_name}</span>
-                            <span className="text-xs text-[#FCFF52] font-mono">{p.final_score} pts</span>
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             {/* Stats */}
             <div className="glass rounded-[2rem] border border-white/10 p-6 space-y-4">
@@ -521,10 +442,7 @@ function LiveReportContent() {
                   <div className="text-xl font-black text-[#35D07F]">{players.length}</div>
                   <div className="text-[10px] text-gray-500 font-bold">{lang === "ENG" ? "Players" : "Pemain"}</div>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5 text-center">
-                  <div className="text-xl font-black text-[#FCFF52]">{bets.length}</div>
-                  <div className="text-[10px] text-gray-500 font-bold">{lang === "ENG" ? "Bets" : "Taruhan"}</div>
-                </div>
+
                 <div className="p-3 rounded-xl bg-white/5 text-center">
                   <div className="text-xl font-black text-[#FDE047]">
                     {sortedPlayers[0]?.final_score || 0}
