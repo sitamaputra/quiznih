@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     apple: "/quiznih-icon-flat.png",
   },
   other: {
-    "talentapp:project_verification": "171439e1...[kode unik]...",
+    "talentapp:project_verification": "171439e100eb5b4d78f16cf3fe500c6e5659410fbbd547a0c4ff48936e82c4d96267e28c26591ff637a95b974809de2113bc9eabec1c34df09cdb475a264bef5",
   },
 };
 
