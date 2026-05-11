@@ -1,5 +1,5 @@
-import { t } from "@/lib/translations";
 "use client";
+import { t } from "@/lib/translations";
 import { Twitter, Share2, Smartphone } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";

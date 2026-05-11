@@ -1,5 +1,5 @@
-import { t } from "@/lib/translations";
 "use client";
+import { t } from "@/lib/translations";
 import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useLanguage, LANGUAGES } from "@/context/LanguageContext";

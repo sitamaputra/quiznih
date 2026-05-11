@@ -1,5 +1,5 @@
-import { t } from "@/lib/translations";
 "use client";
+import { t } from "@/lib/translations";
 import { X, ChevronRight, Loader2, Wallet2, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";

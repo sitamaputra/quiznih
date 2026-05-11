@@ -1,5 +1,5 @@
-import { t } from "@/lib/translations";
 "use client";
+import { t } from "@/lib/translations";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { useState, useEffect, useRef } from "react";
 import { Wallet2, LogOut, Copy, CheckCircle2, ChevronDown, Coins, ExternalLink } from "lucide-react";

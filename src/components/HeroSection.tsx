@@ -1,5 +1,5 @@
-import { t } from "@/lib/translations";
 "use client";
+import { t } from "@/lib/translations";
 import { PlayCircle, Zap, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";

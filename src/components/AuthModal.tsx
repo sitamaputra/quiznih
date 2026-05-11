@@ -1,5 +1,5 @@
-import { t } from "@/lib/translations";
 "use client";
+import { t } from "@/lib/translations";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail, Lock, User, LogIn, ChevronRight, Chrome, Wallet2, ExternalLink, Loader2 } from "lucide-react";
