@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     shortcut: "/quiznih-icon-flat.png",
     apple: "/quiznih-icon-flat.png",
   },
+  other: {
+    "talentapp:project_verification": "171439e1...[kode unik]...",
+  },
 };
 
 export default function RootLayout({
