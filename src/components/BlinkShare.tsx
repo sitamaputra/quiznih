@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { Twitter, Share2, Smartphone } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -31,13 +32,11 @@ export default function BlinkShare() {
       
       <div className="space-y-2">
         <h3 className="text-3xl font-extrabold text-black dark:text-white">
-          {lang === "ENG" ? "Celo " : "Aplikasi "}
+          {t("auto.42", lang)}
           <span className="text-gradient">MiniPay</span>
         </h3>
         <p className="text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
-          {lang === "ENG" 
-            ? "Quiznih is optimized as a MiniPay mini app. Open directly from MiniPay wallet to play quizzes with auto-connect and instant CELO payouts."
-            : "Quiznih dioptimalkan sebagai mini app MiniPay. Buka langsung dari dompet MiniPay untuk main kuis dengan auto-connect dan pembayaran CELO instan."}
+          {t("auto.43", lang)}
         </p>
       </div>
 
@@ -47,7 +46,7 @@ export default function BlinkShare() {
           className="inline-flex items-center gap-3 bg-black dark:bg-white text-white dark:text-black px-10 py-4 rounded-full font-bold text-lg hover:bg-[#35D07F] hover:text-white transition-all duration-300 shadow-xl"
         >
           <Share2 className="w-5 h-5" />
-          {lang === "ENG" ? "Share to X" : "Bagikan ke X"}
+          {t("auto.44", lang)}
         </button>
         <a
           href="https://www.opera.com/products/minipay"
@@ -56,7 +55,7 @@ export default function BlinkShare() {
           className="inline-flex items-center gap-3 bg-[#35D07F] text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-[#2bb86e] transition-all duration-300 shadow-xl"
         >
           <Smartphone className="w-5 h-5" />
-          {lang === "ENG" ? "Get MiniPay" : "Unduh MiniPay"}
+          {t("auto.45", lang)}
         </a>
       </div>
     </motion.div>

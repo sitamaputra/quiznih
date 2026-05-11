@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { PlayCircle, Zap, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -72,9 +73,7 @@ export default function HeroSection() {
           className="max-w-2xl mx-auto"
         >
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light">
-            {lang === "ENG"
-              ? "Host quizzes on Celo blockchain. Auto-distribute crypto rewards. Zero friction. Maximum fun."
-              : "Host kuis di blockchain Celo. Distribusi hadiah kripto otomatis. Tanpa hambatan. Maksimal seru."}
+            {t("auto.14", lang)}
           </p>
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-6">
@@ -114,13 +113,13 @@ export default function HeroSection() {
             className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#FCFF52] text-black px-14 py-5 rounded-lg font-extrabold text-xl hover:shadow-[0_0_40px_rgba(252,255,82,0.4)] hover:scale-105 transition-all duration-300 group uppercase tracking-wider"
           >
             <PlayCircle className="w-7 h-7 group-hover:scale-110 transition-transform" />
-            {lang === "ENG" ? "PLAY NOW" : "MAIN SEKARANG"}
+            {t("auto.15", lang)}
           </Link>
           <Link href="/live"
             className="w-full sm:w-auto flex items-center justify-center gap-3 border border-[#FCFF52]/30 text-[#FCFF52] px-10 py-5 rounded-lg font-bold text-lg hover:bg-[#FCFF52]/10 hover:border-[#FCFF52]/60 transition-all duration-300 group uppercase tracking-wider"
           >
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            {lang === "ENG" ? "WATCH LIVE" : "TONTON LIVE"}
+            {t("auto.16", lang)}
             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>

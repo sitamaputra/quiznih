@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { X, ChevronRight, Loader2, Wallet2, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -98,7 +99,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                   <Wallet2 className="w-5 h-5 text-black" />
                 </div>
                 <h2 className="text-2xl font-bold text-black dark:text-white">
-                  {lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
+                  {t("auto.9", lang)}
                 </h2>
               </div>
               <button 
@@ -110,9 +111,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
             </div>
 
             <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm leading-relaxed">
-              {lang === "ENG" 
-                ? "Choose your preferred wallet to connect to the Celo network."
-                : "Pilih dompet favorit Anda untuk terhubung ke jaringan Celo."}
+              {t("auto.10", lang)}
             </p>
 
             {error && (
@@ -150,7 +149,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                         {wallet.name}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {lang === "ENG" ? "Browser Extension" : "Ekstensi Browser"}
+                        {t("auto.11", lang)}
                       </span>
                     </div>
                   </div>
@@ -165,14 +164,14 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
             <div className="mt-8 pt-5 border-t border-black/5 dark:border-white/10 text-center">
               <p className="text-xs text-gray-500">
-                {lang === "ENG" ? "Don't have a wallet?" : "Belum punya dompet?"}{" "}
+                {t("auto.12", lang)}{" "}
                 <a 
                   href="https://metamask.io/download/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-[#35D07F] font-bold hover:underline inline-flex items-center gap-1"
                 >
-                  {lang === "ENG" ? "Get MetaMask" : "Dapatkan MetaMask"}
+                  {t("auto.13", lang)}
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </p>

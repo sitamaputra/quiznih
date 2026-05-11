@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { useState, useEffect, useRef } from "react";
@@ -46,7 +47,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
         >
           <Wallet2 className="w-4 h-4" />
           <span className="font-semibold text-sm">
-            {lang === "ENG" ? "Connect Wallet" : "Hubungkan Dompet"}
+            {t("auto.4", lang)}
           </span>
         </button>
         <WalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
@@ -107,7 +108,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-2 text-gray-500">
                 <Coins className="w-4 h-4" />
-                <span className="text-sm font-semibold">{lang === "ENG" ? "Balance" : "Saldo"}</span>
+                <span className="text-sm font-semibold">{t("auto.5", lang)}</span>
               </div>
               <span className="font-black text-[#35D07F]">
                 {balance} CELO
@@ -122,7 +123,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
               >
                 <div className="flex items-center gap-2">
                   <Copy className="w-4 h-4 text-gray-400" />
-                  <span>{lang === "ENG" ? "Copy Address" : "Salin Alamat"}</span>
+                  <span>{t("auto.6", lang)}</span>
                 </div>
                 {copied && <CheckCircle2 className="w-4 h-4 text-[#35D07F]" />}
               </button>
@@ -134,7 +135,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
                 className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors font-semibold text-sm"
               >
                 <ExternalLink className="w-4 h-4 text-gray-400" />
-                <span>{lang === "ENG" ? "View on Explorer" : "Lihat di Explorer"}</span>
+                <span>{t("auto.7", lang)}</span>
               </a>
 
               {!isMiniPay && (
@@ -143,7 +144,7 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
                   className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors font-semibold text-sm"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>{lang === "ENG" ? "Disconnect" : "Putuskan Koneksi"}</span>
+                  <span>{t("auto.8", lang)}</span>
                 </button>
               )}
             </div>

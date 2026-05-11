@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
 import Link from "next/link";
@@ -149,7 +150,7 @@ export default function Navbar() {
                     style={{ background: "#FCFF52", color: "#0a1a0f", fontWeight: 900, border: "none", borderRadius: 50, padding: "10px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", cursor: "pointer" }}
                   >
                     <LogIn className="w-4 h-4" />
-                    <span>{lang === "ENG" ? "Sign In / Connect" : "Masuk / Hubung"}</span>
+                    <span>{t("auto.1", lang)}</span>
                   </button>
                 )}
 
@@ -169,7 +170,7 @@ export default function Navbar() {
                     {isUserDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-2xl shadow-xl p-2 z-50">
                         <div className="px-3 py-2 border-b border-black/10 dark:border-white/10 mb-2">
-                          <p className="text-xs text-gray-500 font-semibold">{lang === "ENG" ? "Signed in as" : "Masuk sebagai"}</p>
+                          <p className="text-xs text-gray-500 font-semibold">{t("auto.2", lang)}</p>
                           <p className="text-sm font-bold truncate">{user.email}</p>
                         </div>
                         <button
@@ -177,7 +178,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-xl transition-colors font-semibold"
                         >
                           <LogOut className="w-4 h-4" />
-                          {lang === "ENG" ? "Sign Out" : "Keluar"}
+                          {t("auto.3", lang)}
                         </button>
                       </div>
                     )}

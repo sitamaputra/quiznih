@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { Link as LinkIcon, Users, Trophy } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -9,28 +10,22 @@ export default function HowItWorks() {
   const steps = [
     {
       icon: <span className="text-3xl">⚡️</span>,
-      title: lang === "ENG" ? "Instant Payouts" : "Pembayaran Instan",
-      description: lang === "ENG" 
-        ? "Reward top players instantly via smart contracts using CELO or cUSD."
-        : "Hadiah untuk pemain top dikirim langsung via smart contract menggunakan CELO atau cUSD.",
+      title: t("auto.46", lang),
+      description: t("auto.47", lang),
       color: "from-[#35D07F]/20 to-transparent",
       border: "border-[#35D07F]/30",
     },
     {
       icon: <span className="text-3xl">🛡️</span>,
-      title: lang === "ENG" ? "On-Chain Verified" : "Terverifikasi On-Chain",
-      description: lang === "ENG"
-        ? "Immutable leaderboards. No more cheating, total transparency."
-        : "Leaderboard tidak bisa diubah. Tidak ada kecurangan, transparansi total.",
+      title: t("auto.48", lang),
+      description: t("auto.49", lang),
       color: "from-cyan-500/20 to-transparent",
       border: "border-cyan-500/30",
     },
     {
       icon: <span className="text-3xl">🔗</span>,
-      title: lang === "ENG" ? "MiniPay Ready" : "Siap MiniPay",
-      description: lang === "ENG"
-        ? "Play quizzes directly from MiniPay wallet with auto-connect and instant payouts."
-        : "Mainkan kuis langsung dari dompet MiniPay dengan auto-connect dan pembayaran instan.",
+      title: t("auto.50", lang),
+      description: t("auto.51", lang),
       color: "from-[#FCFF52]/20 to-transparent",
       border: "border-[#FCFF52]/30",
     }
@@ -47,15 +42,13 @@ export default function HowItWorks() {
           className="text-center mb-16 space-y-4"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-black dark:text-white">
-            {lang === "ENG" ? "How " : "Cara "}
+            {t("auto.52", lang)}
             <span className="text-gradient">
-              {lang === "ENG" ? "It Works" : "Kerjanya"}
+              {t("auto.53", lang)}
             </span>
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
-            {lang === "ENG" 
-              ? "Your journey to becoming a trivia champion in three simple steps." 
-              : "Perjalananmu menjadi juara trivia hanya dalam tiga langkah sederhana."}
+            {t("auto.54", lang)}
           </p>
         </motion.div>
 

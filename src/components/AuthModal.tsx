@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,7 +61,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         });
         if (signInError) throw signInError;
       } else {
-        if (!username.trim()) throw new Error(lang === "ENG" ? "Username is required" : "Username wajib diisi");
+        if (!username.trim()) throw new Error(t("auto.29", lang));
         
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -181,11 +182,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-extrabold text-gray-900">
                   {isLogin
-                    ? (lang === "ENG" ? "Welcome Back" : "Selamat Datang")
-                    : (lang === "ENG" ? "Create Account" : "Daftar Akun")}
+                    ? (t("auto.30", lang))
+                    : (t("auto.31", lang))}
                 </h2>
                 <p className="text-gray-500 text-sm mt-2">
-                  {lang === "ENG" ? "Log in to save your progress and quizzes." : "Masuk untuk menyimpan progres kuis Anda."}
+                  {t("auto.32", lang)}
                 </p>
               </div>
 
@@ -245,8 +246,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   className="w-full py-4 rounded-xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-extrabold text-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 mt-4"
                 >
                   {loading
-                    ? (lang === "ENG" ? "Processing..." : "Memproses...")
-                    : (isLogin ? (lang === "ENG" ? "Sign In" : "Masuk") : (lang === "ENG" ? "Create Account" : "Daftar Akun"))}
+                    ? (t("auto.33", lang))
+                    : (isLogin ? (t("auto.34", lang)) : (t("auto.35", lang)))}
                   {!loading && <ChevronRight className="w-5 h-5" />}
                 </button>
               </form>
@@ -257,7 +258,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-4 bg-white text-gray-500">
-                    {lang === "ENG" ? "or continue with" : "atau masuk dengan"}
+                    {t("auto.36", lang)}
                   </span>
                 </div>
               </div>
@@ -277,7 +278,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 <div className="flex items-center gap-2 mb-4">
                   <Wallet2 className="w-4 h-4 text-[#35D07F]" />
                   <span className="text-sm font-bold text-gray-700">
-                    {lang === "ENG" ? "Web3 Wallets" : "Dompet Web3"}
+                    {t("auto.37", lang)}
                   </span>
                 </div>
 
@@ -320,15 +321,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
               <div className="mt-6 text-center text-sm text-gray-500">
                 {isLogin
-                  ? (lang === "ENG" ? "Don't have an account? " : "Belum punya akun? ")
-                  : (lang === "ENG" ? "Already have an account? " : "Sudah punya akun? ")}
+                  ? (t("auto.38", lang))
+                  : (t("auto.39", lang))}
                 <button
                   onClick={() => { setIsLogin(!isLogin); setError(null); }}
                   className="text-[#35D07F] font-bold hover:underline"
                 >
                   {isLogin
-                    ? (lang === "ENG" ? "Sign Up" : "Daftar Sekarang")
-                    : (lang === "ENG" ? "Sign In" : "Masuk")}
+                    ? (t("auto.40", lang))
+                    : (t("auto.41", lang))}
                 </button>
               </div>
             </div>

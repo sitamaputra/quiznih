@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { Flame, Medal, Award } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -26,16 +27,14 @@ export default function Leaderboard() {
           <div className="space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold flex items-center gap-4 text-black dark:text-white">
               <Flame className="w-10 h-10 text-[#FF4500]" />
-              {lang === "ENG" ? "Live Leaderboard" : "Papan Peringkat"}
+              {t("auto.17", lang)}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              {lang === "ENG"
-                ? "Top trivia hunters fetching real rewards this season."
-                : "Pemburu trivia teratas yang mendapatkan hadiah nyata musim ini."}
+              {t("auto.18", lang)}
             </p>
           </div>
           <button className="whitespace-nowrap px-6 py-3 rounded-full border border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sm font-semibold text-black dark:text-white">
-            {lang === "ENG" ? "View All Ranks" : "Lihat Semua Peringkat"}
+            {t("auto.19", lang)}
           </button>
         </motion.div>
 
@@ -46,10 +45,10 @@ export default function Leaderboard() {
           className="glass rounded-3xl border border-black/10 dark:border-white/10 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(53,208,127,0.1)]"
         >
           <div className="grid grid-cols-12 gap-4 p-6 bg-black/5 dark:bg-white/5 font-semibold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider border-b border-black/5 dark:border-white/5">
-            <div className="col-span-2 text-center">{lang === "ENG" ? "Rank" : "Peringkat"}</div>
-            <div className="col-span-5">{lang === "ENG" ? "Player" : "Pemain"}</div>
-            <div className="col-span-3 text-right">{lang === "ENG" ? "Score" : "Skor"}</div>
-            <div className="col-span-2 text-right">{lang === "ENG" ? "Wallet" : "Dompet"}</div>
+            <div className="col-span-2 text-center">{t("auto.20", lang)}</div>
+            <div className="col-span-5">{t("auto.21", lang)}</div>
+            <div className="col-span-3 text-right">{t("auto.22", lang)}</div>
+            <div className="col-span-2 text-right">{t("auto.23", lang)}</div>
           </div>
 
           <div className="divide-y divide-black/5 dark:divide-white/5">

@@ -1,3 +1,4 @@
+import { t } from "@/lib/translations";
 "use client";
 import { Clock, Users, ShieldCheck, Play } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -51,15 +52,13 @@ export default function UpcomingQuizzes() {
           >
             <h2 className="text-4xl md:text-5xl font-bold flex items-center gap-4 text-black dark:text-white">
               <Clock className="w-10 h-10 text-[#35D07F]" />
-              {lang === "ENG" ? "Upcoming " : "Kuis "}
+              {t("auto.24", lang)}
               <span className="text-gradient">
-                {lang === "ENG" ? "Quizzes" : "Mendatang"}
+                {t("auto.25", lang)}
               </span>
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              {lang === "ENG"
-                ? "Join these live sessions and win prizes straight to your wallet."
-                : "Ikuti sesi kuis ini dan menangkan hadiah langsung ke dompetmu."}
+              {t("auto.26", lang)}
             </p>
           </motion.div>
         </div>
@@ -98,7 +97,7 @@ export default function UpcomingQuizzes() {
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400 text-sm">
                   <Clock className="w-5 h-5" />
-                  <span>{lang === "ENG" ? "Starts in " : "Mulai dalam "} 
+                  <span>{t("auto.27", lang)} 
                     <span className="text-[#35D07F] font-bold">
                       {lang === "ID" && quiz.startsIn === "Next Room" ? "Sesi Berikutnya" : 
                        lang === "ID" && quiz.startsIn === "Scheduled" ? "Terjadwal" : 
@@ -110,7 +109,7 @@ export default function UpcomingQuizzes() {
 
               <button className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-black dark:bg-white text-white dark:text-black font-bold group-hover:shadow-[0_0_20px_rgba(53,208,127,0.3)] transition-all duration-300">
                 <Play className="w-4 h-4 fill-current" />
-                {lang === "ENG" ? "Join Waitlist" : "Gabung Antrean"}
+                {t("auto.28", lang)}
               </button>
             </motion.div>
           ))}
