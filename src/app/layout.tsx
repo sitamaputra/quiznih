@@ -11,6 +11,11 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Quiznih | Web3 Trivia on Celo",
   description: "Join the ultimate Web3 trivia experience on Celo. Win crypto, climb the leaderboard, and prove your knowledge.",
+  icons: {
+    icon: "/quiznih-icon-flat.png",
+    shortcut: "/quiznih-icon-flat.png",
+    apple: "/quiznih-icon-flat.png",
+  },
 };
 
 export default function RootLayout({
