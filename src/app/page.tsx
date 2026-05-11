@@ -86,28 +86,7 @@ function Hero() {
             alignItems: "center", textAlign: "center",
           }}
         >
-          {/* Live badge */}
-          <div
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "8px 18px", borderRadius: 100,
-              background: "rgba(53,208,127,0.10)",
-              border: "1px solid rgba(53,208,127,0.3)",
-              fontSize: 14, color: "#1a9f5e", fontWeight: 500,
-              marginBottom: 32,
-            }}
-          >
-            <span
-              style={{
-                width: 8, height: 8, borderRadius: "50%",
-                background: "#35D07F", display: "inline-block",
-                animation: "pulse-dot 2s ease-in-out infinite",
-              }}
-            />
-            {IS_TESTNET
-              ? (lang === "ENG" ? "Live on Celo Alfajores Testnet" : "Aktif di Celo Alfajores Testnet")
-              : (lang === "ENG" ? "Live on Celo" : "Aktif di Celo")}
-          </div>
+
 
           {/* H1 */}
           <h1
