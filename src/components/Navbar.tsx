@@ -1,6 +1,6 @@
 "use client";
 import { t } from "@/lib/translations";
-import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn } from "lucide-react";
+import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn, X } from "lucide-react";
 import Link from "next/link";
 import { useLanguage, LANGUAGES } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
@@ -21,6 +21,7 @@ export default function Navbar() {
   const [user, setUser] = useState<any>(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
