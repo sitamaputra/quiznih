@@ -105,6 +105,17 @@ export default function PlayPage() {
     setFloatingEmojis(emojis);
   }, [isJoined]);
 
+  // Cleanup audio on unmount (e.g. navigating away)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   // Music toggle
   const toggleMusic = () => {
     if (!audioRef.current) {
@@ -216,6 +227,13 @@ export default function PlayPage() {
       setQuizState("playing");
     } else {
       setQuizState("finished");
+      // Stop background music when quiz is finished
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+      setMusicOn(false);
       // Trigger confetti when finished
       confetti({
         particleCount: 150,
@@ -513,7 +531,7 @@ export default function PlayPage() {
           <button onClick={() => { 
             if (window.confirm(t("play.leaveConfirm", lang))) {
               setIsJoined(false); 
-              if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } 
+              if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null; } setMusicOn(false); 
             }
           }} className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group text-sm font-medium">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
@@ -897,7 +915,16 @@ export default function PlayPage() {
               <Link 
                 href="/dashboard"
                 className="block text-sm text-gray-500 hover:text-black dark:hover:text-white transition-colors"
-                onClick={() => setQuizState("waiting")}
+                onClick={() => {
+                  // Stop music before navigating away
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.src = "";
+                    audioRef.current = null;
+                  }
+                  setMusicOn(false);
+                  setQuizState("waiting");
+                }}
               >
                 {t("play.backDashboard", lang)}
               </Link>
