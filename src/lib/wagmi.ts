@@ -41,32 +41,37 @@ export const wagmiConfig = createSafeConfig();
  */
 export const WALLET_INSTALL_LIST = [
   {
+    id: "metamask",
     name: "MetaMask",
-    icon: "/wallets/metamask.svg",
+    icon: "https://res.cloudinary.com/dsichsufc/image/upload/Metamask_logo_xexpwo.png",
     downloadUrl: "https://metamask.io/download/",
     color: "#F6851B",
   },
   {
+    id: "rabby",
     name: "Rabby Wallet",
-    icon: "/wallets/rabby.svg",
+    icon: "https://res.cloudinary.com/dsichsufc/image/upload/unnamed_3_ctzyrw.png",
     downloadUrl: "https://rabby.io/",
     color: "#7C7AF9",
   },
   {
+    id: "okx",
     name: "OKX Wallet",
-    icon: "/wallets/okx.svg",
+    icon: "https://res.cloudinary.com/dsichsufc/image/upload/Okx_Logo_pb3gab.png",
     downloadUrl: "https://www.okx.com/web3",
     color: "#000000",
   },
   {
+    id: "bitget",
     name: "Bitget Wallet",
-    icon: "/wallets/bitget.svg",
+    icon: "https://res.cloudinary.com/dsichsufc/image/upload/bitget_wallet_logo_jlus0t.webp",
     downloadUrl: "https://web3.bitget.com/",
     color: "#00D4AA",
   },
   {
+    id: "trust",
     name: "Trust Wallet",
-    icon: "/wallets/trust.svg",
+    icon: "https://res.cloudinary.com/dsichsufc/image/upload/trust-wallet-icon_kqqr8j.webp",
     downloadUrl: "https://trustwallet.com/",
     color: "#3375BB",
   },

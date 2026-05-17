@@ -141,7 +141,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                       <img
                         src={wallet.icon}
                         alt={wallet.name}
-                        className="w-7 h-7"
+                        className="w-7 h-7 object-contain rounded-lg"
                       />
                     </div>
                     <div className="text-left">

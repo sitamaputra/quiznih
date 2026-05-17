@@ -302,7 +302,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                           <img
                             src={wallet.icon}
                             alt={wallet.name}
-                            className="w-6 h-6"
+                            className="w-6 h-6 object-contain rounded-lg"
                           />
                         </div>
                         <span className="font-bold text-sm text-gray-900 group-hover:text-[#35D07F] transition-colors">
