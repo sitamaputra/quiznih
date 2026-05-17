@@ -2,7 +2,7 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Wallet2, Send, Copy, CheckCircle, Loader2, Users, Trophy, Trash2, ShieldX, Eye, MessageCircle, ExternalLink, Gift
 } from "lucide-react";
@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
 import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+import PodiumView from "@/components/shared/PodiumView";
 
 
 
@@ -152,6 +153,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
         .eq("quiz_id", quizId)
         .eq("user_wallet", wallet);
       if (error) throw error;
+      setParticipants(prev => prev.filter(p => p.user_wallet !== wallet));
     } catch (err) {
       console.error("Error kicking:", err);
     }
@@ -267,6 +269,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 </div>
               ) : (
                 <div className="space-y-3">
+                  <AnimatePresence mode="popLayout">
                   {[...participants]
                     .sort((a, b) => (b.final_score || 0) - (a.final_score || 0))
                     .map((p, idx) => {
@@ -278,6 +281,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                           layout
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20, scale: 0.95 }}
                           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                           className="flex items-center gap-4 p-5 rounded-2xl border transition-all"
                           style={{
@@ -327,6 +331,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                         </motion.div>
                       );
                     })}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
@@ -352,6 +357,16 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-8 text-center"
           >
+            {/* Podium */}
+            {participants.length > 0 && (
+              <PodiumView
+                players={[...participants]
+                  .sort((a, b) => (b.final_score || 0) - (a.final_score || 0))
+                  .slice(0, 3)
+                  .map(p => ({ name: p.player_name || "Anonymous", score: p.final_score || 0 }))}
+              />
+            )}
+
             <div className="glass rounded-[2.5rem] border border-[#FDE047]/40 p-10 space-y-6">
               <div className="text-7xl">🏆</div>
               <h2 className="text-4xl font-extrabold text-gradient">{lang === "ENG" ? "Quiz Finished!" : "Kuis Selesai!"}</h2>
@@ -508,13 +523,17 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <AnimatePresence mode="popLayout">
                   {participants
                     .sort((a, b) => (b.final_score || 0) - (a.final_score || 0))
                     .map((p, idx) => (
                       <motion.div
                         key={p.user_wallet}
-                        initial={{ opacity: 0, x: -10 }}
+                        layout
+                        initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20, scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         className="flex items-center justify-between p-4 rounded-2xl bg-white border border-[#35D07F]/10 hover:border-red-500/20 shadow-sm transition-all group"
                       >
                         <div className="flex items-center gap-3">
@@ -550,6 +569,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                         </div>
                       </motion.div>
                     ))}
+                  </AnimatePresence>
                 </div>
               )}
             </div>

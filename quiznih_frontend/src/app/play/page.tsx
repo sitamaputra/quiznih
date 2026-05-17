@@ -14,6 +14,7 @@ import { supabase } from "@/lib/supabase";
 import WalletDropdown from "@/components/wallet/WalletDropdown";
 import { useCeloQuiz } from "@/hooks/useCeloQuiz";
 import TopBar from "@/components/layout/TopBar";
+import PodiumView, { type PodiumPlayer } from "@/components/shared/PodiumView";
 
 const BGM_URLS = [
   "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3", // upbeat fun
@@ -21,7 +22,6 @@ const BGM_URLS = [
   "https://cdn.pixabay.com/audio/2023/10/24/audio_3327d532ab.mp3", // chiptune happy
 ];
 
-const FLOATING_EMOJIS = ["🎯","⚡","🔥","💎","🏆","🎮","✨","🚀","💰","🎉","⭐","🎪"];
 const CORRECT_SFX_URL = "https://cdn.pixabay.com/audio/2022/03/10/audio_5e5a3779f3.mp3";
 const WRONG_SFX_URL = "https://cdn.pixabay.com/audio/2022/03/10/audio_b4c5a4cd9e.mp3";
 
@@ -55,6 +55,82 @@ export default function PlayPage() {
   }, []);
   const [isJoined, setIsJoined] = useState(false);
   const [quizState, setQuizState] = useState<"waiting" | "playing" | "revealed" | "finished">("waiting");
+
+  // Restore session from sessionStorage after page refresh
+  useEffect(() => {
+    const saved = sessionStorage.getItem("quiznih_session");
+    if (!saved) return;
+    let session: { roomCode: string; quizId: string; playerName: string; leaderboardId: string | null; avatar: number };
+    try {
+      session = JSON.parse(saved);
+    } catch {
+      sessionStorage.removeItem("quiznih_session");
+      return;
+    }
+    (async () => {
+      // Verify leaderboard record still exists (player may have been kicked)
+      if (session.leaderboardId) {
+        const { data, error } = await supabase
+          .from("leaderboard")
+          .select("id")
+          .eq("id", session.leaderboardId)
+          .single();
+        if (error || !data) {
+          sessionStorage.removeItem("quiznih_session");
+          return;
+        }
+      }
+      // Re-fetch quiz data
+      const { data: quizData, error: quizError } = await supabase
+        .from("quizzes")
+        .select("*")
+        .eq("id", session.quizId)
+        .single();
+      if (quizError || !quizData) {
+        sessionStorage.removeItem("quiznih_session");
+        return;
+      }
+      // Re-fetch questions
+      const { data: qsData, error: qsError } = await supabase
+        .from("questions")
+        .select("*")
+        .eq("quiz_id", session.quizId)
+        .order("order_number", { ascending: true });
+      if (qsError || !qsData?.length) {
+        sessionStorage.removeItem("quiznih_session");
+        return;
+      }
+      // Restore all state
+      setRoomCode(session.roomCode);
+      setPlayerName(session.playerName);
+      setSelectedAvatar(session.avatar ?? 0);
+      if (session.leaderboardId) setLeaderboardId(session.leaderboardId);
+      setQuizInfo(quizData);
+      setQuestions(qsData);
+      setTimeLeft(qsData[0].time_limit_seconds || 15);
+      if (quizData.status === "finished") {
+        setQuizState("finished");
+        sessionStorage.removeItem("quiznih_session");
+      } else if (quizData.status === "playing") {
+        setQuizState("playing");
+      } else {
+        setQuizState("waiting");
+      }
+      setIsJoined(true);
+      // Re-subscribe to quiz status changes
+      supabase
+        .channel(`quiz-status-restore-${quizData.id}`)
+        .on("postgres_changes", {
+          event: "UPDATE",
+          schema: "public",
+          table: "quizzes",
+          filter: `id=eq.${quizData.id}`,
+        }, (payload) => {
+          if (payload.new.status === "playing") setQuizState("playing");
+        })
+        .subscribe();
+    })();
+  }, []);
   
   // Game state
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -76,9 +152,56 @@ export default function PlayPage() {
   const [musicOn, setMusicOn] = useState(false);
   const [currentBgm, setCurrentBgm] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [floatingEmojis, setFloatingEmojis] = useState<{id:number;emoji:string;x:number;delay:number}[]>([]);
+  const [floatingEmojis, setFloatingEmojis] = useState<{id:number;x:number;delay:number;size:number;opacity:number}[]>([]);
   const [celebrationEmojis, setCelebrationEmojis] = useState<{id:number;emoji:string;x:number;y:number;scale:number}[]>([]);
   const [showRankPanel, setShowRankPanel] = useState(false);
+  const [leaderboardId, setLeaderboardId] = useState<string | null>(null);
+  const [podiumPlayers, setPodiumPlayers] = useState<PodiumPlayer[]>([]);
+
+  // Ref holds latest values so handleLeave never has stale closure issues
+  const playerDataRef = useRef({
+    leaderboardId: null as string | null,
+    quizInfoId: null as string | null,
+    walletAddress: null as string | null,
+    score: 0,
+    quizState: "waiting" as string,
+  });
+
+  useEffect(() => {
+    playerDataRef.current = {
+      leaderboardId,
+      quizInfoId: quizInfo?.id ?? null,
+      walletAddress: publicKey ?? null,
+      score,
+      quizState,
+    };
+  });
+
+  const handleLeave = useCallback(() => {
+    const { leaderboardId: lbId, quizInfoId, walletAddress, score: currentScore, quizState: currentState } = playerDataRef.current;
+    // Keep leaderboard entry if player already scored or completed the quiz
+    if (currentScore > 0 || currentState === "finished") return;
+    // If session is still saved, this unload is from a page refresh — preserve the record
+    if (sessionStorage.getItem("quiznih_session")) return;
+    // Delete by ID (reliable) or fall back to composite key
+    if (lbId) {
+      supabase.from("leaderboard").delete().eq("id", lbId).then(() => {}).catch(() => {});
+    } else if (quizInfoId && walletAddress) {
+      supabase.from("leaderboard").delete().eq("quiz_id", quizInfoId).eq("user_wallet", walletAddress).then(() => {}).catch(() => {});
+    }
+  }, []);
+
+  // Remove player from leaderboard when they close the browser or navigate away within the app
+  useEffect(() => {
+    if (!isJoined) return;
+    window.addEventListener("beforeunload", handleLeave);
+    window.addEventListener("pagehide", handleLeave);
+    return () => {
+      handleLeave();
+      window.removeEventListener("beforeunload", handleLeave);
+      window.removeEventListener("pagehide", handleLeave);
+    };
+  }, [isJoined, handleLeave]);
 
   const CELEBRATION_CORRECT = ["🎉","🔥","💯","⚡","✅","🏆","👏","💪","🌟","😎","🥳","💎"];
   const CELEBRATION_WRONG = ["😭","💔","😢","❌","😩","🫠","😬","👀"];
@@ -97,14 +220,18 @@ export default function PlayPage() {
     setTimeout(() => setCelebrationEmojis([]), 2000);
   };
 
-  // Initialize floating emojis
+  // Initialize floating icons
   useEffect(() => {
     if (!isJoined) return;
-    const emojis = Array.from({length: 12}, (_, i) => ({
-      id: i, emoji: FLOATING_EMOJIS[i % FLOATING_EMOJIS.length],
-      x: Math.random() * 100, delay: Math.random() * 5,
+    const SIZES = [30, 38, 50];
+    const icons = Array.from({length: 6}, (_, i) => ({
+      id: i,
+      x: Math.random() * 90,
+      delay: Math.random() * 5,
+      size: SIZES[i % SIZES.length],
+      opacity: 0.85 + Math.random() * 0.15,
     }));
-    setFloatingEmojis(emojis);
+    setFloatingEmojis(icons);
   }, [isJoined]);
 
   // Music toggle
@@ -240,6 +367,7 @@ export default function PlayPage() {
   // When quiz finishes: save final score + fetch rank from leaderboard
   useEffect(() => {
     if (quizState !== "finished" || !quizInfo?.id || !publicKey) return;
+    sessionStorage.removeItem("quiznih_session");
     const finalizeScore = async () => {
       await supabase
         .from("leaderboard")
@@ -249,7 +377,7 @@ export default function PlayPage() {
 
       const { data: lb } = await supabase
         .from("leaderboard")
-        .select("user_wallet, final_score")
+        .select("user_wallet, final_score, player_name")
         .eq("quiz_id", quizInfo.id)
         .order("final_score", { ascending: false });
 
@@ -259,6 +387,12 @@ export default function PlayPage() {
         setClaimRank(rank);
         const pool = quizInfo.reward_pool_amount || 0;
         setClaimRewardAmount(rank && rank <= 3 ? pool * REWARD_SPLITS[rank - 1] : 0);
+        setPodiumPlayers(
+          lb.slice(0, 3).map((p: any) => ({
+            name: p.player_name || `${p.user_wallet.slice(0, 6)}...`,
+            score: p.final_score || 0,
+          }))
+        );
       }
     };
     finalizeScore();
@@ -401,12 +535,25 @@ export default function PlayPage() {
                     { wallet_address: walletStr, username: playerName },
                     { onConflict: 'wallet_address' }
                   );
-                  await supabase.from("leaderboard").upsert({
-                    quiz_id: quizData.id,
-                    user_wallet: walletStr,
-                    player_name: playerName,
-                    final_score: 0
-                  });
+                  const { data: lbData } = await supabase
+                    .from("leaderboard")
+                    .upsert({
+                      quiz_id: quizData.id,
+                      user_wallet: walletStr,
+                      player_name: playerName,
+                      final_score: 0
+                    })
+                    .select("id")
+                    .single();
+                  if (lbData?.id) setLeaderboardId(lbData.id);
+                  // Persist session so page refresh restores state without re-joining
+                  sessionStorage.setItem("quiznih_session", JSON.stringify({
+                    roomCode,
+                    quizId: quizData.id,
+                    playerName,
+                    leaderboardId: lbData?.id ?? null,
+                    avatar: selectedAvatar,
+                  }));
                 } catch (_) { /* non-critical */ }
               }
 
@@ -525,17 +672,17 @@ export default function PlayPage() {
         />
       </div>
 
-        {/* Floating Emojis */}
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Floating Icons */}
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
           {floatingEmojis.map(fe => (
             <motion.div
               key={fe.id}
-              initial={{ y: "110vh", x: `${fe.x}vw`, opacity: 0.6, scale: 0.8 }}
-              animate={{ y: "-10vh", opacity: [0.6, 0.9, 0.3], scale: [0.8, 1.2, 0.6], rotate: [0, 180, 360] }}
-              transition={{ duration: 8 + Math.random() * 6, delay: fe.delay, repeat: Infinity, ease: "linear" }}
-              className="absolute text-2xl sm:text-3xl select-none"
+              initial={{ y: "110vh", x: `${fe.x}vw`, opacity: fe.opacity, scale: 0.8 }}
+              animate={{ y: "-10vh", opacity: [fe.opacity, fe.opacity, fe.opacity * 0.5], scale: [0.8, 1.1, 0.7], rotate: [0, 180, 360] }}
+              transition={{ duration: 10 + fe.delay * 1.5, delay: fe.delay, repeat: Infinity, ease: "linear" }}
+              className="absolute select-none"
             >
-              {fe.emoji}
+              <img src="/quiznih-hero-3d.png" width={fe.size} height={fe.size} alt="" style={{ objectFit: "contain", display: "block" }} />
             </motion.div>
           ))}
         </div>
@@ -543,10 +690,11 @@ export default function PlayPage() {
         <TopBar />
 
         <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-16 pb-4 flex items-center justify-between z-10">
-          <button onClick={() => { 
+          <button onClick={() => {
             if (window.confirm(t("play.leaveConfirm", lang))) {
-              setIsJoined(false); 
-              if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); } 
+              sessionStorage.removeItem("quiznih_session");
+              setIsJoined(false);
+              if (audioRef.current) { audioRef.current.pause(); setMusicOn(false); }
             }
           }} className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group text-sm font-medium">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
@@ -665,7 +813,14 @@ export default function PlayPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass rounded-[2.5rem] border border-[#FCFF52]/30 p-12 max-w-lg w-full text-center space-y-8"
+              className="rounded-[2.5rem] p-12 max-w-lg w-full text-center space-y-8"
+              style={{
+                background: "#ffffff",
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+                border: "1.5px solid rgba(53,208,127,0.3)",
+              }}
             >
               <div className="space-y-4">
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-[#FCFF52]/20 flex items-center justify-center">
@@ -834,7 +989,11 @@ export default function PlayPage() {
 
         {/* 4. Final Result & Claim Prize */}
         {quizState === "finished" && (
-          <div className="flex-1 flex flex-col items-center justify-center px-4">
+          <div className="flex-1 flex flex-col items-center justify-start px-4 pt-6 pb-12 w-full max-w-2xl mx-auto space-y-8">
+            {/* Podium */}
+            {podiumPlayers.length > 0 && (
+              <PodiumView players={podiumPlayers} />
+            )}
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}

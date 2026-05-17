@@ -147,7 +147,37 @@ export default function WalletDropdown({ hideIfDisconnected = false }: { hideIfD
 
               {!isMiniPay && (
                 <button
-                  onClick={() => disconnect()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setIsOpen(false);
+
+                    disconnect();
+
+                    if (typeof window !== 'undefined') {
+                      const keysToRemove: string[] = [];
+                      for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key.startsWith('wagmi') || key.startsWith('wc@') || key.startsWith('WALLETCONNECT'))) {
+                          keysToRemove.push(key);
+                        }
+                      }
+                      keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                      const sessionKeysToRemove: string[] = [];
+                      for (let i = 0; i < sessionStorage.length; i++) {
+                        const key = sessionStorage.key(i);
+                        if (key && (key.startsWith('wagmi') || key.startsWith('wc@'))) {
+                          sessionKeysToRemove.push(key);
+                        }
+                      }
+                      sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
+                    }
+
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 200);
+                  }}
                   className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors font-semibold text-sm"
                 >
                   <LogOut className="w-4 h-4" />

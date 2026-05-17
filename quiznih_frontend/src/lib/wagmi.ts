@@ -9,6 +9,7 @@ function createSafeConfig() {
       chains: [celo, celoSepolia],
       multiInjectedProviderDiscovery: true,
       connectors: [injected()],
+      storage: null,
       transports: {
         [celo.id]: http(),
         [celoSepolia.id]: http("https://celo-sepolia.drpc.org"),
@@ -20,6 +21,7 @@ function createSafeConfig() {
       chains: [celo, celoSepolia],
       multiInjectedProviderDiscovery: false,
       connectors: [],
+      storage: null,
       transports: {
         [celo.id]: http(),
         [celoSepolia.id]: http("https://celo-sepolia.drpc.org"),
