@@ -24,7 +24,7 @@ export const celoSepolia = defineChain({
 });
 
 // ─── Network Config ─────────────────────────────────────
-export const IS_TESTNET = true; // Toggle untuk production
+export const IS_TESTNET = false; // Toggle untuk production
 export const ACTIVE_CHAIN = IS_TESTNET ? celoSepolia : celo;
 export const CHAIN_NAME = IS_TESTNET ? "Celo Sepolia" : "Celo";
 
