@@ -96,3 +96,46 @@ Per-slice CELO reward contract for spin wheel sessions.
 Host create session + deposit → player spins (off-chain RNG) → backend signs result
 → player calls claimSpin() → CELO sent to wallet
 ```
+
+---
+
+## Database Schema (Supabase / PostgreSQL)
+
+Migrations in `quiznih_backend/migrations/`.
+
+### `profiles`
+```
+id · wallet_address (unique) · auth_id · username · avatar_url · total_score
+```
+
+### `quizzes`
+```
+id · host_wallet · title · description · room_code (unique)
+reward_pool_amount · status: waiting|playing|finished
+contract_quiz_id · deposit_status: none|pending|confirmed · deposit_tx · escrow_balance
+```
+
+### `questions`
+```
+id · quiz_id (FK) · question_text · options (JSONB) · correct_answer_index
+time_limit_seconds · order_number
+```
+
+### `leaderboard`
+```
+id · quiz_id (FK) · user_wallet · player_name · final_score
+rank · reward_amount · claim_amount_wei · claim_signature
+claimed_reward · claim_tx
+```
+
+### `spin_sessions`
+```
+id · host_wallet · session_id (on-chain) · status: open|closed
+total_slices · celo_per_slice · contract_address
+```
+
+### `spin_results`
+```
+id · session_id (FK) · player_wallet · slice_index
+claim_signature · claimed · claim_tx
+```
