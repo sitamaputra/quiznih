@@ -12,7 +12,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         defaultTheme="light"
         enableSystem={false}
         disableTransitionOnChange
-        nonce=""
       >
         <LanguageProvider>
           {children}

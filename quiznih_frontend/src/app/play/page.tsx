@@ -37,7 +37,7 @@ export default function PlayPage() {
     if (!publicKey && connectors.length > 0) connect({ connector: connectors[0] });
   }, [publicKey, connectors, connect]);
 
-  const { getExplorerTxUrl: getExplorer } = useCeloQuiz();
+  const { getExplorerTxUrl: getExplorer, claimReward: claimOnChain, isClaiming: isClaimingOnChain } = useCeloQuiz();
 
   const [roomCode, setRoomCode] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -143,6 +143,30 @@ export default function PlayPage() {
 
   const [questions, setQuestions] = useState<any[]>([]);
   const [quizInfo, setQuizInfo] = useState<any>(null);
+  const [playerCount, setPlayerCount] = useState(0);
+
+  // Polling fallback: cek status quiz setiap 3 detik saat waiting
+  // Jaga-jaga kalau realtime Supabase miss event
+  useEffect(() => {
+    if (quizState !== 'waiting' || !quizInfo?.id) return;
+
+    const poll = setInterval(async () => {
+      const { data } = await supabase
+        .from('quizzes')
+        .select('status')
+        .eq('id', quizInfo.id)
+        .single();
+      if (data?.status === 'playing') setQuizState('playing');
+
+      const { count } = await supabase
+        .from('leaderboard')
+        .select('*', { count: 'exact', head: true })
+        .eq('quiz_id', quizInfo.id);
+      if (count !== null) setPlayerCount(count);
+    }, 3000);
+
+    return () => clearInterval(poll);
+  }, [quizState, quizInfo?.id]);
   const [isJoining, setIsJoining] = useState(false);
   const [revealCountdown, setRevealCountdown] = useState(3);
   const [selectedAvatar, setSelectedAvatar] = useState(0);
@@ -361,6 +385,27 @@ export default function PlayPage() {
   const [claimRewardAmount, setClaimRewardAmount] = useState<number | null>(null);
   const [claimRank, setClaimRank] = useState<number | null>(null);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [isSignatureReady, setIsSignatureReady] = useState(false);
+
+  // Poll sampai signature siap (backend butuh beberapa detik setelah quiz finish)
+  useEffect(() => {
+    if (quizState !== 'finished' || !quizInfo?.id || !publicKey || isSignatureReady || hasClaimed) return;
+
+    const poll = setInterval(async () => {
+      const { data } = await supabase
+        .from('leaderboard')
+        .select('claim_signature, claim_amount_wei, rank')
+        .eq('quiz_id', quizInfo.id)
+        .eq('user_wallet', publicKey)
+        .single();
+      if (data?.claim_signature && data?.claim_amount_wei) {
+        setIsSignatureReady(true);
+        clearInterval(poll);
+      }
+    }, 2000);
+
+    return () => clearInterval(poll);
+  }, [quizState, quizInfo?.id, publicKey, isSignatureReady, hasClaimed]);
 
   const REWARD_SPLITS = [0.5, 0.3, 0.2];
 
@@ -371,7 +416,7 @@ export default function PlayPage() {
     const finalizeScore = async () => {
       await supabase
         .from("leaderboard")
-        .update({ final_score: score })
+        .update({ final_score: score, is_finished: true })
         .eq("quiz_id", quizInfo.id)
         .eq("user_wallet", publicKey);
 
@@ -399,38 +444,63 @@ export default function PlayPage() {
   }, [quizState, quizInfo?.id, publicKey, score]);
 
   const handleClaimReward = async () => {
-    if (!quizInfo?.id) return;
+    if (!quizInfo?.id || !publicKey) return;
     setIsClaiming(true);
     setClaimError(null);
 
     try {
-      // Rewards are distributed by the host on-chain. Just confirm rank here.
-      if (claimRank === null) {
-        const { data: lb } = await supabase
-          .from("leaderboard")
-          .select("user_wallet, final_score")
-          .eq("quiz_id", quizInfo.id)
-          .order("final_score", { ascending: false });
+      // 1. Fetch claim signature + amount from leaderboard (set by backend after quiz ends)
+      const { data: entry, error: entryErr } = await supabase
+        .from("leaderboard")
+        .select("claim_signature, claim_amount_wei, rank, claimed_reward")
+        .eq("quiz_id", quizInfo.id)
+        .eq("user_wallet", publicKey)
+        .single();
 
-        if (lb) {
-          const idx = lb.findIndex((p: any) => p.user_wallet === publicKey);
-          const rank = idx >= 0 ? idx + 1 : null;
-          setClaimRank(rank);
-          const pool = quizInfo.reward_pool_amount || 0;
-          setClaimRewardAmount(rank && rank <= 3 ? pool * REWARD_SPLITS[rank - 1] : 0);
-        }
+      if (entryErr || !entry) {
+        throw new Error("Could not find your leaderboard entry.");
       }
 
+      if (entry.claimed_reward) {
+        setHasClaimed(true);
+        return;
+      }
+
+      if (!entry.claim_signature || !entry.claim_amount_wei) {
+        throw new Error("Reward not ready yet. Quiz may still be processing.");
+      }
+
+      // 2. Call claimReward on-chain
+      const result = await claimOnChain(
+        quizInfo.id,
+        entry.claim_amount_wei,
+        entry.claim_signature as `0x${string}`
+      );
+
+      if (!result.success) {
+        throw new Error(result.error || "On-chain claim failed");
+      }
+
+      // 3. Record claim in DB
+      await fetch("/api/quiz/claim-reward", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          quizId: quizInfo.id,
+          userWallet: publicKey,
+          txHash: result.txHash,
+        }),
+      });
+
+      setClaimTxSignature(result.txHash || null);
       setHasClaimed(true);
-      const finalRank = claimRank;
-      if (finalRank && finalRank <= 3) {
-        confetti({
-          particleCount: 150,
-          spread: 70,
-          origin: { y: 0.7 },
-          colors: ['#FCFF52', '#35D07F', '#FDE047']
-        });
-      }
+
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.7 },
+        colors: ['#FCFF52', '#35D07F', '#FDE047'],
+      });
     } catch (err: any) {
       console.error("Claim error:", err);
       setClaimError(err.message || "An error occurred");
@@ -537,12 +607,15 @@ export default function PlayPage() {
                   );
                   const { data: lbData } = await supabase
                     .from("leaderboard")
-                    .upsert({
-                      quiz_id: quizData.id,
-                      user_wallet: walletStr,
-                      player_name: playerName,
-                      final_score: 0
-                    })
+                    .upsert(
+                      {
+                        quiz_id: quizData.id,
+                        user_wallet: walletStr,
+                        player_name: playerName,
+                        final_score: 0,
+                      },
+                      { onConflict: 'quiz_id,user_wallet' }
+                    )
                     .select("id")
                     .single();
                   if (lbData?.id) setLeaderboardId(lbData.id);
@@ -557,7 +630,14 @@ export default function PlayPage() {
                 } catch (_) { /* non-critical */ }
               }
 
-              // Subscribe to quiz status
+              // Fetch jumlah player saat ini
+              const { count } = await supabase
+                .from("leaderboard")
+                .select("*", { count: "exact", head: true })
+                .eq("quiz_id", quizData.id);
+              setPlayerCount(count || 0);
+
+              // Subscribe ke quiz status + perubahan jumlah player
               supabase
                 .channel(`quiz-status-${quizData.id}`)
                 .on('postgres_changes', {
@@ -569,6 +649,19 @@ export default function PlayPage() {
                   if (payload.new.status === 'playing') {
                     setQuizState('playing');
                   }
+                })
+                .on('postgres_changes', {
+                  event: '*',
+                  schema: 'public',
+                  table: 'leaderboard',
+                  filter: `quiz_id=eq.${quizData.id}`
+                }, async () => {
+                  // Update jumlah player setiap ada perubahan
+                  const { count: newCount } = await supabase
+                    .from("leaderboard")
+                    .select("*", { count: "exact", head: true })
+                    .eq("quiz_id", quizData.id);
+                  setPlayerCount(newCount || 0);
                 })
                 .subscribe();
             }
@@ -836,7 +929,7 @@ export default function PlayPage() {
 
               <div className="flex flex-wrap justify-center gap-8 text-center pt-4">
                 <div>
-                  <div className="text-2xl font-extrabold text-[#FCFF52]">12</div>
+                  <div className="text-2xl font-extrabold text-[#FCFF52]">{playerCount}</div>
                   <div className="text-xs text-gray-500 font-semibold">{t("play.players", lang)}</div>
                 </div>
                 <div>
@@ -856,13 +949,6 @@ export default function PlayPage() {
                 </span>
               </div>
               
-              {/* For Demo Purposes: Auto-start button */}
-              <button 
-                onClick={() => setQuizState("playing")}
-                className="mt-4 px-6 py-2 text-xs bg-black/10 dark:bg-white/10 rounded-full hover:bg-black/20"
-              >
-                (Demo: Force Start Quiz)
-              </button>
             </motion.div>
           </div>
         )}
@@ -1058,7 +1144,7 @@ export default function PlayPage() {
                 {hasClaimed && claimRank !== null && claimRank <= 3 && (
                   <div className="flex items-center justify-center gap-2 text-[#35D07F] font-bold text-sm">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Reward akan dikirim ke wallet kamu oleh host</span>
+                    <span>{lang === "ENG" ? "Reward sent to your wallet!" : "Reward sudah dikirim ke wallet kamu!"}</span>
                   </div>
                 )}
 
@@ -1075,9 +1161,16 @@ export default function PlayPage() {
                 </div>
               )}
 
+              {claimRank !== null && claimRank <= 3 && !isSignatureReady && !hasClaimed && (
+                <div className="flex items-center justify-center gap-2 text-sm text-[#FCFF52] font-medium">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {lang === "ENG" ? "Processing reward, please wait..." : "Memproses reward, harap tunggu..."}
+                </div>
+              )}
+
               <button
                 onClick={handleClaimReward}
-                disabled={isClaiming || hasClaimed}
+                disabled={isClaiming || hasClaimed || (claimRank !== null && claimRank <= 3 && !isSignatureReady)}
                 className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#FDE047] to-[#EAB308] text-black font-extrabold text-lg hover:shadow-[0_0_30px_rgba(253,224,71,0.5)] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 {isClaiming ? (

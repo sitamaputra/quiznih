@@ -7,7 +7,7 @@ import {
   ArrowLeft, Wallet2, Send, Copy, CheckCircle, Loader2, Users, Trophy, Trash2, ShieldX, Eye, MessageCircle, ExternalLink, Gift
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
@@ -25,14 +25,18 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
   const connectors = useConnectors();
   const router = useRouter();
 
-  const { distributeRewards, isDistributing, getExplorerTxUrl } = useCeloQuiz();
-  const [distributeTx, setDistributeTx] = useState<string | null>(null);
-  const [distributeError, setDistributeError] = useState<string | null>(null);
+  const { getExplorerTxUrl } = useCeloQuiz();
+  const [finalizeTx, setFinalizeTx] = useState<string | null>(null);
+  const [finalizeError, setFinalizeError] = useState<string | null>(null);
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   const [quizData, setQuizData] = useState<any>(null);
   const [participants, setParticipants] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
+  const [autoFinishCountdown, setAutoFinishCountdown] = useState<number | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countdownStartedRef = useRef(false);
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<'manage' | 'live'>('manage');
 
@@ -42,10 +46,18 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
       return;
     }
 
+    // Fetch semua data terbaru dari DB (dipakai saat load awal & polling)
+    const fetchParticipants = async () => {
+      const { data } = await supabase
+        .from("leaderboard")
+        .select("*")
+        .eq("quiz_id", quizId);
+      if (data) setParticipants(data);
+    };
+
     const loadData = async () => {
       setIsLoading(true);
       try {
-        // Fetch Quiz
         const { data: qData, error: qError } = await supabase
           .from("quizzes")
           .select("*")
@@ -53,8 +65,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
           .single();
 
         if (qError || !qData) throw qError || new Error("Quiz not found");
-        
-        // Security: Ensure the user is the host
+
         if (qData.host_wallet !== publicKey) {
           alert("Unauthorized");
           router.push("/dashboard");
@@ -62,14 +73,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
         }
 
         setQuizData(qData);
-
-        // Fetch Initial Participants
-        const { data: pData } = await supabase
-          .from("leaderboard")
-          .select("*")
-          .eq("quiz_id", quizId);
-        
-        setParticipants(pData || []);
+        await fetchParticipants();
       } catch (err) {
         console.error("Error loading quiz:", err);
       } finally {
@@ -79,7 +83,7 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
 
     loadData();
 
-    // Subscribe to Participants (Leaderboard Changes)
+    // Realtime subscription — aktif langsung, tidak tunggu loadData selesai
     const channel = supabase
       .channel(`room-${quizId}`)
       .on('postgres_changes', {
@@ -89,19 +93,92 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
         filter: `quiz_id=eq.${quizId}`
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
-          setParticipants(prev => [...prev, payload.new]);
+          setParticipants(prev => {
+            const exists = prev.some(p => p.user_wallet === payload.new.user_wallet);
+            if (exists) return prev.map(p => p.user_wallet === payload.new.user_wallet ? payload.new : p);
+            return [...prev, payload.new];
+          });
         } else if (payload.eventType === 'UPDATE') {
           setParticipants(prev => prev.map(p => p.user_wallet === payload.new.user_wallet ? payload.new : p));
         } else if (payload.eventType === 'DELETE') {
           setParticipants(prev => prev.filter(p => p.id !== payload.old.id));
         }
       })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'quizzes',
+        filter: `id=eq.${quizId}`
+      }, (payload) => {
+        setQuizData((prev: any) => ({ ...prev, ...payload.new }));
+      })
       .subscribe();
+
+    // Polling fallback setiap 5 detik — jaga-jaga realtime telat/miss event
+    const poll = setInterval(fetchParticipants, 5000);
 
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(poll);
     };
   }, [quizId, publicKey, router]);
+
+  // Auto-finalize: ketika quiz selesai, langsung buka klaim tanpa host klik apapun
+  useEffect(() => {
+    if (
+      quizData?.status === 'finished' &&
+      quizData?.reward_pool_amount > 0 &&
+      !finalizeTx &&
+      !isFinalizing
+    ) {
+      handleFinalizeQuiz();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizData?.status]);
+
+  // Auto-finish: jika semua player sudah menjawab semua soal, mulai countdown 60 detik
+  const allPlayersFinished =
+    participants.length > 0 && participants.every((p) => p.is_finished === true);
+
+  useEffect(() => {
+    // Hanya aktif saat quiz sedang berjalan dan belum ada countdown
+    if (!allPlayersFinished || quizData?.status !== 'playing' || countdownStartedRef.current) return;
+
+    countdownStartedRef.current = true;
+    let seconds = 60;
+    setAutoFinishCountdown(seconds);
+
+    countdownIntervalRef.current = setInterval(() => {
+      seconds -= 1;
+      setAutoFinishCountdown(seconds);
+
+      if (seconds <= 0) {
+        if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+        setAutoFinishCountdown(null);
+        countdownStartedRef.current = false;
+        // Akhiri quiz secara otomatis
+        supabase.from("quizzes").update({ status: 'finished' }).eq("id", quizId).then(() => {
+          setQuizData((prev: any) => ({ ...prev, status: 'finished' }));
+          confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, colors: ['#35D07F', '#FCFF52', '#FDE047'] });
+        });
+      }
+    }, 1000);
+
+    return () => {
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allPlayersFinished, quizData?.status]);
+
+  // Hentikan countdown jika host klik End Quiz lebih dahulu
+  useEffect(() => {
+    if (quizData?.status === 'finished' && countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+      setAutoFinishCountdown(null);
+    }
+  }, [quizData?.status]);
 
   const handleStartQuiz = async () => {
     setIsStarting(true);
@@ -123,24 +200,39 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
     }
   };
 
-  const handleDistributeRewards = async () => {
-    if (!quizData?.contract_quiz_id) {
-      setDistributeError("Quiz tidak memiliki contract_quiz_id. Reward pool mungkin tidak di-deposit.");
-      return;
-    }
-    const sorted = [...participants].sort((a, b) => (b.final_score || 0) - (a.final_score || 0));
-    const winners = sorted.slice(0, 3).map((p) => p.user_wallet).filter(Boolean);
-    if (winners.length === 0) {
-      setDistributeError("Tidak ada pemenang untuk didistribusikan.");
-      return;
-    }
-    setDistributeError(null);
-    const result = await distributeRewards(quizData.id, winners);
-    if (result.success) {
-      setDistributeTx(result.txHash || null);
+  const handleFinalizeQuiz = async () => {
+    if (!quizData?.id) return;
+    setIsFinalizing(true);
+    setFinalizeError(null);
+
+    try {
+      const res = await fetch("/api/quiz/finalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quizId: quizData.id }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Finalize failed");
+      }
+
+      if (data.onChainError) {
+        // Signatures sudah tersimpan di DB, tapi finalisasi on-chain gagal
+        setFinalizeError(
+          `Signatures tersimpan, tapi finalisasi on-chain gagal: ${data.onChainError}. ` +
+          `Pastikan wallet backend (signer) punya CELO untuk gas, lalu coba lagi.`
+        );
+        return;
+      }
+
+      setFinalizeTx("done");
       confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, colors: ['#35D07F', '#FCFF52', '#FDE047'] });
-    } else {
-      setDistributeError(result.error || "Distribusi gagal");
+    } catch (err: any) {
+      setFinalizeError(err.message || "Finalize gagal");
+    } finally {
+      setIsFinalizing(false);
     }
   };
 
@@ -336,10 +428,49 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
               )}
             </div>
 
+            {/* Auto-finish countdown banner */}
+            {autoFinishCountdown !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full p-5 rounded-2xl border-2 border-[#35D07F]/40 bg-[#35D07F]/10 flex flex-col sm:flex-row items-center justify-between gap-4"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">✅</span>
+                  <div>
+                    <p className="font-extrabold text-[#1a9f5e]">
+                      {lang === "ENG" ? "All players have finished!" : "Semua pemain sudah selesai!"}
+                    </p>
+                    <p className="text-sm text-[#4a6357]">
+                      {lang === "ENG"
+                        ? `Auto-ending quiz in ${autoFinishCountdown}s if you don't act`
+                        : `Kuis akan berakhir otomatis dalam ${autoFinishCountdown}s jika tidak ada tindakan`}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+                    countdownIntervalRef.current = null;
+                    setAutoFinishCountdown(null);
+                    await supabase.from("quizzes").update({ status: 'finished' }).eq("id", quizId);
+                    setQuizData((prev: any) => ({ ...prev, status: 'finished' }));
+                    confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, colors: ['#35D07F', '#FCFF52', '#FDE047'] });
+                  }}
+                  className="shrink-0 px-6 py-3 rounded-xl bg-[#35D07F] text-white font-extrabold text-sm hover:bg-[#1a9f5e] transition-all"
+                >
+                  🏁 {lang === "ENG" ? "End Now" : "Akhiri Sekarang"}
+                </button>
+              </motion.div>
+            )}
+
             {/* End Quiz */}
             <button
               onClick={async () => {
                 if (!confirm(lang === "ENG" ? "End the quiz and show final results?" : "Akhiri kuis dan tampilkan hasil akhir?")) return;
+                if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+                countdownIntervalRef.current = null;
+                setAutoFinishCountdown(null);
                 await supabase.from("quizzes").update({ status: 'finished' }).eq("id", quizId);
                 setQuizData((prev: any) => ({ ...prev, status: 'finished' }));
                 confetti({ particleCount: 250, spread: 100, origin: { y: 0.5 }, colors: ['#35D07F','#FCFF52','#FDE047'] });
@@ -387,39 +518,34 @@ export default function QuizControlRoom({ params }: { params: Promise<{ id: stri
                 </div>
               )}
 
-              {/* Distribute Rewards Button */}
+              {/* Status finalisasi reward — otomatis, tanpa host klik */}
               {quizData.reward_pool_amount > 0 && (
                 <div className="pt-4 space-y-3">
-                  {distributeTx ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-center gap-2 text-[#35D07F] font-bold">
-                        <CheckCircle className="w-5 h-5" /> Reward berhasil didistribusikan!
-                      </div>
-                      <a
-                        href={getExplorerTxUrl(distributeTx)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#35D07F]/10 border border-[#35D07F]/30 text-[#35D07F] text-sm font-bold hover:bg-[#35D07F]/20 transition-all"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" /> Lihat di Explorer
-                      </a>
+                  {finalizeTx ? (
+                    <div className="flex items-center justify-center gap-2 text-[#35D07F] font-bold">
+                      <CheckCircle className="w-5 h-5" />
+                      {lang === "ENG"
+                        ? "Rewards ready! Winners can now claim directly."
+                        : "Reward siap! Pemenang bisa langsung klaim."}
                     </div>
-                  ) : (
-                    <button
-                      onClick={handleDistributeRewards}
-                      disabled={isDistributing}
-                      className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-black font-extrabold text-lg flex items-center justify-center gap-3 hover:shadow-[0_0_30px_rgba(53,208,127,0.5)] transition-all disabled:opacity-50"
-                    >
-                      {isDistributing ? (
-                        <><Loader2 className="w-5 h-5 animate-spin" /> Mendistribusikan...</>
-                      ) : (
-                        <><Gift className="w-5 h-5" /> Distribusikan Reward ({quizData.reward_pool_amount} CELO)</>
-                      )}
-                    </button>
-                  )}
-                  {distributeError && (
-                    <p className="text-red-400 text-sm">{distributeError}</p>
-                  )}
+                  ) : isFinalizing ? (
+                    <div className="flex items-center justify-center gap-2 text-[#FCFF52] font-bold">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      {lang === "ENG" ? "Opening claims automatically..." : "Membuka klaim otomatis..."}
+                    </div>
+                  ) : finalizeError ? (
+                    // Hanya tampilkan tombol retry kalau ada error
+                    <div className="space-y-2">
+                      <p className="text-red-400 text-sm text-center">{finalizeError}</p>
+                      <button
+                        onClick={handleFinalizeQuiz}
+                        className="w-full py-3 rounded-2xl bg-red-500/20 border border-red-500/40 text-red-400 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-500/30 transition-all"
+                      >
+                        <Gift className="w-4 h-4" />
+                        {lang === "ENG" ? "Retry Open Claims" : "Coba Lagi Buka Klaim"}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               )}
 

@@ -1,0 +1,17 @@
+{
+  "name": "quiznih-spin-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bot": "ts-node index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "@types/node": "^20.12.0"
+  }
+}

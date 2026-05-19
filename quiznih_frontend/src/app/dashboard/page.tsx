@@ -156,7 +156,7 @@ export default function DashboardPage() {
         )}
 
         {/* Hero Header */}
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: isConnected ? "24px 24px 0" : "80px 24px 0", textAlign: "center" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: mounted && isConnected ? "24px 24px 0" : "80px 24px 0", textAlign: "center" }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

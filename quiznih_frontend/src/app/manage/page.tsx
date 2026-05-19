@@ -19,8 +19,11 @@ export default function ManageQuizzesPage() {
   const connectors = useConnectors();
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!address && connectors.length > 0) {
@@ -90,13 +93,13 @@ export default function ManageQuizzesPage() {
       <TopBar backHref="/dashboard" />
 
       <div style={{ position: "relative", zIndex: 1 }}>
-        {isConnected && (
+        {mounted && isConnected && (
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "68px 24px 0", display: "flex", justifyContent: "flex-end" }}>
             <WalletDropdown />
           </div>
         )}
 
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: isConnected ? "32px 24px 60px" : "80px 24px 60px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: mounted && isConnected ? "32px 24px 60px" : "80px 24px 60px" }}>
           {/* Page header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

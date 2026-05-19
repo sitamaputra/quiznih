@@ -6,17 +6,18 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useAccount, useBalance, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from "wagmi";
+import { useAccount, useBalance, useWriteContract, useSwitchChain } from "wagmi";
 import {
   QUIZ_ESCROW_ADDRESS,
   QUIZ_ESCROW_ABI,
+  SPIN_WHEEL_ADDRESS,
+  SPIN_WHEEL_ABI,
   ACTIVE_CHAIN,
   uuidToBytes32,
   getExplorerTxUrl,
   IS_TESTNET,
   parseCelo,
   formatCelo,
-  celoSepolia,
 } from "@/lib/celo";
 
 interface DepositResult {
@@ -26,7 +27,7 @@ interface DepositResult {
   error?: string;
 }
 
-interface DistributeResult {
+interface ClaimResult {
   success: boolean;
   txHash?: string;
   explorerUrl?: string;
@@ -50,8 +51,11 @@ export function useCeloQuiz() {
   };
 
   const [isDepositing, setIsDepositing] = useState(false);
-  const [isDistributing, setIsDistributing] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [isClaimingSpin, setIsClaimingSpin] = useState(false);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [isClosingSession, setIsClosingSession] = useState(false);
 
   /**
    * Create a quiz and deposit CELO reward pool
@@ -146,52 +150,10 @@ export function useCeloQuiz() {
   );
 
   /**
-   * Distribute rewards to quiz winners
-   */
-  const distributeRewards = useCallback(
-    async (quizId: string, winners: string[]): Promise<DistributeResult> => {
-      if (!address || !isConnected) {
-        return { success: false, error: "Wallet not connected" };
-      }
-
-      setIsDistributing(true);
-      try {
-        await ensureCorrectChain();
-        const quizIdBytes = uuidToBytes32(quizId);
-
-        const txHash = await writeContractAsync({
-          address: QUIZ_ESCROW_ADDRESS,
-          abi: QUIZ_ESCROW_ABI,
-          functionName: "distributeRewards",
-          args: [quizIdBytes, winners as `0x${string}`[]],
-          chain: ACTIVE_CHAIN,
-        });
-
-        await refetchBalance();
-
-        return {
-          success: true,
-          txHash,
-          explorerUrl: getExplorerTxUrl(txHash),
-        };
-      } catch (err: any) {
-        console.error("Distribute error:", err);
-        return {
-          success: false,
-          error: err.shortMessage || err.message || "Distribution failed",
-        };
-      } finally {
-        setIsDistributing(false);
-      }
-    },
-    [address, isConnected, writeContractAsync, refetchBalance]
-  );
-
-  /**
    * Cancel a quiz and refund the host
    */
   const cancelQuiz = useCallback(
-    async (quizId: string): Promise<DistributeResult> => {
+    async (quizId: string): Promise<ClaimResult> => {
       if (!address || !isConnected) {
         return { success: false, error: "Wallet not connected" };
       }
@@ -229,6 +191,165 @@ export function useCeloQuiz() {
     [address, isConnected, writeContractAsync, refetchBalance]
   );
 
+  /**
+   * Winner claims reward using backend-signed authorization.
+   * No host involvement needed — winner calls this directly.
+   */
+  const claimReward = useCallback(
+    async (quizId: string, amountWei: string, signature: `0x${string}`): Promise<ClaimResult> => {
+      if (!address || !isConnected) {
+        return { success: false, error: "Wallet not connected" };
+      }
+
+      setIsClaiming(true);
+      try {
+        await ensureCorrectChain();
+        const quizIdBytes = uuidToBytes32(quizId);
+
+        const txHash = await writeContractAsync({
+          address: QUIZ_ESCROW_ADDRESS,
+          abi: QUIZ_ESCROW_ABI,
+          functionName: "claimReward",
+          args: [quizIdBytes, BigInt(amountWei), signature],
+          chain: ACTIVE_CHAIN,
+        });
+
+        await refetchBalance();
+
+        return {
+          success: true,
+          txHash,
+          explorerUrl: getExplorerTxUrl(txHash),
+        };
+      } catch (err: any) {
+        console.error("Claim error:", err);
+        if (err.message?.includes("User rejected") || err.message?.includes("denied")) {
+          return { success: false, error: "Transaction cancelled by user" };
+        }
+        return {
+          success: false,
+          error: err.shortMessage || err.message || "Claim failed",
+        };
+      } finally {
+        setIsClaiming(false);
+      }
+    },
+    [address, isConnected, writeContractAsync, refetchBalance]
+  );
+
+  /**
+   * Claim spin prize using backend-signed authorization.
+   */
+  const claimSpin = useCallback(
+    async (sessionId: string, amountWei: string, signature: `0x${string}`): Promise<ClaimResult> => {
+      if (!address || !isConnected) {
+        return { success: false, error: "Wallet not connected" };
+      }
+
+      setIsClaimingSpin(true);
+      try {
+        await ensureCorrectChain();
+        const sessionIdBytes = uuidToBytes32(sessionId);
+
+        const txHash = await writeContractAsync({
+          address: SPIN_WHEEL_ADDRESS,
+          abi: SPIN_WHEEL_ABI,
+          functionName: "claimSpin",
+          args: [sessionIdBytes, BigInt(amountWei), signature],
+          chain: ACTIVE_CHAIN,
+        });
+
+        await refetchBalance();
+
+        return {
+          success: true,
+          txHash,
+          explorerUrl: getExplorerTxUrl(txHash),
+        };
+      } catch (err: any) {
+        console.error("Claim spin error:", err);
+        if (err.message?.includes("User rejected") || err.message?.includes("denied")) {
+          return { success: false, error: "Transaction cancelled by user" };
+        }
+        return {
+          success: false,
+          error: err.shortMessage || err.message || "Claim spin failed",
+        };
+      } finally {
+        setIsClaimingSpin(false);
+      }
+    },
+    [address, isConnected, writeContractAsync, refetchBalance]
+  );
+
+  /**
+   * Host creates a SpinWheel session and deposits prize pool.
+   */
+  const createSpinSession = useCallback(
+    async (sessionId: string, amountCelo: string): Promise<ClaimResult> => {
+      if (!address || !isConnected) return { success: false, error: "Wallet not connected" };
+
+      setIsCreatingSession(true);
+      try {
+        await ensureCorrectChain();
+        const sessionIdBytes = uuidToBytes32(sessionId);
+        const value = parseCelo(amountCelo);
+
+        const txHash = await writeContractAsync({
+          address: SPIN_WHEEL_ADDRESS,
+          abi: SPIN_WHEEL_ABI,
+          functionName: "createSession",
+          args: [sessionIdBytes],
+          value,
+          chain: ACTIVE_CHAIN,
+        });
+
+        await refetchBalance();
+        return { success: true, txHash, explorerUrl: getExplorerTxUrl(txHash) };
+      } catch (err: any) {
+        if (err.message?.includes("User rejected") || err.message?.includes("denied"))
+          return { success: false, error: "Transaction cancelled by user" };
+        return { success: false, error: err.shortMessage || err.message || "Create session failed" };
+      } finally {
+        setIsCreatingSession(false);
+      }
+    },
+    [address, isConnected, writeContractAsync, refetchBalance]
+  );
+
+  /**
+   * Host closes a SpinWheel session and reclaims remaining pool.
+   */
+  const closeSpinSession = useCallback(
+    async (sessionId: string): Promise<ClaimResult> => {
+      if (!address || !isConnected) return { success: false, error: "Wallet not connected" };
+
+      setIsClosingSession(true);
+      try {
+        await ensureCorrectChain();
+        const sessionIdBytes = uuidToBytes32(sessionId);
+
+        const txHash = await writeContractAsync({
+          address: SPIN_WHEEL_ADDRESS,
+          abi: SPIN_WHEEL_ABI,
+          functionName: "closeSession",
+          args: [sessionIdBytes],
+          chain: ACTIVE_CHAIN,
+        });
+
+        await refetchBalance();
+        return { success: true, txHash, explorerUrl: getExplorerTxUrl(txHash) };
+      } catch (err: any) {
+        if (err.message?.includes("User rejected") || err.message?.includes("denied"))
+          return { success: false, error: "Transaction cancelled by user" };
+        return { success: false, error: err.shortMessage || err.message || "Close session failed" };
+      } finally {
+        setIsClosingSession(false);
+      }
+    },
+    [address, isConnected, writeContractAsync, refetchBalance]
+  );
+
   return {
     // State
     address,
@@ -240,14 +361,20 @@ export function useCeloQuiz() {
 
     // Loading states
     isDepositing,
-    isDistributing,
     isCancelling,
+    isClaiming,
+    isClaimingSpin,
+    isCreatingSession,
+    isClosingSession,
 
     // Actions
     createQuizAndDeposit,
     addToRewardPool,
-    distributeRewards,
     cancelQuiz,
+    claimReward,
+    claimSpin,
+    createSpinSession,
+    closeSpinSession,
     refetchBalance,
 
     // Utils

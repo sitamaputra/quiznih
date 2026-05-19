@@ -1,12 +1,15 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, Trash2, Gift, RotateCcw, Sparkles, Trophy, Users, UserPlus, Clock, Camera, Video, VideoOff, Download } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Gift, RotateCcw, Sparkles, Trophy, Users, UserPlus, Clock, Camera, Video, VideoOff, Zap, Wallet, CheckCircle2, Loader2, X, Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { useCapture } from "@/hooks/useCapture";
 import TopBar from "@/components/layout/TopBar";
+import { useAccount, useConnect, useConnectors } from "wagmi";
+import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+import { supabase } from "@/lib/supabase";
 
 const WHEEL_COLORS = ["#35D07F","#FCFF52","#60A5FA","#F472B6","#A78BFA","#F59E0B","#EF4444","#10B981","#8B5CF6","#EC4899","#06B6D4","#F97316"];
 const DURATIONS = [{ label: "5s", val: 5 },{ label: "10s", val: 10 },{ label: "15s", val: 15 }];
@@ -24,14 +27,33 @@ const PRIZE_OPTIONS = [
   "0.1 CELO","0.5 CELO","1 CELO","Kaos Eksklusif","Tumbler","Sticker Pack","NFT Rare","Mystery Box","Pizza Party","Voucher 50K","Free Pass","Custom..."
 ];
 
-interface Item { id: number; label: string; color: string; emoji: string; }
+interface Item { id: number; label: string; color: string; emoji: string; celoAmount?: number; }
 
 export default function SpinWheelPage() {
   const { lang } = useLanguage();
-  // Mode: "prize" = spin prizes, "name" = spin names
   const [mode, setMode] = useState<"prize"|"name">("prize");
   const { takeScreenshot, startRecording, stopRecording, isRecording, recordingTime, formatRecTime } = useCapture();
   const captureRef = useRef<HTMLDivElement>(null);
+
+  // Wallet & CELO
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
+  const { createSpinSession, closeSpinSession, claimSpin: claimSpinOnChain, isCreatingSession, isClosingSession, isClaimingSpin } = useCeloQuiz();
+
+  // CELO Session state
+  const [celoMode, setCeloMode] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionPool, setSessionPool] = useState("1");
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [sessionActive, setSessionActive] = useState(false);
+  const [sessionTx, setSessionTx] = useState<string | null>(null);
+  // Claim state
+  const [winnerCeloAmount, setWinnerCeloAmount] = useState(0);
+  const [showClaimPanel, setShowClaimPanel] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const [claimDone, setClaimDone] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
 
   // Shared
   const [items, setItems] = useState<Item[]>(DEFAULT_PRIZES);
@@ -55,6 +77,75 @@ export default function SpinWheelPage() {
 
   const actualDuration = duration;
   const activePrize = selectedPrize === "Custom..." ? customPrize : selectedPrize;
+
+  // Update CELO amount untuk satu irisan
+  const updateItemCelo = (id: number, amount: number) => {
+    setItems(prev => prev.map(item => item.id === id ? { ...item, celoAmount: amount } : item));
+  };
+
+  // CELO: Buat session on-chain + simpan ke Supabase via API (service role)
+  const handleCreateSession = async () => {
+    if (!address || !isConnected) { connect({ connector: connectors[0] }); return; }
+    const newId = crypto.randomUUID();
+    const result = await createSpinSession(newId, sessionPool);
+    if (!result.success) { alert("Failed to create session: " + result.error); return; }
+    const wheelConfig = items.map(({ id, label, color, emoji, celoAmount }) => ({ id, label, color, emoji, celoAmount: celoAmount ?? 0 }));
+    const res = await fetch("/api/spin/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: newId, hostAddress: address, prizePool: sessionPool, wheelConfig, txHash: result.txHash }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      alert("Session created on-chain but DB save failed: " + (data.error || "unknown error"));
+      return;
+    }
+    setSessionId(newId);
+    setSessionActive(true);
+    setSessionTx(result.txHash || null);
+    confetti({ particleCount: 100, spread: 70, colors: ["#35D07F","#FCFF52"] });
+  };
+
+  // CELO: Tutup session & kembalikan sisa pool ke host
+  const handleCloseSession = async () => {
+    if (!sessionId || !confirm("Close session and return remaining CELO to your wallet?")) return;
+    const result = await closeSpinSession(sessionId);
+    if (!result.success) { alert("Failed to close: " + result.error); return; }
+    await fetch("/api/spin/session", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId }),
+    });
+    setSessionActive(false);
+    setSessionId(null);
+  };
+
+  // CELO: Minta signature lalu claim on-chain untuk pemenang
+  const handleClaimPrize = async () => {
+    if (!sessionId || !address || winnerCeloAmount <= 0) return;
+    setIsSigning(true);
+    setClaimError(null);
+    try {
+      const prizeWei = BigInt(Math.round(winnerCeloAmount * 1e18)).toString();
+      const res = await fetch("/api/spin/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, playerAddress: address, prizeAmountWei: prizeWei }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal minta signature");
+      const result = await claimSpinOnChain(sessionId, prizeWei, data.signature as `0x${string}`);
+      if (!result.success) throw new Error(result.error || "Claim on-chain gagal");
+      await supabase.from("spin_claims").update({ claimed_onchain: true, tx_hash: result.txHash })
+        .eq("session_id", sessionId).eq("player_address", address.toLowerCase());
+      setClaimDone(true);
+      confetti({ particleCount: 200, spread: 90, colors: ["#35D07F","#FCFF52","#a78bfa"] });
+    } catch (err: any) {
+      setClaimError(err.message);
+    } finally {
+      setIsSigning(false);
+    }
+  };
 
   // Switch mode
   const switchMode = (m: "prize"|"name") => {
@@ -142,9 +233,21 @@ export default function SpinWheelPage() {
 
     setTimeout(() => {
       setIsSpinning(false); setCountdown(0);
-      setWinner(items[winIdx]); setShowResult(true);
-      setHistory(prev => [{item:items[winIdx], prize: mode==="name"?activePrize:undefined}, ...prev].slice(0,15));
+      const w = items[winIdx];
+      setWinner(w); setShowResult(true);
+      setHistory(prev => [{item:w, prize: mode==="name"?activePrize:undefined}, ...prev].slice(0,15));
       confetti({ particleCount: 180, spread: 90, origin:{y:0.45}, colors:["#35D07F","#FCFF52","#FDE047","#A78BFA"] });
+      // Trigger claim panel jika CELO mode aktif, session ada, dan irisan ini punya CELO
+      const cAmount = w.celoAmount ?? 0;
+      if (celoMode && sessionActive && sessionId && cAmount > 0) {
+        setWinnerCeloAmount(cAmount);
+        setShowClaimPanel(true);
+        setClaimDone(false);
+        setClaimError(null);
+      } else {
+        setShowClaimPanel(false);
+        setWinnerCeloAmount(0);
+      }
     }, actualDuration*1000);
   };
 
@@ -299,12 +402,29 @@ export default function SpinWheelPage() {
                 {mode==="prize"?<Gift className="w-5 h-5" style={{color:'#7a6e00'}}/>:<Users className="w-5 h-5" style={{color:'#1a9f5e'}}/>}
                 {mode==="prize"?(lang==="ENG"?"Prizes":"Hadiah"):(lang==="ENG"?"Names":"Daftar Nama")} ({items.length})
               </h3>
-              <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
                 {items.map(item=>(
-                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 12, background: 'rgba(53,208,127,0.05)', border: '1px solid rgba(53,208,127,0.12)' }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, background: item.color+'25' }}>{item.emoji}</div>
-                    <span style={{ flex: 1, fontWeight: 600, fontSize: 14, color: '#0a1a0f' }}>{item.label}</span>
-                    <button onClick={()=>removeItem(item.id)} disabled={items.length<=2} style={{ padding: 4, borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', opacity: items.length<=2?0.2:1 }}>
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 12, background: 'rgba(53,208,127,0.05)', border: '1px solid rgba(53,208,127,0.12)' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, background: item.color+'25', flexShrink: 0 }}>{item.emoji}</div>
+                    <span style={{ flex: 1, fontWeight: 600, fontSize: 13, color: '#0a1a0f', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
+                    {celoMode && mode === "prize" && !sessionActive && (
+                      <input
+                        type="number"
+                        value={item.celoAmount ?? 0}
+                        onChange={e => updateItemCelo(item.id, parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        step="0.001"
+                        min="0"
+                        title="CELO amount for this slice"
+                        style={{ width: 68, padding: '3px 6px', borderRadius: 7, border: '1.5px solid rgba(167,139,250,0.35)', fontSize: 12, textAlign: 'center', fontFamily: 'monospace', color: '#7c3aed', background: '#f8f5ff', outline: 'none', flexShrink: 0 }}
+                      />
+                    )}
+                    {celoMode && mode === "prize" && sessionActive && (
+                      <span style={{ fontSize: 12, color: (item.celoAmount ?? 0) > 0 ? '#7c3aed' : '#9ca3af', fontWeight: 700, minWidth: 58, textAlign: 'right', flexShrink: 0 }}>
+                        {(item.celoAmount ?? 0) > 0 ? `${item.celoAmount}⬡` : '—'}
+                      </span>
+                    )}
+                    <button onClick={()=>removeItem(item.id)} disabled={items.length<=2 || sessionActive} style={{ padding: 4, borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', color: '#ef4444', opacity: items.length<=2||sessionActive?0.2:1, flexShrink: 0 }}>
                       <Trash2 className="w-3.5 h-3.5"/>
                     </button>
                   </div>
@@ -318,6 +438,104 @@ export default function SpinWheelPage() {
                   <Plus className="w-4 h-4"/>
                 </button>
               </div>
+            </div>
+
+            {/* CELO Session Card */}
+            <div style={{ background: '#fff', border: `1.5px solid ${celoMode ? 'rgba(167,139,250,0.5)' : 'rgba(167,139,250,0.2)'}`, borderRadius: 20, padding: 20, boxShadow: '0 2px 12px rgba(167,139,250,0.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: celoMode ? 16 : 0 }}>
+                <h3 style={{ fontWeight: 700, fontSize: 14, color: '#0a1a0f', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+                  <Zap style={{ width: 16, height: 16, color: '#7c3aed' }} />
+                  CELO Prize Mode
+                </h3>
+                <button onClick={() => setCeloMode(v => !v)} style={{ position: 'relative', width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: celoMode ? '#35D07F' : '#e5e7eb', transition: 'background 0.2s', padding: 0 }}>
+                  <div style={{ position: 'absolute', top: 2, left: celoMode ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+                </button>
+              </div>
+
+              {celoMode && !sessionActive && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div>
+                    <label style={{ fontSize: 12, color: '#4a6357', fontWeight: 600, display: 'block', marginBottom: 4 }}>Total Pool (CELO)</label>
+                    <input value={sessionPool} onChange={e => setSessionPool(e.target.value)} type="number" step="0.1" min="0.1"
+                      style={{ width: '100%', padding: '8px 12px', borderRadius: 10, border: '1.5px solid rgba(53,208,127,0.25)', fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  </div>
+                  <div style={{ padding: '8px 12px', borderRadius: 10, background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.2)', fontSize: 12, color: '#6b4fa8', lineHeight: 1.5 }}>
+                    💡 Set a CELO amount per slice in the prize list above.
+                    Slices with 0 = no CELO reward.
+                  </div>
+                  {mode === "prize" && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#4a6357', padding: '4px 2px' }}>
+                      <span>Rewarded slices:</span>
+                      <span style={{ fontWeight: 700, color: '#7c3aed' }}>
+                        {items.filter(i => (i.celoAmount ?? 0) > 0).length} / {items.length}
+                      </span>
+                    </div>
+                  )}
+                  {!isConnected ? (
+                    <button onClick={() => connect({ connector: connectors[0] })}
+                      style={{ width: '100%', padding: '10px', borderRadius: 12, background: '#7c3aed', color: '#fff', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      <Wallet style={{ width: 16, height: 16 }} /> Connect Wallet
+                    </button>
+                  ) : (
+                    <button onClick={handleCreateSession} disabled={isCreatingSession}
+                      style={{ width: '100%', padding: '10px', borderRadius: 12, background: 'linear-gradient(135deg,#7c3aed,#a78bfa)', color: '#fff', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit', opacity: isCreatingSession ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      {isCreatingSession ? <><Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} /> Creating...</> : <><Zap style={{ width: 16, height: 16 }} /> Create CELO Session</>}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {celoMode && sessionActive && sessionId && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(53,208,127,0.08)', border: '1px solid rgba(53,208,127,0.2)' }}>
+                    <div style={{ fontSize: 12, color: '#1a9f5e', fontWeight: 700, marginBottom: 6 }}>✅ Session Active</div>
+                    <div style={{ fontSize: 13, color: '#0a1a0f', marginBottom: 6 }}>Pool: <strong>{sessionPool} CELO</strong></div>
+                    <div style={{ fontSize: 11, color: '#4a6357', fontWeight: 600, marginBottom: 4 }}>Reward per slice:</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, maxHeight: 120, overflowY: 'auto' }}>
+                      {items.map(item => (
+                        <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#0a1a0f' }}>
+                          <span>{item.emoji} {item.label.length > 14 ? item.label.slice(0,13)+'…' : item.label}</span>
+                          <span style={{ fontWeight: 700, color: (item.celoAmount ?? 0) > 0 ? '#7c3aed' : '#9ca3af' }}>
+                            {(item.celoAmount ?? 0) > 0 ? `${item.celoAmount} ⬡` : '—'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Share link untuk player */}
+                  <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(167,139,250,0.07)', border: '1.5px solid rgba(167,139,250,0.25)' }}>
+                    <div style={{ fontSize: 11, color: '#7c3aed', fontWeight: 700, marginBottom: 6 }}>🔗 Player Link</div>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <code style={{ flex: 1, fontSize: 10, color: '#4a4a6a', background: 'rgba(167,139,250,0.1)', padding: '5px 8px', borderRadius: 7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
+                        {typeof window !== 'undefined' ? `${window.location.origin}/spin/${sessionId}` : `/spin/${sessionId}`}
+                      </code>
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/spin/${sessionId}`;
+                          navigator.clipboard.writeText(url);
+                          setCopiedLink(true);
+                          setTimeout(() => setCopiedLink(false), 2000);
+                        }}
+                        style={{ padding: '5px 8px', borderRadius: 8, background: copiedLink ? 'rgba(53,208,127,0.15)' : 'rgba(167,139,250,0.15)', border: 'none', cursor: 'pointer', color: copiedLink ? '#1a9f5e' : '#7c3aed', flexShrink: 0 }}
+                        title="Copy link"
+                      >
+                        {copiedLink ? <CheckCircle2 style={{ width: 14, height: 14 }} /> : <Copy style={{ width: 14, height: 14 }} />}
+                      </button>
+                      <a href={`/spin/${sessionId}`} target="_blank" rel="noopener noreferrer"
+                        style={{ padding: '5px 8px', borderRadius: 8, background: 'rgba(167,139,250,0.15)', color: '#7c3aed', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                        <ExternalLink style={{ width: 14, height: 14 }} />
+                      </a>
+                    </div>
+                    <p style={{ fontSize: 10, color: '#9ca3af', marginTop: 5 }}>Share with participants. Each wallet can spin once.</p>
+                  </div>
+
+                  <button onClick={handleCloseSession} disabled={isClosingSession}
+                    style={{ width: '100%', padding: '8px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {isClosingSession ? "Closing..." : "🔒 Close Session & Reclaim CELO"}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* History */}
@@ -419,8 +637,42 @@ export default function SpinWheelPage() {
                     🎁 {lang==="ENG"?"Prize":"Hadiah"}: {activePrize}
                   </motion.div>
                 )}
+                {/* CELO Claim Section */}
+                {celoMode && sessionActive && showClaimPanel && winnerCeloAmount > 0 && (
+                  <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.5}}
+                    style={{ width: '100%', padding: '16px', borderRadius: 16, background: 'rgba(167,139,250,0.08)', border: '1.5px solid rgba(167,139,250,0.3)', marginTop: 4 }}>
+                    <p style={{ fontWeight: 700, fontSize: 14, color: '#7c3aed', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Zap style={{ width: 16, height: 16 }} />
+                      Claim {winnerCeloAmount} CELO
+                    </p>
+                    {claimDone ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1a9f5e', fontWeight: 700, fontSize: 14 }}>
+                        <CheckCircle2 style={{ width: 18, height: 18 }} />
+                        {winnerCeloAmount} CELO claimed successfully!
+                      </div>
+                    ) : (
+                      <>
+                        {!isConnected ? (
+                          <button onClick={() => connect({ connector: connectors[0] })}
+                            style={{ width: '100%', padding: '10px', borderRadius: 12, background: '#7c3aed', color: '#fff', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                            Connect Wallet to Claim
+                          </button>
+                        ) : (
+                          <button onClick={handleClaimPrize} disabled={isSigning || isClaimingSpin}
+                            style={{ width: '100%', padding: '10px', borderRadius: 12, background: 'linear-gradient(135deg,#35D07F,#FCFF52)', color: '#000', fontWeight: 800, fontSize: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: isSigning || isClaimingSpin ? 0.7 : 1 }}>
+                            {isSigning || isClaimingSpin
+                              ? <><Loader2 style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} /> Processing...</>
+                              : <><Gift style={{ width: 16, height: 16 }} /> Claim {winnerCeloAmount} CELO</>}
+                          </button>
+                        )}
+                        {claimError && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 8, textAlign: 'center' }}>{claimError}</p>}
+                      </>
+                    )}
+                  </motion.div>
+                )}
+
                 <motion.button initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.6}}
-                  onClick={()=>{setShowResult(false);setWinner(null);}}
+                  onClick={()=>{setShowResult(false);setWinner(null);setShowClaimPanel(false);}}
                   className="mt-4 px-8 py-3 rounded-xl bg-[#FCFF52]/10 border border-[#FCFF52]/30 text-[#FCFF52] font-bold hover:bg-[#FCFF52]/20 transition-all text-sm"
                 >
                   {lang==="ENG"?"Close":"Tutup"}

@@ -6,7 +6,8 @@
 import { createPublicClient, http, parseEther, formatEther, type Address, keccak256, toHex, defineChain } from "viem";
 import { celo } from "viem/chains";
 import { QUIZ_ESCROW_ABI } from "./abi/QuizEscrow";
-export { QUIZ_ESCROW_ABI };
+import { SPIN_WHEEL_ABI } from "./abi/SpinWheel";
+export { QUIZ_ESCROW_ABI, SPIN_WHEEL_ABI };
 
 // ─── Celo Sepolia Testnet (viem belum include ini) ──────
 export const celoSepolia = defineChain({
@@ -27,8 +28,8 @@ export const IS_TESTNET = true; // Toggle untuk production
 export const ACTIVE_CHAIN = IS_TESTNET ? celoSepolia : celo;
 export const CHAIN_NAME = IS_TESTNET ? "Celo Sepolia" : "Celo";
 
-// QuizEscrow contract address (deploy & update this)
 export const QUIZ_ESCROW_ADDRESS: Address = (process.env.NEXT_PUBLIC_QUIZ_ESCROW_ADDRESS as Address) || "0x0000000000000000000000000000000000000000";
+export const SPIN_WHEEL_ADDRESS: Address = (process.env.NEXT_PUBLIC_SPIN_WHEEL_ADDRESS as Address) || "0x0000000000000000000000000000000000000000";
 
 // ─── Public Client (read-only) ─────────────────────────
 export const publicClient = createPublicClient({
