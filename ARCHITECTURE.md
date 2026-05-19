@@ -46,3 +46,53 @@ Contract addresses are read from environment variables:
 NEXT_PUBLIC_QUIZ_ESCROW_ADDRESS=0x...
 NEXT_PUBLIC_SPIN_WHEEL_ADDRESS=0x...
 ```
+
+---
+
+## Smart Contracts
+
+Located in `quiznih_smartcontract/apps/contracts/src/`.
+Both contracts are **UUPS Upgradeable** via OpenZeppelin v5 + ERC1967Proxy.
+
+### QuizEscrow.sol
+
+Escrow contract for quiz reward pools.
+
+| Function | Who calls | Description |
+|---|---|---|
+| `createQuizAndDeposit(quizId, roomCode)` | Host | Deposit CELO reward pool — only on-chain action host needs to do |
+| `addToRewardPool(quizId)` | Host | Top up pool before quiz starts |
+| `cancelQuiz(quizId)` | Host | Refund full pool (only before finalized) |
+| `finalizeQuiz(quizId)` | Backend signer | Mark quiz ended, open 30-day claim window |
+| `claimReward(quizId, amount, signature)` | Winner | Claim CELO using backend-signed authorization |
+| `reclaimExpiredFunds(quizId)` | Host | Reclaim unclaimed funds after 30-day window |
+| `setSigner(address)` | Owner | Update trusted backend signer |
+
+**Reward split:** 1st 50% / 2nd 30% / 3rd 20%
+
+**Claim flow:**
+```
+Host deposit → quiz runs off-chain → backend signs winner claims
+→ each winner calls claimReward() independently → CELO sent to wallet
+```
+
+**Security:** ReentrancyGuard, CEI pattern, ECDSA signature verification,
+cross-contract replay protection via `address(this)` + `block.chainid` in hash.
+
+---
+
+### SpinWheel.sol
+
+Per-slice CELO reward contract for spin wheel sessions.
+
+| Function | Who calls | Description |
+|---|---|---|
+| `createSession(sessionId, slices, amounts)` | Host | Create session and deposit CELO per slice |
+| `closeSession(sessionId)` | Host | Close session, refund unclaimed slices |
+| `claimSpin(sessionId, sliceIndex, signature)` | Player | Claim a slice reward with backend signature |
+
+**Claim flow:**
+```
+Host create session + deposit → player spins (off-chain RNG) → backend signs result
+→ player calls claimSpin() → CELO sent to wallet
+```
