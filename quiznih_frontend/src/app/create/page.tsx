@@ -2,7 +2,7 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useAccount, useConnect, useConnectors } from "wagmi";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Plus, Trash2, Wallet2, Send, GripVertical, Copy, CheckCircle, Loader2, AlertTriangle, LogOut,
   Upload, Gift, Shirt, Coffee, Sticker, ImageIcon, HelpCircle, FileJson, ExternalLink, Coins, Zap, MessageSquare
@@ -224,6 +224,20 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
   const [isStarting, setIsStarting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [participants, setParticipants] = useState<any[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [errorFields, setErrorFields] = useState<{
+    title: boolean;
+    questions: Record<number, { text: boolean; options: boolean[] }>;
+  }>({ title: false, questions: {} });
+
+  useEffect(() => {
+    if (validationErrors.length === 0) return;
+    const timer = setTimeout(() => {
+      setValidationErrors([]);
+      setErrorFields({ title: false, questions: {} });
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [validationErrors]);
   const [quizState, setQuizState] = useState<"waiting" | "playing" | "finished">("waiting");
 
   // Real-time Leaderboard Subscription
@@ -263,6 +277,39 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
   }, [quizId, isPublished]);
 
   const handlePublish = async () => {
+    // Validate fields
+    const errors: string[] = [];
+    const fields: typeof errorFields = { title: false, questions: {} };
+
+    if (!title.trim()) {
+      errors.push(lang === "ENG" ? "Quiz title is required" : "Judul kuis wajib diisi");
+      fields.title = true;
+    }
+    questions.forEach((q, idx) => {
+      const qNum = idx + 1;
+      const qFields = { text: false, options: q.options.map(() => false) };
+      if (!q.text.trim()) {
+        errors.push(lang === "ENG" ? `Question ${qNum}: question text is empty` : `Soal ${qNum}: teks pertanyaan belum diisi`);
+        qFields.text = true;
+      }
+      q.options.forEach((opt, optIdx) => {
+        if (!opt.trim()) {
+          errors.push(lang === "ENG" ? `Question ${qNum}: Option ${String.fromCharCode(65 + optIdx)} is empty` : `Soal ${qNum}: Opsi ${String.fromCharCode(65 + optIdx)} belum diisi`);
+          qFields.options[optIdx] = true;
+        }
+      });
+      fields.questions[q.id] = qFields;
+    });
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setErrorFields(fields);
+      return;
+    }
+
+    setValidationErrors([]);
+    setErrorFields({ title: false, questions: {} });
+
     // Check if Supabase is configured
     if (!isSupabaseConfigured) {
       alert(lang === "ENG" 
@@ -837,7 +884,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder={lang === "ENG" ? "e.g. Celo Ecosystem Mastery" : "contoh: Penguasaan Ekosistem Celo"}
-                    style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontSize: 18, fontFamily: "inherit" }}
+                    style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: `1.5px solid ${errorFields.title ? "rgba(239,68,68,0.6)" : "rgba(53,208,127,0.3)"}`, outline: "none", background: "#fff", color: "#0a1a0f", fontSize: 18, fontFamily: "inherit" }}
                   />
                 </div>
 
@@ -931,7 +978,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                   value={q.text}
                   onChange={(e) => updateQuestion(q.id, "text", e.target.value)}
                   placeholder={lang === "ENG" ? "Enter your question..." : "Tulis pertanyaanmu..."}
-                  style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: "1.5px solid rgba(53,208,127,0.3)", outline: "none", background: "#fff", color: "#0a1a0f", fontFamily: "inherit" }}
+                  style={{ width: "100%", padding: "16px 24px", borderRadius: 16, border: `1.5px solid ${errorFields.questions[q.id]?.text ? "rgba(239,68,68,0.6)" : "rgba(53,208,127,0.3)"}`, outline: "none", background: "#fff", color: "#0a1a0f", fontFamily: "inherit" }}
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -942,7 +989,7 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
                         value={opt}
                         onChange={(e) => updateOption(q.id, optIdx, e.target.value)}
                         placeholder={`${lang === "ENG" ? "Option" : "Opsi"} ${String.fromCharCode(65 + optIdx)}`}
-                        style={{ width: '100%', padding: '12px 20px', paddingRight: 40, borderRadius: 12, outline: 'none', fontFamily: 'inherit', border: `1.5px solid ${q.correctIndex === optIdx ? 'rgba(53,208,127,0.8)' : 'rgba(53,208,127,0.3)'}`, background: q.correctIndex === optIdx ? 'rgba(53,208,127,0.1)' : '#fff', color: '#0a1a0f' }}
+                        style={{ width: '100%', padding: '12px 20px', paddingRight: 40, borderRadius: 12, outline: 'none', fontFamily: 'inherit', border: `1.5px solid ${errorFields.questions[q.id]?.options[optIdx] ? 'rgba(239,68,68,0.6)' : q.correctIndex === optIdx ? 'rgba(53,208,127,0.8)' : 'rgba(53,208,127,0.3)'}`, background: q.correctIndex === optIdx ? 'rgba(53,208,127,0.1)' : '#fff', color: '#0a1a0f' }}
                       />
                       <button
                         onClick={() => updateQuestion(q.id, "correctIndex", optIdx)}
@@ -988,12 +1035,41 @@ Berikan HANYA text JSON valid dengan format persis seperti di bawah ini (tanpa m
               {lang === "ENG" ? "Add Question" : "Tambah Soal"}
             </motion.button>
 
+            {/* Validation Error Panel */}
+            <AnimatePresence>
+              {validationErrors.length > 0 && (
+                <motion.div
+                  key="validation-errors"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <div style={{
+                    background: "rgba(239,68,68,0.07)",
+                    border: "1.5px solid rgba(239,68,68,0.3)",
+                    borderRadius: 16, padding: "16px 20px",
+                    marginBottom: 12,
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, color: "#dc2626", fontWeight: 700, fontSize: 14 }}>
+                      <AlertTriangle style={{ width: 16, height: 16, flexShrink: 0 }} />
+                      {lang === "ENG" ? "Please fix the following before publishing:" : "Perbaiki hal berikut sebelum publikasi:"}
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 20, color: "#dc2626", fontSize: 13, lineHeight: 1.9 }}>
+                      {validationErrors.map((err, i) => <li key={i}>{err}</li>)}
+                    </ul>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Publish */}
             <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={handlePublish}
-              disabled={!title || questions.some((q) => !q.text || q.options.some((o) => !o)) || isPublishing}
+              disabled={isPublishing}
               className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#35D07F] to-[#FCFF52] text-white dark:text-black font-extrabold text-lg hover:shadow-[0_0_40px_rgba(153,69,255,0.4)] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               {isPublishing ? (

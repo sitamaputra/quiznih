@@ -1,16 +1,53 @@
 "use client";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAccount, useConnect, useConnectors } from "wagmi";
-import { motion } from "framer-motion";
-import { PlusCircle, Gamepad2, Crown, Users, LayoutDashboard, MessageCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { PlusCircle, Gamepad2, Crown, Users, LayoutDashboard, MessageCircle, Copy, CheckCircle2, Trash2, Loader2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import WalletDropdown from "@/components/wallet/WalletDropdown";
 import { isMiniPayEnvironment } from "@/lib/celo";
 import TopBar from "@/components/layout/TopBar";
 import Image from "next/image";
 import { t } from "@/lib/translations";
+import { supabase } from "@/lib/supabase";
+import { useCeloQuiz } from "@/hooks/useCeloQuiz";
+
+type Quiz = {
+  id: string;
+  title: string;
+  status: "waiting" | "playing" | "finished" | "cancelled";
+  room_code: string;
+  reward_pool_amount: number;
+  contract_quiz_id: string;
+  questions: { count: number }[];
+};
+
+function StatusBadge({ status }: { status: Quiz["status"] }) {
+  const configs: Record<string, { bg: string; color: string; dot: string; label: string; pulse: boolean }> = {
+    waiting: { bg: "rgba(53,208,127,0.12)", color: "#1a9f5e", dot: "#35D07F", label: "Waiting", pulse: true },
+    playing: { bg: "rgba(252,255,82,0.18)", color: "#7a6e00", dot: "#e6d800", label: "Live", pulse: false },
+    finished: { bg: "rgba(0,0,0,0.06)", color: "#4a6357", dot: "#9ca3af", label: "Finished", pulse: false },
+    cancelled: { bg: "rgba(0,0,0,0.05)", color: "#9ca3af", dot: "#d1d5db", label: "Cancelled", pulse: false },
+  };
+  const cfg = configs[status] ?? configs.finished;
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 6,
+      padding: "4px 12px", borderRadius: 100,
+      background: cfg.bg, color: cfg.color,
+      fontSize: 12, fontWeight: 700, whiteSpace: "nowrap",
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: "50%",
+        background: cfg.dot, display: "inline-block",
+        animation: cfg.pulse ? "pulse-dot 2s ease-in-out infinite" : "none",
+      }} />
+      {cfg.label}
+    </span>
+  );
+}
 
 export default function DashboardPage() {
   const { lang } = useLanguage();
@@ -21,6 +58,12 @@ export default function DashboardPage() {
   const connectors = useConnectors();
   const router = useRouter();
   const isMiniPay = isMiniPayEnvironment();
+  const { cancelQuiz } = useCeloQuiz();
+
+  const [showManage, setShowManage] = useState(false);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isConnected && connectors.length > 0) {
@@ -30,8 +73,48 @@ export default function DashboardPage() {
     }
   }, [isConnected, connectors, connect, isMiniPay]);
 
+  const fetchQuizzes = useCallback(async () => {
+    if (!address) return;
+    setLoadingQuizzes(true);
+    const { data } = await supabase
+      .from("quizzes")
+      .select("*, questions(count)")
+      .eq("host_wallet", address)
+      .order("created_at", { ascending: false });
+    setQuizzes((data as Quiz[]) || []);
+    setLoadingQuizzes(false);
+  }, [address]);
+
+  useEffect(() => {
+    if (showManage && address) fetchQuizzes();
+  }, [showManage, address, fetchQuizzes]);
+
   const handleNavigate = (path: string) => {
     router.push(path);
+  };
+
+  const copyRoomCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const handleCancelQuiz = async (quiz: Quiz) => {
+    if (!window.confirm(t("dash.cancelConfirm", lang))) return;
+    try {
+      await cancelQuiz(quiz.id);
+      await supabase.from("quizzes").update({ status: "cancelled" }).eq("id", quiz.id);
+      alert(t("dash.cancelSuccess", lang));
+      fetchQuizzes();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteQuiz = async (quiz: Quiz) => {
+    if (!window.confirm(t("dash.deleteConfirm", lang))) return;
+    await supabase.from("quizzes").delete().eq("id", quiz.id);
+    fetchQuizzes();
   };
 
   return (
@@ -43,7 +126,7 @@ export default function DashboardPage() {
         overflowX: "hidden",
       }}
     >
-      {/* Soft glow orbs — memperkuat warna dari layout.tsx */}
+      {/* Soft glow orbs */}
       <div aria-hidden style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
         <div style={{
           position: "absolute", left: "5%", top: "15%",
@@ -118,12 +201,200 @@ export default function DashboardPage() {
 
             <p style={{
               fontSize: 17, color: "#4a6357",
-              maxWidth: 480, margin: "0 auto 52px",
+              maxWidth: 480, margin: "0 auto 28px",
               lineHeight: 1.6,
             }}>
               {t("dash.subtitle", lang)}
             </p>
           </motion.div>
+        </div>
+
+        {/* Manage Toggle + Panel */}
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 32px", textAlign: "center" }}>
+          <motion.button
+            onClick={() => setShowManage((v) => !v)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              padding: "12px 28px", borderRadius: 100,
+              background: showManage ? "linear-gradient(90deg, #35D07F, #1a9f5e)" : "transparent",
+              border: `2px solid #35D07F`,
+              color: showManage ? "#ffffff" : "#1a9f5e",
+              fontWeight: 700, fontSize: 15,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              boxShadow: showManage ? "0 4px 16px rgba(53,208,127,0.3)" : "none",
+              transition: "background 0.2s, color 0.2s, box-shadow 0.2s",
+            }}
+          >
+            <LayoutDashboard style={{ width: 18, height: 18 }} />
+            {t("dash.toggleManage", lang)}
+          </motion.button>
+
+          <AnimatePresence>
+            {showManage && (
+              <motion.div
+                key="manage-panel"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                style={{ overflow: "hidden", textAlign: "left", marginTop: 20 }}
+              >
+                <div style={{
+                  background: "#ffffff",
+                  border: "1.5px solid rgba(53,208,127,0.2)",
+                  boxShadow: "0 3px 24px rgba(53,208,127,0.08)",
+                  borderRadius: 24, padding: 28,
+                }}>
+                  {loadingQuizzes ? (
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0", gap: 12, color: "#4a6357" }}>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Loader2 style={{ width: 20, height: 20 }} />
+                      </motion.div>
+                      <span style={{ fontSize: 14 }}>Loading...</span>
+                    </div>
+                  ) : quizzes.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px 0" }}>
+                      <p style={{ color: "#4a6357", fontSize: 15, margin: "0 0 20px" }}>
+                        {t("dash.noQuizzes", lang)}
+                      </p>
+                      <button
+                        onClick={() => router.push("/create")}
+                        style={{
+                          padding: "12px 24px", borderRadius: 12,
+                          background: "linear-gradient(90deg, #35D07F, #1a9f5e)",
+                          color: "#fff", fontWeight: 700, fontSize: 14,
+                          border: "none", cursor: "pointer",
+                          boxShadow: "0 4px 12px rgba(53,208,127,0.3)",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        {t("dash.createFirst", lang)}
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                      {quizzes.map((quiz, i) => (
+                        <motion.div
+                          key={quiz.id}
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.06, duration: 0.3 }}
+                          style={{
+                            background: "#fafffe",
+                            border: "1.5px solid rgba(53,208,127,0.15)",
+                            borderRadius: 16, padding: "20px 24px",
+                            boxShadow: "0 2px 10px rgba(53,208,127,0.05)",
+                          }}
+                        >
+                          {/* Title + Status */}
+                          <div style={{
+                            display: "flex", alignItems: "center",
+                            justifyContent: "space-between",
+                            marginBottom: 12, flexWrap: "wrap", gap: 8,
+                          }}>
+                            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0a1a0f", margin: 0 }}>
+                              {quiz.title}
+                            </h3>
+                            <StatusBadge status={quiz.status} />
+                          </div>
+
+                          {/* Meta row */}
+                          <div style={{
+                            display: "flex", flexWrap: "wrap", gap: 12,
+                            marginBottom: 16, alignItems: "center",
+                          }}>
+                            <button
+                              onClick={() => copyRoomCode(quiz.room_code)}
+                              style={{
+                                display: "inline-flex", alignItems: "center", gap: 6,
+                                background: "rgba(53,208,127,0.08)",
+                                border: "1px solid rgba(53,208,127,0.2)",
+                                borderRadius: 8, padding: "5px 12px",
+                                cursor: "pointer", color: "#1a9f5e",
+                                fontWeight: 600, fontSize: 13,
+                                fontFamily: "monospace",
+                              }}
+                            >
+                              {copiedCode === quiz.room_code
+                                ? <><CheckCircle2 style={{ width: 13, height: 13 }} />{t("dash.copied", lang)}</>
+                                : <><Copy style={{ width: 13, height: 13 }} />{quiz.room_code}</>
+                              }
+                            </button>
+                            <span style={{ fontSize: 13, color: "#4a6357" }}>
+                              {quiz.questions?.[0]?.count ?? 0} {t("dash.questions", lang)}
+                            </span>
+                            <span style={{ fontSize: 13, color: "#4a6357" }}>
+                              {quiz.reward_pool_amount ?? 0} CELO {t("dash.rewardPool", lang)}
+                            </span>
+                          </div>
+
+                          {/* Actions */}
+                          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                            {(quiz.status === "waiting" || quiz.status === "playing") && (
+                              <button
+                                onClick={() => router.push(`/create/room/${quiz.id}`)}
+                                style={{
+                                  display: "inline-flex", alignItems: "center", gap: 6,
+                                  padding: "8px 18px", borderRadius: 10,
+                                  background: "linear-gradient(90deg, #35D07F, #1a9f5e)",
+                                  color: "#fff", fontWeight: 600, fontSize: 13,
+                                  border: "none", cursor: "pointer",
+                                  fontFamily: "inherit",
+                                  boxShadow: "0 2px 8px rgba(53,208,127,0.25)",
+                                }}
+                              >
+                                <ExternalLink style={{ width: 13, height: 13 }} />
+                                {t("dash.openRoom", lang)}
+                              </button>
+                            )}
+                            {quiz.status === "waiting" && (
+                              <button
+                                onClick={() => handleCancelQuiz(quiz)}
+                                style={{
+                                  display: "inline-flex", alignItems: "center", gap: 6,
+                                  padding: "8px 18px", borderRadius: 10,
+                                  background: "rgba(239,68,68,0.08)",
+                                  color: "#dc2626",
+                                  border: "1.5px solid rgba(239,68,68,0.25)",
+                                  fontWeight: 600, fontSize: 13, cursor: "pointer",
+                                  fontFamily: "inherit",
+                                }}
+                              >
+                                {t("dash.cancelQuiz", lang)}
+                              </button>
+                            )}
+                            {(quiz.status === "finished" || quiz.status === "cancelled") && (
+                              <button
+                                onClick={() => handleDeleteQuiz(quiz)}
+                                style={{
+                                  display: "inline-flex", alignItems: "center", gap: 6,
+                                  padding: "8px 18px", borderRadius: 10,
+                                  background: "rgba(0,0,0,0.04)",
+                                  color: "#4a6357",
+                                  border: "1.5px solid rgba(0,0,0,0.08)",
+                                  fontWeight: 600, fontSize: 13, cursor: "pointer",
+                                  fontFamily: "inherit",
+                                }}
+                              >
+                                <Trash2 style={{ width: 13, height: 13 }} />
+                                {t("dash.deleteQuiz", lang)}
+                              </button>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Main Cards Grid */}
@@ -195,25 +466,9 @@ export default function DashboardPage() {
                   {t("dash.createDesc", lang)}
                 </p>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#1a9f5e", fontWeight: 700 }}>
-                    <PlusCircle style={{ width: 18, height: 18 }} />
-                    <span style={{ fontSize: 14 }}>{t("dash.startCreating", lang)}</span>
-                  </div>
-                  <Link
-                    href="/manage"
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      display: "flex", alignItems: "center", gap: 8,
-                      color: "#4a6357", textDecoration: "none", fontSize: 13, fontWeight: 500,
-                      transition: "color 0.2s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#1a9f5e")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#4a6357")}
-                  >
-                    <LayoutDashboard style={{ width: 15, height: 15 }} />
-                    <span>{t("dash.manageQuizzes", lang)}</span>
-                  </Link>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#1a9f5e", fontWeight: 700 }}>
+                  <PlusCircle style={{ width: 18, height: 18 }} />
+                  <span style={{ fontSize: 14 }}>{t("dash.startCreating", lang)}</span>
                 </div>
               </div>
             </motion.div>
@@ -444,14 +699,13 @@ export default function DashboardPage() {
               overflow: "hidden"
             }}
           >
-             {/* decorative background element */}
              <div style={{
                 position: "absolute", top: -60, left: -60,
                 width: 200, height: 200, borderRadius: "50%",
                 background: "rgba(53,208,127,0.05)", filter: "blur(40px)",
                 pointerEvents: "none",
              }} />
-             
+
              <div style={{ position: "relative", zIndex: 1 }}>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0a1a0f", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8 }}>
                   <MessageCircle style={{ width: 20, height: 20, color: "#1a9f5e" }} />
@@ -460,16 +714,16 @@ export default function DashboardPage() {
                 <p style={{ fontSize: 14, color: "#4a6357", margin: "0 0 20px" }}>
                   {t("dash.feedbackDesc", lang)}
                 </p>
-                
-                <form 
-                  onSubmit={(e) => { 
-                    e.preventDefault(); 
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
                     alert(t("dash.feedbackThanks", lang));
                     (e.target as HTMLFormElement).reset();
                   }}
                   style={{ display: "flex", flexDirection: "column", gap: 16 }}
                 >
-                  <textarea 
+                  <textarea
                     placeholder={t("dash.feedbackPlaceholder", lang)}
                     required
                     style={{
@@ -485,7 +739,7 @@ export default function DashboardPage() {
                     onFocus={(e) => (e.target.style.borderColor = "rgba(53,208,127,0.5)")}
                     onBlur={(e) => (e.target.style.borderColor = "rgba(53,208,127,0.2)")}
                   />
-                  <button 
+                  <button
                     type="submit"
                     style={{
                       alignSelf: "flex-end",
