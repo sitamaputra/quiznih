@@ -139,3 +139,73 @@ total_slices · celo_per_slice · contract_address
 id · session_id (FK) · player_wallet · slice_index
 claim_signature · claimed · claim_tx
 ```
+
+---
+
+## Frontend Pages & API Routes
+
+### Pages (`quiznih_frontend/src/app/`)
+
+| Route | File | Description |
+|---|---|---|
+| `/` | `page.tsx` | Landing page — hero, how it works, leaderboard |
+| `/dashboard` | `dashboard/page.tsx` | Role selector: Quiz Creator vs Player |
+| `/create` | `create/page.tsx` | Quiz builder: questions, reward pool deposit |
+| `/create/room/[id]` | `create/room/[id]/page.tsx` | Host control room — start quiz, finalize & open claims |
+| `/play` | `play/page.tsx` | Player join → answer → claim CELO reward |
+| `/manage` | `manage/page.tsx` | Host quiz management list |
+| `/spin` | `spin/page.tsx` | Host spin wheel — create session, deposit per slice |
+| `/spin/[sessionId]` | `spin/[sessionId]/page.tsx` | Player spin & claim CELO per slice |
+| `/live` | `live/page.tsx` | Live quiz dashboard view |
+| `/qa` | `qa/page.tsx` | Q&A page |
+
+### API Routes (`quiznih_frontend/src/app/api/`)
+
+| Route | Description |
+|---|---|
+| `POST /api/quiz/deposit` | Record on-chain deposit tx to Supabase |
+| `POST /api/quiz/confirm-deposit` | Verify tx hash via viem `getTransactionReceipt` |
+| `POST /api/quiz/finalize` | Sign winner claims (ECDSA) + call `finalizeQuiz()` on-chain |
+| `POST /api/quiz/claim-reward` | Record successful claim to Supabase after on-chain tx |
+| `POST /api/spin/session` | Create / close spin session in Supabase |
+| `POST /api/spin/request` | Sign player spin result — returns ECDSA signature for `claimSpin()` |
+| `POST /api/spin/claim` | Record spin claim to Supabase after on-chain tx |
+
+---
+
+## Key Libraries & Hooks
+
+| File | Purpose |
+|---|---|
+| `src/lib/celo.ts` | Chain config, contract addresses, ABI exports, utilities |
+| `src/lib/wagmi.ts` | Wagmi config + wallet connectors (MetaMask, Rabby, OKX, Bitget, Trust, MiniPay) |
+| `src/lib/supabase.ts` | Supabase client singleton |
+| `src/lib/translations.ts` | EN / ID bilingual strings |
+| `src/hooks/useCeloQuiz.ts` | All on-chain write actions: deposit, cancel, claimReward |
+| `src/context/LanguageContext.tsx` | Global EN ↔ ID toggle |
+
+---
+
+## Environment Variables
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=       # server-only (API routes)
+
+# Celo Smart Contracts
+NEXT_PUBLIC_QUIZ_ESCROW_ADDRESS= # QuizEscrow proxy address (Celo Mainnet)
+NEXT_PUBLIC_SPIN_WHEEL_ADDRESS=  # SpinWheel proxy address (Celo Mainnet)
+
+# Backend Signer (server-only — NEVER expose to client)
+SIGNER_PRIVATE_KEY=              # Private key of trustedSigner wallet
+                                 # Signs winner claims; wallet needs ~0.01 CELO for gas
+
+# Optional
+NEXT_PUBLIC_WC_PROJECT_ID=       # WalletConnect project ID
+```
+
+> **Note:** `SIGNER_PRIVATE_KEY` is a dedicated backend-only wallet.
+> It does **not** hold user funds — only used to authorize winner claims on-chain.
+> Store in `.env.local` (never commit).
