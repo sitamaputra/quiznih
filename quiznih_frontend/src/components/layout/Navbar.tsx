@@ -1,11 +1,12 @@
 "use client";
 import { t } from "@/lib/translations";
-import { Menu, Globe2, Sun, Moon, LogOut, User, LogIn, X } from "lucide-react";
+import { Menu, Globe2, LogOut, User, LogIn, X } from "lucide-react";
 import Link from "next/link";
 import { useLanguage, LANGUAGES } from "@/context/LanguageContext";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { AnimatePresence, motion } from "framer-motion";
 import WalletDropdown from "@/components/wallet/WalletDropdown";
 import AuthModal from "@/components/wallet/AuthModal";
 import { supabase } from "@/lib/supabase";
@@ -194,14 +195,113 @@ export default function Navbar() {
 
           {/* Mobile controls */}
           <div className="md:hidden flex items-center gap-4">
-            <button className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white">
-              <Menu className="w-6 h-6" />
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-white hover:text-white/80 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
         </div>
       </div>
     </nav>
+
+    {/* Mobile Menu Panel */}
+    <AnimatePresence>
+      {isMobileMenuOpen && (
+        <motion.div
+          key="mobile-menu"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="fixed top-20 left-0 right-0 z-40 md:hidden"
+          style={{
+            background: "white",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            borderTop: "1px solid rgba(53,208,127,0.2)",
+          }}
+        >
+          <div className="flex flex-col px-4 py-4 gap-1">
+            {/* Nav links */}
+            {[
+              { label: "How it Works", href: "#how-it-works" },
+              { label: "Join a Quiz", href: "#quizzes" },
+              { label: "Play with MiniPay", href: "#minipay" },
+              { label: "Leaderboard", href: "#leaderboard" },
+            ].map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-700 text-gray-700 hover:bg-[#35D07F]/10 hover:text-[#35D07F] transition-colors"
+                style={{ fontWeight: 700 }}
+              >
+                {label}
+              </a>
+            ))}
+
+            {/* Divider */}
+            <div className="my-2 border-t border-gray-100" />
+
+            {/* Language switcher */}
+            {mounted && (
+              <div className="flex items-center gap-2 px-4 py-2">
+                <Globe2 className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-500 font-semibold mr-2">Language:</span>
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => { setLang(l.code); }}
+                    className={`px-3 py-1 rounded-full text-sm font-semibold transition-colors ${lang === l.code ? "bg-[#35D07F] text-white" : "bg-gray-100 text-gray-600 hover:bg-[#35D07F]/20"}`}
+                  >
+                    {l.flag} {l.code.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Auth controls */}
+            {mounted && (
+              <div className="px-4 py-2 flex flex-col gap-2">
+                {!user && !isConnected && (
+                  <button
+                    onClick={() => { setIsAuthOpen(true); setIsMobileMenuOpen(false); }}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-base"
+                    style={{ background: "#FCFF52", color: "#0a1a0f", fontWeight: 900, border: "none" }}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>{t("auto.1", lang)}</span>
+                  </button>
+                )}
+                {user && (
+                  <div className="flex items-center justify-between px-3 py-3 rounded-2xl bg-gray-50">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm font-bold text-gray-700 truncate max-w-[160px]">
+                        {user.user_metadata?.username || user.email?.split("@")[0]}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                      className="flex items-center gap-1 text-sm text-red-500 font-semibold hover:text-red-600"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {t("auto.3", lang)}
+                    </button>
+                  </div>
+                )}
+                <div onClick={() => setIsMobileMenuOpen(false)}>
+                  <WalletDropdown hideIfDisconnected={!user} />
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
 
     {/* Auth Modal — outside nav to escape backdrop-filter containing block */}
     <AuthModal

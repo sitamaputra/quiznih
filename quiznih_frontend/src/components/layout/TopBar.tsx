@@ -42,7 +42,7 @@ export default function TopBar({ backHref, hideBack = false }: TopBarProps) {
     <div style={{
       position: "fixed",
       top: 0, left: 0, right: 0,
-      zIndex: 50,
+      zIndex: 100,
       backdropFilter: "blur(16px)",
       WebkitBackdropFilter: "blur(16px)",
       background: "rgba(232, 253, 242, 0.85)",

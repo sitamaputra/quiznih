@@ -277,7 +277,7 @@ export default function SpinWheelPage() {
   const transStyle = isSpinning ? `transform ${actualDuration}s cubic-bezier(0.17,0.67,0.12,0.99)` : "none";
 
   return (
-    <main className="min-h-screen w-full text-[#0a1a0f] relative" style={{ background: '#e8fdf2' }}>
+    <main className="min-h-screen w-full text-[#0a1a0f] relative overflow-x-hidden" style={{ background: '#e8fdf2' }}>
       {/* Soft glow orbs */}
       <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', left: '5%', top: '10%', width: 500, height: 500, borderRadius: '50%', background: 'rgba(167,139,250,0.10)', filter: 'blur(120px)' }} />
@@ -582,7 +582,7 @@ export default function SpinWheelPage() {
                 <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FCFF52] drop-shadow-[0_0_12px_rgba(252,255,82,0.6)]"/>
               </div>
               <div style={{transform:`rotate(${rotation}deg)`,transition:transStyle}}>
-                <canvas ref={canvasRef} width={560} height={560} className="w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] md:w-[560px] md:h-[560px]"/>
+                <canvas ref={canvasRef} width={560} height={560} className="w-[min(360px,85vw)] h-[min(360px,85vw)] sm:w-[480px] sm:h-[480px] md:w-[560px] md:h-[560px] max-w-full"/>
               </div>
               <div className={`absolute inset-0 rounded-full border-4 pointer-events-none transition-all duration-500 ${isSpinning?"border-[#FCFF52]/60 shadow-[0_0_50px_rgba(252,255,82,0.4)]":"border-[#35D07F]/20"}`}/>
             </div>

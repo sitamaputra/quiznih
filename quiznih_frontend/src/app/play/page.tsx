@@ -1249,8 +1249,10 @@ export default function PlayPage() {
               className="glass rounded-[2rem] p-8 hover:border-[#FCFF52] transition-all text-left space-y-5 group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(252,255,82,0.08)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
-              <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#ffffff] border border-[#35D07F] flex items-center justify-center shadow-[0_0_15px_rgba(53,208,127,0.1)] group-hover:shadow-[0_0_20px_rgba(53,208,127,0.2)] transition-shadow">
-                <QrCode className="w-8 h-8 text-[#1a9f5e]" />
+              <div className="flex justify-center sm:justify-start">
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#ffffff] border border-[#35D07F] flex items-center justify-center shadow-[0_0_15px_rgba(53,208,127,0.1)] group-hover:shadow-[0_0_20px_rgba(53,208,127,0.2)] transition-shadow">
+                  <QrCode className="w-8 h-8 text-[#1a9f5e]" />
+                </div>
               </div>
               <div className="relative z-10">
                 <h3 className="text-xl font-extrabold mb-1 text-[#0a1a0f]">
@@ -1272,8 +1274,10 @@ export default function PlayPage() {
               className="glass rounded-[2rem] p-8 hover:border-[#35D07F] transition-all text-left space-y-5 group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(53,208,127,0.08)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] group-hover:animate-[shimmer_3s_infinite]" />
-              <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#ffffff] border border-[#FCFF52] flex items-center justify-center shadow-[0_0_15px_rgba(252,255,82,0.1)] group-hover:shadow-[0_0_20px_rgba(252,255,82,0.2)] transition-shadow">
-                <Keyboard className="w-8 h-8 text-[#7a6e00]" />
+              <div className="flex justify-center sm:justify-start">
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#ffffff] border border-[#FCFF52] flex items-center justify-center shadow-[0_0_15px_rgba(252,255,82,0.1)] group-hover:shadow-[0_0_20px_rgba(252,255,82,0.2)] transition-shadow">
+                  <Keyboard className="w-8 h-8 text-[#7a6e00]" />
+                </div>
               </div>
               <div className="relative z-10">
                 <h3 className="text-xl font-extrabold mb-1 text-[#0a1a0f]">
