@@ -32,8 +32,8 @@ export const BACKEND_PRIVATE_KEY = (
 
 export const POOL_PER_SESSION   = "0.5";    // CELO deposit per session
 export const SPINS_PER_SESSION  = 5;        // jumlah wallet per session
-export const GAS_SEED_PER_WALLET = "0.01";  // CELO seed ke tiap generated wallet
-export const GAS_RESERVE        = "0.002";  // sisa gas buat send back
+export const GAS_SEED_PER_WALLET = "0.2";   // CELO seed ke tiap generated wallet
+export const GAS_RESERVE        = "0.02";   // sisa gas buat send back
 export const ROUNDS             = 3;        // berapa kali session dibuka
 
 export const WHEEL_CONFIG = [

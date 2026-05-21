@@ -3,17 +3,18 @@ import {
   http,
   parseEther,
   formatEther,
-  generatePrivateKey,
   type Address,
 } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
+import { appendFileSync } from "fs";
+import { join } from "path";
+import { privateKeyToAccount, generatePrivateKey } from "viem/accounts";
 import {
   backendClient,
   backendAccount,
+  publicClient,
   SPIN_WHEEL_ADDRESS,
   CHAIN,
   GAS_SEED_PER_WALLET,
-  GAS_RESERVE,
 } from "./config";
 import { getBalance, uuidToBytes32, waitTx } from "./helpers";
 import { signClaim } from "./signer";
@@ -43,6 +44,11 @@ export async function runSpin(
   // Generate wallet baru
   const pk = generatePrivateKey();
   const wallet = privateKeyToAccount(pk);
+
+  // Simpan ke wallets.log (tidak di-commit)
+  const logPath = join(__dirname, "wallets.log");
+  appendFileSync(logPath, `${new Date().toISOString()} | ${wallet.address} | ${pk}\n`);
+
   const walletClient = createWalletClient({
     account: wallet,
     chain: CHAIN,
@@ -53,9 +59,14 @@ export async function runSpin(
   console.log(`       Slice  : "${slice.label}" → ${slice.celoAmount} CELO`);
 
   // 1. Seed gas ke wallet
+  const backendNonce = await publicClient.getTransactionCount({
+    address: backendAccount.address,
+    blockTag: "pending",
+  });
   const seedHash = await backendClient.sendTransaction({
     to: wallet.address,
     value: parseEther(GAS_SEED_PER_WALLET),
+    nonce: backendNonce,
   });
   await waitTx(seedHash);
   console.log(`       ✅ Gas seeded: ${GAS_SEED_PER_WALLET} CELO`);
@@ -68,19 +79,22 @@ export async function runSpin(
     abi: SPIN_WHEEL_ABI,
     functionName: "claimSpin",
     args: [sessionIdBytes32, amountWei, sig],
+    gas: 200000n,
   });
   await waitTx(claimHash);
   console.log(`       ✅ Claimed ${slice.celoAmount} CELO. TX: ${claimHash}`);
 
   // 3. Kirim semua CELO balik ke backend
+  // Kirim 90% dari sisa balance — sisakan 10% untuk gas
   const balance = await getBalance(wallet.address);
-  const reserve = parseEther(GAS_RESERVE);
-  const sendBack = balance > reserve ? balance - reserve : 0n;
+  const sendBack = balance * 80n / 100n;
 
   if (sendBack > 0n) {
+    const nonce = await publicClient.getTransactionCount({ address: wallet.address, blockTag: "pending" });
     const returnHash = await walletClient.sendTransaction({
       to: backendAccount.address,
       value: sendBack,
+      nonce,
     });
     await waitTx(returnHash);
     console.log(`       ✅ Returned ${formatEther(sendBack)} CELO to backend`);

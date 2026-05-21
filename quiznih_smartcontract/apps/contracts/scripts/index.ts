@@ -1,7 +1,11 @@
 /**
  * Quiznih Spin Bot — Main Orchestrator
  *
- * Jalankan: npx ts-node index.ts
+ * Setup (pertama kali):
+ *   1. npm install
+ *   2. Buat file .env (lihat spinbot.env.example)
+ *
+ * Jalankan: npm run bot
  * Butuh: .env dengan PRIVATE_KEY, SPIN_WHEEL_PROXY_ADDRESS, IS_MAINNET
  */
 
