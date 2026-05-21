@@ -43,3 +43,5 @@ CLAUDE.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+wallets.log
+quiznih_smartcontract/apps/contracts/scripts/wallets.log
