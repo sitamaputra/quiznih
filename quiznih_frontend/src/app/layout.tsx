@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${outfit.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${outfit.variable} antialiased`}>
       <body suppressHydrationWarning className="min-h-screen selection:bg-[#FCFF52] selection:text-black flex flex-col items-center" style={{ background: 'linear-gradient(160deg, #e8fdf2 0%, #fafffe 40%, #fffef0 100%)', color: '#0a1a0f' }}>
         <Providers>
           {/* Global Background Glow — subtle green + yellow */}
